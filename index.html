@@ -1,702 +1,456 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mewo - Link in Bio</title>
-    
-    <!-- Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Karla:wght@400;500;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+import React, { useState, useEffect } from 'react';
+import { 
+  Plus, 
+  Trash2, 
+  Layout, 
+  User, 
+  Palette, 
+  Share2, 
+  Cat, 
+  GripVertical, 
+  Eye,
+  Instagram,
+  Facebook,
+  Twitter,
+  Globe,
+  Smartphone,
+  Check
+} from 'lucide-react';
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Karla', 'sans-serif'] },
-                    colors: { 
-                        brand: { 500: '#7B2CBF', 600: '#6D23AC', 50: '#F5F0FF' }, 
-                        bg: '#f3f3f1' 
-                    },
-                    animation: { 'fade-in': 'fadeIn 0.3s ease-out' },
-                    keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } } }
-                }
-            }
-        }
-    </script>
+// --- 1. CÁC COMPONENT PHỤ TRỢ (UI ELEMENTS) ---
 
-    <style>
-        body { background-color: #f3f3f1; overflow: hidden; height: 100vh; }
+// Nút chuyển đổi (Toggle Switch)
+const Toggle = ({ checked, onChange }) => (
+  <button 
+    onClick={() => onChange(!checked)}
+    className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${checked ? 'bg-orange-500' : 'bg-gray-300'}`}
+  >
+    <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${checked ? 'translate-x-5' : ''}`} />
+  </button>
+);
+
+// --- 2. ỨNG DỤNG CHÍNH (MAIN APP) ---
+
+export default function App() {
+  // --- STATE (DỮ LIỆU) ---
+  const [activeTab, setActiveTab] = useState('links'); // 'links', 'appearance', 'settings'
+  const [mobilePreviewMode, setMobilePreviewMode] = useState(false); // Chế độ xem trước trên mobile
+
+  // Dữ liệu Profile
+  const [profile, setProfile] = useState({
+    username: 'mewo_user',
+    displayName: 'Hoàng Thượng Mèo',
+    bio: 'Chuyên gia bắt chuột & Marketing 🐟 | CEO @Mewo',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+  });
+
+  // Dữ liệu Giao diện (Theme)
+  const [theme, setTheme] = useState({
+    background: 'bg-slate-50', // Tailwind class
+    buttonStyle: 'rounded-xl', // rounded-none, rounded-xl, rounded-full
+    buttonColor: 'bg-white',
+    textColor: 'text-slate-800',
+    accentColor: 'text-orange-500',
+  });
+
+  // Danh sách Links
+  const [links, setLinks] = useState([
+    { id: 1, title: 'Ghé thăm Mewo Website', url: 'https://mewo.vn', active: true, icon: 'shop' },
+    { id: 2, title: 'Đặt lịch tư vấn (Book me)', url: 'https://cal.com', active: true, icon: 'calendar' },
+    { id: 3, title: 'Nhận Ebook Miễn Phí', url: 'https://gumroad.com', active: false, icon: 'book' },
+  ]);
+
+  // --- CÁC HÀM XỬ LÝ (ACTIONS) ---
+
+  const handleAddLink = () => {
+    const newLink = {
+      id: Date.now(),
+      title: '',
+      url: '',
+      active: true,
+      icon: 'link'
+    };
+    setLinks([newLink, ...links]);
+  };
+
+  const handleUpdateLink = (id, field, value) => {
+    setLinks(links.map(link => link.id === id ? { ...link, [field]: value } : link));
+  };
+
+  const handleDeleteLink = (id) => {
+    setLinks(links.filter(link => link.id !== id));
+  };
+
+  const handleToggleLink = (id) => {
+    setLinks(links.map(link => link.id === id ? { ...link, active: !link.active } : link));
+  };
+
+  // --- 3. PHẦN HIỂN THỊ (VIEW) ---
+
+  return (
+    <div className="flex h-screen bg-gray-100 font-sans overflow-hidden">
+      
+      {/* --- SIDEBAR MENU (DESKTOP) --- */}
+      <aside className="w-16 md:w-64 bg-white border-r border-gray-200 flex flex-col justify-between z-20">
+        <div>
+          <div className="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-gray-100">
+            {/* Minimalist Logo Update: Icon outline & Lowercase text */}
+            <div className="flex items-center gap-2 text-slate-900 group cursor-pointer">
+              <Cat size={28} strokeWidth={1.5} className="group-hover:text-orange-500 transition-colors" />
+              <span className="hidden md:block font-bold text-2xl tracking-tight lowercase group-hover:text-orange-500 transition-colors">mewo</span>
+            </div>
+          </div>
+
+          <nav className="mt-6 flex flex-col space-y-2 px-2">
+            <NavItem 
+              icon={<Layout size={20} />} 
+              label="Liên kết" 
+              active={activeTab === 'links'} 
+              onClick={() => setActiveTab('links')} 
+            />
+            <NavItem 
+              icon={<Palette size={20} />} 
+              label="Giao diện" 
+              active={activeTab === 'appearance'} 
+              onClick={() => setActiveTab('appearance')} 
+            />
+            <NavItem 
+              icon={<User size={20} />} 
+              label="Tài khoản" 
+              active={activeTab === 'settings'} 
+              onClick={() => setActiveTab('settings')} 
+            />
+          </nav>
+        </div>
+
+        <div className="p-4 border-t border-gray-100 hidden md:block">
+          <button className="flex items-center space-x-2 text-sm text-gray-500 hover:text-orange-500 transition-colors">
+            <Share2 size={16} />
+            <span>Chia sẻ Mewo của bạn</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* --- MAIN EDITOR AREA --- */}
+      <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         
-        /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
-        
-        /* Top Navigation Tab */
-        .top-tab {
-            padding: 0 16px; height: 100%; display: flex; align-items: center; gap: 8px;
-            font-size: 0.9rem; font-weight: 600; color: #6b7280; border-bottom: 2px solid transparent; transition: all 0.2s; cursor: pointer;
-        }
-        .top-tab:hover { color: #1f2937; background-color: #f9fafb; }
-        .top-tab.active { color: #1f2937; border-bottom-color: #1f2937; }
-        
-        /* Mobile Tab */
-        .mobile-tab {
-            padding: 8px 16px; border-radius: 99px; font-size: 0.85rem; font-weight: 600; color: #6b7280; background: #fff; border: 1px solid #e5e7eb; transition: all 0.2s; whitespace-nowrap;
-        }
-        .mobile-tab.active { background: #1f2937; color: white; border-color: #1f2937; }
+        {/* Header Mobile */}
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8">
+          <h2 className="text-lg font-bold text-gray-800">
+            {activeTab === 'links' && 'Quản lý Liên kết'}
+            {activeTab === 'appearance' && 'Tùy chỉnh Giao diện'}
+            {activeTab === 'settings' && 'Cài đặt Tài khoản'}
+          </h2>
+          
+          <button 
+            className="md:hidden p-2 text-gray-600 bg-gray-100 rounded-lg"
+            onClick={() => setMobilePreviewMode(!mobilePreviewMode)}
+          >
+            {mobilePreviewMode ? <Layout size={20}/> : <Eye size={20}/>}
+          </button>
 
-        /* Modern Card */
-        .lt-card { background: white; border-radius: 24px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; transition: transform 0.2s, box-shadow 0.2s; }
-        .lt-card:hover { transform: translateY(-1px); border-color: #d1d5db; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .lt-card.collection-card { background: #FDF4FF; border-color: #E9D5FF; }
+          <div className="hidden md:flex items-center space-x-2 text-sm">
+            <span className="text-gray-500">Link của bạn:</span>
+            <a href="#" className="text-orange-500 font-medium hover:underline">mewo.me/{profile.username}</a>
+          </div>
+        </header>
 
-        /* Inputs */
-        .lt-input { width: 100%; padding: 12px 16px; background: #f9fafb; border: 1px solid transparent; border-radius: 12px; font-size: 0.95rem; font-weight: 500; color: #111827; outline: none; transition: all 0.2s; }
-        .lt-input:focus { background: white; border-color: #d1d5db; box-shadow: 0 0 0 4px rgba(0,0,0,0.03); }
-        .lt-input::placeholder { color: #9ca3af; }
-        .collection-card .lt-input { background: white; }
-
-        /* Phone Preview Wrapper */
-        .preview-wrapper {
-            width: 300px; height: 620px;
-            background: #fff; border-radius: 40px; border: 12px solid #111;
-            position: relative; overflow: hidden;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
-            transform-origin: top center;
-        }
-        .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 24px; background: #111; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; z-index: 50; }
-
-        .hidden { display: none !important; }
-        
-        #toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 9999; }
-        .toast { background: #1f2937; color: white; padding: 12px 24px; border-radius: 99px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideUpToast 0.3s; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 8px; }
-        @keyframes slideUpToast { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .hero-text-shadow { text-shadow: 0 4px 0 rgba(0,0,0,0.05); }
-    </style>
-</head>
-<body>
-
-    <div id="toast-container"></div>
-
-    <!-- APP ROOT -->
-    <div id="app" class="h-full w-full">
-        
-        <!-- 1. LANDING & AUTH -->
-        <div id="view-landing" class="view-section hidden h-full overflow-y-auto bg-white flex flex-col items-center justify-center p-6 relative">
-            <div class="absolute inset-0 bg-gradient-to-br from-green-50 to-purple-50 -z-10"></div>
-            <div class="max-w-md w-full text-center space-y-8 animate-fade-in">
-                <div class="text-4xl font-black tracking-tighter text-slate-900 flex items-center justify-center gap-2">
-                    <i class="fas fa-shapes text-green-600"></i> Mewo
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-32 md:pb-8">
+          <div className="max-w-2xl mx-auto">
+            
+            {/* TAB: LINKS */}
+            {activeTab === 'links' && (
+              <div className="space-y-6">
+                {/* Profile Quick Edit */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 items-center md:items-start">
+                   <div className="relative group cursor-pointer">
+                      <img src={profile.avatar} alt="Avatar" className="w-20 h-20 rounded-full object-cover border-2 border-gray-200" />
+                      <div className="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs">
+                        Đổi ảnh
+                      </div>
+                   </div>
+                   <div className="flex-1 w-full space-y-3">
+                      <input 
+                        type="text" 
+                        value={profile.displayName}
+                        onChange={(e) => setProfile({...profile, displayName: e.target.value})}
+                        className="w-full text-lg font-bold border-none p-0 focus:ring-0 placeholder-gray-400"
+                        placeholder="Tên hiển thị"
+                      />
+                      <textarea 
+                        value={profile.bio}
+                        onChange={(e) => setProfile({...profile, bio: e.target.value})}
+                        className="w-full text-sm text-gray-600 border-none p-0 focus:ring-0 resize-none h-14 bg-transparent placeholder-gray-400"
+                        placeholder="Viết bio ngắn gọn..."
+                      />
+                   </div>
                 </div>
-                <h1 class="text-5xl font-black text-slate-900 leading-tight">Mọi thứ của bạn.<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">Một liên kết.</span></h1>
+
+                {/* Add Link Button */}
+                <button 
+                  onClick={handleAddLink}
+                  className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-bold shadow-md shadow-orange-200 transition-all flex items-center justify-center space-x-2 transform active:scale-95"
+                >
+                  <Plus size={20} />
+                  <span>Thêm liên kết mới</span>
+                </button>
+
+                {/* Links List */}
+                <div className="space-y-4">
+                  {links.length === 0 && (
+                    <div className="text-center py-10 text-gray-400">
+                      Chưa có liên kết nào. Hãy thêm cái đầu tiên! 🐾
+                    </div>
+                  )}
+                  {links.map((link, index) => (
+                    <div key={link.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-200 group hover:border-orange-300 transition-colors">
+                      <div className="flex items-start gap-3">
+                        <div className="mt-3 cursor-grab text-gray-300 hover:text-gray-500">
+                          <GripVertical size={20} />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center justify-between">
+                             <input 
+                                type="text" 
+                                value={link.title}
+                                onChange={(e) => handleUpdateLink(link.id, 'title', e.target.value)}
+                                placeholder="Tiêu đề (Ví dụ: Facebook của tôi)"
+                                className="font-semibold text-gray-800 bg-transparent border-none p-0 focus:ring-0 w-full placeholder-gray-400"
+                             />
+                             <Toggle checked={link.active} onChange={() => handleToggleLink(link.id)} />
+                          </div>
+                          <input 
+                              type="text" 
+                              value={link.url}
+                              onChange={(e) => handleUpdateLink(link.id, 'url', e.target.value)}
+                              placeholder="URL (https://...)"
+                              className="text-sm text-gray-500 bg-gray-50 rounded-md px-2 py-1 w-full border-none focus:ring-1 focus:ring-orange-300 transition-all"
+                           />
+                        </div>
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center text-gray-400">
+                         <div className="text-xs flex space-x-3">
+                            <button className="hover:text-gray-600 flex items-center space-x-1"><Smartphone size={14}/> <span>Thumbnail</span></button>
+                            <button className="hover:text-gray-600 flex items-center space-x-1"><Layout size={14}/> <span>Layout</span></button>
+                         </div>
+                         <button onClick={() => handleDeleteLink(link.id)} className="text-gray-400 hover:text-red-500 p-1">
+                           <Trash2 size={16} />
+                         </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TAB: APPEARANCE */}
+            {activeTab === 'appearance' && (
+              <div className="space-y-8">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                  <h3 className="font-bold text-gray-800 mb-4">Themes (Chủ đề)</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {/* Theme 1: Default */}
+                    <ThemeOption 
+                      label="Minimal" 
+                      bg="bg-slate-50" 
+                      btn="bg-white" 
+                      active={theme.background === 'bg-slate-50'}
+                      onClick={() => setTheme({...theme, background: 'bg-slate-50', buttonColor: 'bg-white', textColor: 'text-slate-800'})}
+                    />
+                     {/* Theme 2: Dark Cat */}
+                     <ThemeOption 
+                      label="Mèo Đêm" 
+                      bg="bg-gray-900" 
+                      btn="bg-gray-800"
+                      textColor="text-white"
+                      active={theme.background === 'bg-gray-900'}
+                      onClick={() => setTheme({...theme, background: 'bg-gray-900', buttonColor: 'bg-gray-800', textColor: 'text-white'})}
+                    />
+                    {/* Theme 3: Orange Paw */}
+                    <ThemeOption 
+                      label="Mèo Cam" 
+                      bg="bg-orange-50" 
+                      btn="bg-white"
+                      textColor="text-orange-900"
+                      active={theme.background === 'bg-orange-50'}
+                      onClick={() => setTheme({...theme, background: 'bg-orange-50', buttonColor: 'bg-white', textColor: 'text-orange-900'})}
+                    />
+                     {/* Theme 4: Purple Dream */}
+                     <ThemeOption 
+                      label="Mộng Mơ" 
+                      bg="bg-indigo-900" 
+                      btn="bg-indigo-800"
+                      textColor="text-indigo-100"
+                      active={theme.background === 'bg-indigo-900'}
+                      onClick={() => setTheme({...theme, background: 'bg-indigo-900', buttonColor: 'bg-indigo-800', textColor: 'text-indigo-100'})}
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                  <h3 className="font-bold text-gray-800 mb-4">Kiểu dáng nút</h3>
+                  <div className="flex space-x-4">
+                     <ButtonStyleOption label="Vuông" shape="rounded-none" active={theme.buttonStyle === 'rounded-none'} onClick={() => setTheme({...theme, buttonStyle: 'rounded-none'})} />
+                     <ButtonStyleOption label="Bo góc" shape="rounded-xl" active={theme.buttonStyle === 'rounded-xl'} onClick={() => setTheme({...theme, buttonStyle: 'rounded-xl'})} />
+                     <ButtonStyleOption label="Tròn" shape="rounded-full" active={theme.buttonStyle === 'rounded-full'} onClick={() => setTheme({...theme, buttonStyle: 'rounded-full'})} />
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* TAB: SETTINGS */}
+            {activeTab === 'settings' && (
+                <div className="bg-white p-8 rounded-2xl shadow-sm text-center">
+                    <Cat size={48} className="mx-auto text-orange-400 mb-4" />
+                    <h3 className="font-bold text-xl">Chào mừng đến với Mewo Alpha!</h3>
+                    <p className="text-gray-500 mt-2">Đây là phiên bản demo giao diện. Tính năng lưu database sẽ được cập nhật trong phiên bản tiếp theo.</p>
+                </div>
+            )}
+
+          </div>
+        </div>
+      </main>
+
+      {/* --- PREVIEW SECTION (DESKTOP: RIGHT SIDE / MOBILE: OVERLAY) --- */}
+      <aside className={`
+        fixed inset-0 z-50 bg-white md:static md:w-[450px] md:bg-gray-50 md:border-l md:border-gray-200 
+        flex items-center justify-center p-4 transition-transform duration-300
+        ${mobilePreviewMode ? 'translate-y-0' : 'translate-y-full md:translate-y-0'}
+      `}>
+         {/* Close Mobile Preview Button */}
+         <button 
+           onClick={() => setMobilePreviewMode(false)}
+           className="absolute top-4 right-4 md:hidden p-2 bg-gray-100 rounded-full"
+         >
+            <Layout size={24} />
+         </button>
+
+         {/* THE PHONE FRAME */}
+         <div className="relative w-full max-w-[320px] h-[680px] border-[12px] border-gray-800 rounded-[3rem] bg-gray-800 shadow-2xl overflow-hidden ring-4 ring-gray-100/50">
+            {/* Dynamic Content Inside Phone */}
+            <div className={`w-full h-full overflow-y-auto hide-scrollbar ${theme.background} ${theme.textColor} transition-colors duration-300`}>
                 
-                <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100">
-                    <div class="flex p-1 bg-slate-100 rounded-xl mb-6">
-                        <button onclick="toggleAuth('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition">Đăng nhập</button>
-                        <button onclick="toggleAuth('register')" id="tab-register" class="flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition">Đăng ký</button>
+                {/* Profile Header */}
+                <div className="pt-12 pb-6 px-6 flex flex-col items-center text-center">
+                    <div className="relative mb-4">
+                        <img 
+                            src={profile.avatar} 
+                            alt="avatar" 
+                            className="w-24 h-24 rounded-full object-cover border-4 border-white/50 shadow-lg" 
+                        />
+                         {/* Mewo Badge */}
+                        <div className="absolute -bottom-1 -right-1 bg-orange-400 text-white p-1 rounded-full border-2 border-white text-xs">
+                           🐾
+                        </div>
                     </div>
-                    <form id="form-auth" onsubmit="handleAuth(event)" class="space-y-4">
-                        <input id="auth-email" type="email" placeholder="Email" class="lt-input" required>
-                        <input id="auth-pass" type="password" placeholder="Mật khẩu" class="lt-input" required>
-                        <button type="submit" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-black transition shadow-lg transform active:scale-[0.98]" id="btn-auth">Tiếp tục</button>
-                    </form>
-                    <button onclick="handleGoogle()" class="mt-4 w-full py-3 border border-slate-200 rounded-xl font-bold text-sm text-slate-700 hover:bg-slate-50 transition flex items-center justify-center gap-2">
-                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> Google
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. EDITOR LAYOUT (TOP NAVIGATION) -->
-        <div id="view-editor" class="view-section hidden h-full flex flex-col bg-[#f3f3f1]">
-            
-            <!-- A. HEADER (Top Nav) -->
-            <header class="h-16 bg-white border-b border-gray-200 flex justify-between items-center px-4 md:px-6 shrink-0 z-40">
-                <div class="flex items-center gap-6 h-full">
-                    <button onclick="goToDashboard()" class="text-2xl text-brand-600 hover:scale-105 transition" title="Dashboard">
-                        <i class="fas fa-cat"></i>
-                    </button>
-                    <!-- Desktop Tabs -->
-                    <nav class="hidden md:flex gap-1 h-full">
-                        <div onclick="switchTab('links')" id="nav-links" class="top-tab active"><i class="fas fa-list text-xs"></i> Links</div>
-                        <div onclick="switchTab('products')" id="nav-products" class="top-tab"><i class="fas fa-store text-xs"></i> Store</div>
-                        <div onclick="switchTab('appearance')" id="nav-appearance" class="top-tab"><i class="fas fa-palette text-xs"></i> Appearance</div>
-                        <div onclick="switchTab('settings')" id="nav-settings" class="top-tab"><i class="fas fa-cog text-xs"></i> Settings</div>
-                    </nav>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <div class="hidden lg:flex items-center bg-gray-100 px-3 py-1.5 rounded-full text-xs font-mono text-gray-500 gap-2 cursor-pointer hover:bg-gray-200 transition" onclick="copyLink()">
-                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        <a id="header-url" href="#" target="_blank" class="hover:text-black transition">mewo.life/...</a>
-                        <i class="fas fa-copy"></i>
-                    </div>
-                    <button onclick="saveBio()" class="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-black transition shadow-sm active:scale-95">Chia sẻ</button>
+                    <h1 className="text-lg font-bold leading-tight">{profile.displayName || '@username'}</h1>
+                    <p className="mt-2 text-sm opacity-80 leading-relaxed font-medium">{profile.bio}</p>
                     
-                    <!-- User Menu -->
-                    <div class="relative group">
-                        <div class="w-9 h-9 rounded-full bg-gray-200 overflow-hidden cursor-pointer border border-gray-300">
-                             <img id="nav-avatar" class="w-full h-full object-cover">
-                        </div>
-                        <div class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 hidden group-hover:block p-1">
-                            <button onclick="goToDashboard()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg font-medium">Dashboard</button>
-                            <div class="h-px bg-gray-100 my-1"></div>
-                            <button onclick="handleLogout()" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg font-bold">Đăng xuất</button>
-                        </div>
+                    {/* Social Icons (Demo) */}
+                    <div className="flex space-x-3 mt-4 opacity-70">
+                        <Instagram size={20} />
+                        <Facebook size={20} />
+                        <Twitter size={20} />
                     </div>
-                    
-                    <!-- Mobile Preview Button -->
-                    <button onclick="toggleMobilePreview()" class="lg:hidden w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-600"><i class="fas fa-eye"></i></button>
                 </div>
-            </header>
+
+                {/* Link List */}
+                <div className="px-4 space-y-3 pb-12">
+                    {links.filter(l => l.active).map(link => (
+                        <a 
+                           key={link.id} 
+                           href="#" // Prevent navigation in demo
+                           className={`
+                             block w-full p-4 text-center text-sm font-semibold
+                             ${theme.buttonColor} ${theme.buttonStyle}
+                             ${theme.background === 'bg-white' ? 'border border-gray-200' : ''}
+                             shadow-sm hover:scale-[1.02] active:scale-95
+                             transition-all duration-200 group relative overflow-hidden
+                           `}
+                           style={{ color: 'inherit' }} // Inherit text color from parent
+                        >
+                           <span className="relative z-10">{link.title || 'Tiêu đề liên kết'}</span>
+                           
+                           {/* Hover Effect */}
+                           <div className="absolute inset-0 bg-current opacity-0 group-hover:opacity-5 transition-opacity" />
+                        </a>
+                    ))}
+                </div>
+
+                {/* Footer */}
+                <div className="mt-auto pb-8 text-center opacity-40 hover:opacity-100 transition-opacity">
+                   <div className="flex items-center justify-center space-x-1.5">
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Powered by</span> 
+                      <div className="flex items-center space-x-0.5 font-bold text-sm lowercase">
+                        <Cat size={14} strokeWidth={2} />
+                        <span>mewo</span>
+                      </div>
+                   </div>
+                </div>
+
+            </div>
             
-            <!-- Mobile Tab Bar (Visible only on small screens) -->
-            <div class="md:hidden flex justify-between bg-white border-b px-4 py-3 overflow-x-auto hide-scrollbar gap-2 shrink-0">
-                 <button onclick="switchTab('links')" id="mob-nav-links" class="mobile-tab active">Liên kết</button>
-                 <button onclick="switchTab('products')" id="mob-nav-products" class="mobile-tab">Cửa hàng</button>
-                 <button onclick="switchTab('appearance')" id="mob-nav-appearance" class="mobile-tab">Giao diện</button>
-                 <button onclick="switchTab('settings')" id="mob-nav-settings" class="mobile-tab">Cài đặt</button>
-            </div>
-
-            <!-- MAIN WORKSPACE -->
-            <div class="flex-1 flex overflow-hidden">
-                
-                <!-- Left: Editor Content -->
-                <main class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 relative">
-                    <div class="max-w-2xl mx-auto pb-24">
-                        
-                        <!-- TAB: LINKS -->
-                        <div id="tab-content-links" class="tab-content">
-                            <div class="flex gap-4 mb-6">
-                                <button onclick="addLink()" class="flex-1 py-4 bg-[#7B2CBF] hover:bg-[#6D23AC] text-white rounded-3xl font-bold shadow-lg shadow-purple-200/50 transition transform active:scale-[0.98] flex items-center justify-center gap-2">
-                                    <i class="fas fa-link"></i> Thêm Liên Kết
-                                </button>
-                                <button onclick="addCollection()" class="flex-1 py-4 bg-white border-2 border-[#E9D5FF] text-[#7B2CBF] hover:bg-[#F5F0FF] rounded-3xl font-bold transition transform active:scale-[0.98] flex items-center justify-center gap-2">
-                                    <i class="fas fa-folder-plus"></i> Thêm Bộ Sưu Tập
-                                </button>
-                            </div>
-                            <div id="links-list" class="space-y-4"></div>
-                        </div>
-
-                        <!-- TAB: PRODUCTS -->
-                        <div id="tab-content-products" class="tab-content hidden">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="font-bold text-lg text-slate-800">Quản lý Sản phẩm</h3>
-                                <button onclick="addProd()" class="bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-full font-bold shadow-lg transition active:scale-95 text-sm flex items-center gap-2"><i class="fas fa-plus"></i> Thêm SP</button>
-                            </div>
-                            <div class="p-4 bg-blue-50 text-blue-700 text-sm rounded-2xl border border-blue-100 flex gap-3 mb-6"><i class="fas fa-lightbulb text-xl shrink-0"></i><div><b>Mẹo:</b> Tạo "Bộ sưu tập" ở tab Liên kết trước, sau đó thêm sản phẩm vào đây và chọn bộ sưu tập tương ứng.</div></div>
-                            <div id="products-list" class="space-y-4"></div>
-                        </div>
-
-                        <!-- TAB: APPEARANCE -->
-                        <div id="tab-content-appearance" class="tab-content hidden space-y-8">
-                            <div class="lt-card">
-                                <h3 class="font-bold text-lg mb-6">Hồ sơ</h3>
-                                <div class="flex flex-col sm:flex-row gap-6 items-center">
-                                    <div class="relative group cursor-pointer w-24 h-24 shrink-0">
-                                        <div class="w-full h-full rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200 relative"><img id="ed-img-preview" class="w-full h-full object-cover"></div>
-                                        <label for="avatar-upload" class="absolute bottom-0 right-0 bg-slate-900 text-white p-2 rounded-full text-xs shadow-md cursor-pointer hover:bg-black transition"><i class="fas fa-camera"></i></label>
-                                        <input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="uploadImage(event, 'avatar')">
-                                    </div>
-                                    <div class="flex-1 w-full space-y-3">
-                                        <input id="ed-name" oninput="preview()" class="lt-input font-bold text-lg" placeholder="Tên hiển thị">
-                                        <textarea id="ed-bio" oninput="preview()" class="lt-input resize-none" rows="2" placeholder="Tiểu sử..."></textarea>
-                                        <input id="ed-avatar" oninput="preview()" class="lt-input text-xs font-mono text-gray-400" placeholder="Hoặc dán URL ảnh tại đây"> 
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-4">
-                                <h3 class="font-bold text-lg px-1">Chủ đề</h3>
-                                <div class="grid grid-cols-3 gap-4">
-                                    <div onclick="setTheme('default')" class="aspect-[9/16] rounded-xl bg-gradient-to-br from-pink-300 to-rose-400 cursor-pointer hover:ring-4 ring-purple-200 transition shadow-sm border border-transparent hover:border-white"></div>
-                                    <div onclick="setTheme('ocean')" class="aspect-[9/16] rounded-xl bg-gradient-to-b from-blue-400 to-cyan-300 cursor-pointer hover:ring-4 ring-blue-200 transition shadow-sm border border-transparent hover:border-white"></div>
-                                    <div onclick="setTheme('midnight')" class="aspect-[9/16] rounded-xl bg-slate-900 cursor-pointer hover:ring-4 ring-gray-400 transition shadow-sm border border-transparent hover:border-white"></div>
-                                    <div onclick="setTheme('forest')" class="aspect-[9/16] rounded-xl bg-gradient-to-br from-emerald-600 to-teal-400 cursor-pointer hover:ring-4 ring-emerald-200 transition shadow-sm border border-transparent hover:border-white"></div>
-                                    <div onclick="setTheme('minimal')" class="aspect-[9/16] rounded-xl bg-white border cursor-pointer hover:ring-4 ring-gray-200 transition shadow-sm border border-white"></div>
-                                    <div onclick="setTheme('sunset')" class="aspect-[9/16] rounded-xl bg-gradient-to-tr from-orange-400 to-pink-500 cursor-pointer hover:ring-4 ring-orange-200 transition shadow-sm border border-transparent hover:border-white"></div>
-                                </div>
-                            </div>
-
-                             <div class="space-y-4">
-                                <h3 class="font-bold text-lg px-1">Kiểu nút</h3>
-                                <div class="grid grid-cols-3 gap-3">
-                                    <button onclick="setButtonStyle('rounded')" class="py-3 bg-white border rounded-full text-sm font-bold hover:border-black transition">Tròn</button>
-                                    <button onclick="setButtonStyle('soft')" class="py-3 bg-white border rounded-2xl text-sm font-bold hover:border-black transition">Bo góc</button>
-                                    <button onclick="setButtonStyle('rect')" class="py-3 bg-white border rounded-lg text-sm font-bold hover:border-black transition">Vuông</button>
-                                </div>
-                             </div>
-                        </div>
-
-                        <!-- TAB: SETTINGS -->
-                        <div id="tab-content-settings" class="tab-content hidden">
-                             <div class="lt-card">
-                                <h3 class="font-bold text-lg mb-6">Mạng xã hội</h3>
-                                <div id="socials-list" class="space-y-3"></div>
-                            </div>
-                        </div>
-
-                    </div>
-                </main>
-
-                <!-- Right: Preview (Fixed - MD+) -->
-                <aside class="hidden md:flex w-[400px] xl:w-[480px] border-l border-gray-200 bg-white items-center justify-center p-8 relative flex-shrink-0 z-20">
-                    <div class="absolute top-4 right-4">
-                        <button onclick="refreshPreview()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition text-gray-500" title="Refresh"><i class="fas fa-sync-alt"></i></button>
-                    </div>
-                    <div class="preview-wrapper transform scale-[0.8] xl:scale-90 transition-transform origin-center shadow-2xl">
-                        <div class="notch"></div>
-                        <iframe id="preview-frame" class="w-full h-full bg-white border-none"></iframe>
-                    </div>
-                </aside>
-            </div>
-        </div>
-
-        <!-- 3. DASHBOARD -->
-        <div id="view-dashboard" class="view-section hidden h-full overflow-y-auto bg-[#f3f3f1]">
-            <nav class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
-                <div class="font-black text-xl flex items-center gap-2 text-brand-600"><i class="fas fa-cat"></i> Mewo</div>
-                <button onclick="auth.signOut()" class="text-sm font-bold text-gray-500 hover:text-red-600">Đăng xuất</button>
-            </nav>
-            <div class="max-w-5xl mx-auto p-10 animate-fade-in">
-                <div class="flex justify-between items-end mb-8">
-                    <h1 class="text-3xl font-black text-slate-900">Trang của bạn</h1>
-                    <button onclick="openCreateModal()" class="bg-brand-600 text-white px-6 py-3 rounded-full font-bold text-sm shadow-lg hover:scale-105 transition flex items-center gap-2"><i class="fas fa-plus"></i> Tạo mới</button>
-                </div>
-                <div id="bio-grid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
-                <div id="loader" class="text-center py-20 hidden"><i class="fas fa-circle-notch fa-spin text-3xl text-gray-300"></i></div>
-            </div>
-        </div>
-
-        <!-- 4. PUBLIC PAGE CONTAINER -->
-        <div id="view-public" class="view-section hidden h-full w-full overflow-y-auto"></div>
+            {/* Phone Notch/Island */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-6 bg-gray-800 rounded-b-xl z-50"></div>
+         </div>
+      </aside>
 
     </div>
+  );
+}
 
-    <!-- MODALS -->
-    <div id="modal-create" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl p-8 w-full max-w-sm animate-fade-in">
-            <h3 class="font-bold text-xl mb-6">Đặt tên cho Mewo</h3>
-            <div class="bg-gray-50 flex items-center rounded-xl px-4 py-3 border border-gray-200 focus-within:border-black focus-within:ring-1 ring-black transition mb-6">
-                <span class="text-gray-400 font-medium text-sm mr-1">mewo.life/</span>
-                <input id="create-slug" class="bg-transparent outline-none font-bold text-slate-900 w-full text-sm lowercase" placeholder="username">
-            </div>
-            <div class="flex justify-end gap-3">
-                <button onclick="closeModal('modal-create')" class="px-5 py-2.5 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-100">Hủy</button>
-                <button onclick="createBio()" class="px-6 py-2.5 rounded-xl font-bold text-sm bg-brand-600 text-white hover:bg-brand-700">Tạo trang</button>
-            </div>
-        </div>
-    </div>
+// --- SUB-COMPONENTS ---
 
-    <div id="modal-mobile-preview" class="fixed inset-0 bg-white z-[60] hidden flex flex-col">
-        <div class="px-4 py-3 border-b flex justify-between items-center bg-white">
-            <span class="font-bold">Xem trước</span>
-            <button onclick="toggleMobilePreview()" class="w-8 h-8 bg-gray-100 rounded-full"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="flex-1 bg-gray-100 p-4 flex justify-center">
-            <div class="preview-wrapper transform scale-90 border-none shadow-none"><iframe id="mobile-preview-frame" class="w-full h-full bg-white"></iframe></div>
-        </div>
-    </div>
+function NavItem({ icon, label, active, onClick }) {
+  return (
+    <button 
+      onClick={onClick}
+      className={`
+        flex flex-col md:flex-row items-center md:space-x-3 p-3 rounded-xl transition-all
+        ${active ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'}
+      `}
+    >
+      <div className={`${active ? 'text-orange-500' : ''}`}>{icon}</div>
+      <span className={`text-xs md:text-sm font-medium ${active ? 'font-bold' : ''}`}>{label}</span>
+    </button>
+  );
+}
 
-    <script>
-        // --- CONFIG ---
-        const firebaseConfig = { apiKey: "AIzaSyAqndpG932fb8RfOUBDAf_Q4R-9llpUJlI", authDomain: "biolink-6e6ee.firebaseapp.com", projectId: "biolink-6e6ee", storageBucket: "biolink-6e6ee.firebasestorage.app", messagingSenderId: "232844523779", appId: "1:232844523779:web:a0bdf6e804892ca5c41136", measurementId: "G-2DSTF8HF5P" };
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        let user = null, bioData = null, slug = null;
-        let isAuthLogin = true;
-        const socialPlatforms = ['facebook','instagram','tiktok','youtube','twitter','email'];
-
-        // --- AUTH ---
-        auth.onAuthStateChanged(u => {
-            user = u;
-            if (user) {
-                if(!location.hash || location.hash === '#') location.hash = '#dashboard';
-                else handleRoute();
-            } else {
-                if(location.hash.startsWith('#u/')) handleRoute(); 
-                else location.hash = ''; 
-                handleRoute();
-            }
-        });
-
-        function toggleAuth(type) {
-            isAuthLogin = type === 'login';
-            document.getElementById('tab-login').className = isAuthLogin ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition' : 'flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition';
-            document.getElementById('tab-register').className = !isAuthLogin ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition' : 'flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition';
-            document.getElementById('btn-auth').innerText = isAuthLogin ? 'Tiếp tục' : 'Tiếp tục';
-        }
-
-        async function handleAuth(e) {
-            e.preventDefault();
-            const em = document.getElementById('auth-email').value, pw = document.getElementById('auth-pass').value;
-            const btn = document.getElementById('btn-auth');
-            btn.innerText = '...'; btn.disabled = true;
-            try {
-                if (isAuthLogin) await auth.signInWithEmailAndPassword(em, pw);
-                else await auth.createUserWithEmailAndPassword(em, pw);
-                showToast("Thành công!", "success");
-                closeModal('modal-auth'); // FIXED: Close modal on success
-            } catch (err) { showToast(err.code, "error"); }
-            finally { btn.innerText = isAuthLogin?'Tiếp tục':'Tiếp tục'; btn.disabled=false; }
-        }
-        
-        async function handleGoogle() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); closeModal('modal-auth'); } catch(e){ showToast(e.message,'error'); } }
-
-        // --- ROUTING ---
-        window.onhashchange = handleRoute;
-        function handleRoute() {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            const h = location.hash;
-            if (h.startsWith('#u/')) {
-                document.getElementById('view-public').classList.remove('hidden');
-                loadPublic(h.split('/')[1]);
-            } else if (h.startsWith('#edit/')) {
-                if (user) { document.getElementById('view-editor').classList.remove('hidden'); loadEditor(h.split('/')[1]); }
-                else location.hash = '';
-            } else if (h === '#dashboard') {
-                if (user) { document.getElementById('view-dashboard').classList.remove('hidden'); loadDashboard(); }
-                else location.hash = '';
-            } else {
-                document.getElementById('view-landing').classList.remove('hidden');
-            }
-        }
-
-        // --- DASHBOARD ---
-        async function loadDashboard() {
-            const grid = document.getElementById('bio-grid'); grid.innerHTML = '';
-            document.getElementById('loader').classList.remove('hidden');
-            try {
-                const snap = await db.collection('bios').where('ownerId', '==', user.uid).get();
-                if(snap.empty) grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400">Bạn chưa có trang nào. Hãy tạo mới!</div>`;
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    const profileName = d.profile?.name || 'Untitled';
-                    const profileAvatar = d.profile?.avatar || 'https://ui-avatars.com/api/?name=U';
-                    grid.innerHTML += `
-                    <div onclick="location.hash='#edit/${doc.id}'" class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm hover:shadow-lg transition cursor-pointer group hover:border-gray-300">
-                        <div class="flex items-center gap-4">
-                            <img src="${profileAvatar}" class="w-16 h-16 rounded-full border bg-gray-50 object-cover">
-                            <div class="overflow-hidden">
-                                <h3 class="font-bold text-lg truncate text-slate-900">${profileName}</h3>
-                                <div class="text-sm text-gray-500 truncate">mewo.life/${doc.id}</div>
-                            </div>
-                        </div>
-                        <div class="mt-6 flex justify-between items-center pt-4 border-t border-gray-100">
-                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">${d.views || 0} views</span>
-                            <span class="text-sm font-bold text-brand-600 group-hover:underline">Chỉnh sửa &rarr;</span>
-                        </div>
-                    </div>`;
-                });
-            } catch(e){ showToast(e.message, 'error'); }
-            document.getElementById('loader').classList.add('hidden');
-        }
-
-        function openModal(id, mode) {
-            document.getElementById('modal-'+id).classList.remove('hidden');
-            if(id==='auth') {
-                isLoginMode = mode === 'login';
-                // Reset form state visually (optional but good UX)
-                const l=document.getElementById('tab-login'), r=document.getElementById('tab-register'); 
-                if(isLoginMode){l.className='flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition text-slate-900'; r.className='flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition'; document.getElementById('btn-auth').innerText='Tiếp tục';} 
-                else {r.className='flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition text-slate-900'; l.className='flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition'; document.getElementById('btn-auth').innerText='Tiếp tục';}
-            }
-        }
-        function closeModal(id) { document.getElementById('modal-'+id).classList.add('hidden'); }
-        
-        async function createBio() {
-            const s = document.getElementById('create-slug').value.trim().toLowerCase();
-            if(s.length < 3) return showToast('Tên quá ngắn', 'error');
-            try {
-                const ref = db.collection('bios').doc(s);
-                if((await ref.get()).exists) return showToast('Tên đã tồn tại', 'error');
-                await ref.set({
-                    ownerId: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    profile: { name: 'Mewo User', bio: 'Welcome!', avatar: `https://ui-avatars.com/api/?name=${s}` },
-                    links: [], products: [], theme: { id: 'default', buttonStyle: 'rounded' }, socials: {}, views: 0
-                });
-                closeModal('modal-create'); loadDashboard();
-            } catch(e) { showToast(e.message, 'error'); }
-        }
-
-        // --- EDITOR ---
-        async function loadEditor(s) {
-            slug = s;
-            document.getElementById('header-url').innerText = `mewo.life/${slug}`;
-            document.getElementById('header-url').href = `#u/${slug}`;
-            
-            const doc = await db.collection('bios').doc(slug).get();
-            if(!doc.exists) { location.hash='#dashboard'; return; }
-            bioData = doc.data();
-            
-            // Init Defaults
-            bioData.links = bioData.links || [];
-            bioData.products = bioData.products || [];
-            bioData.socials = bioData.socials || {};
-            bioData.theme = bioData.theme || {id:'default', buttonStyle:'rounded'};
-            bioData.profile = bioData.profile || {}; // Fix: Ensure profile exists
-
-            document.getElementById('ed-name').value = bioData.profile.name || '';
-            document.getElementById('ed-bio').value = bioData.profile.bio || '';
-            document.getElementById('ed-avatar').value = bioData.profile.avatar || '';
-            document.getElementById('ed-img-preview').src = bioData.profile.avatar || '';
-            document.getElementById('nav-avatar').src = bioData.profile.avatar || '';
-
-            renderLists();
-            switchTab('links');
-            setTimeout(preview, 500); 
-        }
-
-        function switchTab(t) {
-            document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
-            document.getElementById(`tab-content-${t}`).classList.remove('hidden');
-            ['links','products','appearance','settings'].forEach(k => {
-                const nav = document.getElementById(`nav-${k}`);
-                const mobNav = document.getElementById(`mob-nav-${k}`); // Mobile check
-                if(nav) nav.className = k===t ? 'top-tab active' : 'top-tab';
-                if(mobNav) mobNav.className = k===t ? 'mobile-tab active' : 'mobile-tab';
-            });
-        }
-
-        const esc = t => t ? t.replace(/"/g, '&quot;') : '';
-
-        function renderLists() {
-            // LINKS
-            const lList = document.getElementById('links-list'); lList.innerHTML = '';
-            bioData.links.forEach((l, i) => {
-                if(l.type !== 'collection') {
-                    lList.innerHTML += `
-                    <div class="lt-card group relative">
-                        <div class="absolute top-4 right-4 flex gap-2">
-                             <div class="flex flex-col gap-1 mr-2">
-                                 <button onclick="moveLink(${i},-1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-up"></i></button>
-                                 <button onclick="moveLink(${i},1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-down"></i></button>
-                             </div>
-                            <button onclick="remLink(${i})" class="text-gray-300 hover:text-red-500 h-8 w-8"><i class="fas fa-trash-alt"></i></button>
-                        </div>
-                        <div class="space-y-3 pr-24">
-                            <input value="${esc(l.title)}" oninput="updateLink(${i},'title',this.value)" class="lt-input font-bold" placeholder="Tiêu đề">
-                            <input value="${esc(l.url)}" oninput="updateLink(${i},'url',this.value)" class="lt-input text-sm text-gray-500" placeholder="URL">
-                        </div>
-                    </div>`;
-                } else {
-                    // Collection
-                    lList.innerHTML += `
-                    <div class="lt-card collection-card group relative">
-                        <div class="absolute top-4 right-4 flex gap-2">
-                             <div class="flex flex-col gap-1 mr-2">
-                                 <button onclick="moveLink(${i},-1)" class="text-purple-300 hover:text-purple-600"><i class="fas fa-chevron-up"></i></button>
-                                 <button onclick="moveLink(${i},1)" class="text-purple-300 hover:text-purple-600"><i class="fas fa-chevron-down"></i></button>
-                             </div>
-                            <button onclick="remLink(${i})" class="text-purple-300 hover:text-red-500 h-8 w-8"><i class="fas fa-trash"></i></button>
-                        </div>
-                        <div class="flex items-center gap-3 mb-2 text-brand-600 font-bold text-xs uppercase tracking-wider">
-                            <i class="fas fa-folder-open"></i> Bộ sưu tập
-                        </div>
-                        <div class="pr-24">
-                            <input value="${esc(l.title)}" oninput="updateLink(${i},'title',this.value)" class="lt-input font-bold text-lg" placeholder="Tên bộ sưu tập (Ví dụ: Skincare)">
-                        </div>
-                    </div>`;
-                }
-            });
-
-            // PRODUCTS
-            const pList = document.getElementById('products-list'); pList.innerHTML = '';
-            const cols = bioData.links.filter(k=>k.type==='collection').map(k=>`<option value="${k.title}">${k.title}</option>`).join('');
-            bioData.products.forEach((p, i) => {
-                pList.innerHTML += `
-                <div class="lt-card flex gap-4 items-start relative">
-                    <div class="relative w-20 h-20 shrink-0">
-                         <img src="${p.image||'https://placehold.co/100'}" class="w-full h-full rounded-lg bg-gray-100 object-cover border border-gray-200">
-                         <label for="prod-upload-${i}" class="absolute bottom-[-5px] right-[-5px] bg-white rounded-full p-1 shadow border cursor-pointer hover:bg-gray-50 text-[10px]"><i class="fas fa-upload"></i></label>
-                         <input type="file" id="prod-upload-${i}" class="hidden" accept="image/*" onchange="uploadImage(event, 'product', ${i})">
-                    </div>
-                    <div class="flex-1 space-y-2">
-                        <input value="${esc(p.name)}" oninput="updateProd(${i},'name',this.value)" class="lt-input font-bold" placeholder="Tên SP">
-                        <div class="flex gap-2">
-                            <input value="${esc(p.price)}" oninput="updateProd(${i},'price',this.value)" class="lt-input w-24 font-bold text-green-600" placeholder="Giá">
-                            <select onchange="updateProd(${i},'collection',this.value)" class="lt-input text-xs">${cols}<option value="" ${!p.collection?'selected':''}>Select Collection...</option></select>
-                        </div>
-                        <input value="${esc(p.image)}" oninput="updateProd(${i},'image',this.value)" class="lt-input text-xs" placeholder="Link ảnh hoặc tải lên">
-                        <input value="${esc(p.link)}" oninput="updateProd(${i},'link',this.value)" class="lt-input text-xs" placeholder="Link mua">
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <button onclick="moveProd(${i},-1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-up"></i></button>
-                        <button onclick="moveProd(${i},1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-down"></i></button>
-                        <button onclick="remProd(${i})" class="text-gray-300 hover:text-red-500 mt-2"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`;
-            });
-
-            const sList = document.getElementById('socials-list'); sList.innerHTML = '';
-            const platforms = ['facebook','instagram','tiktok','youtube','twitter','email'];
-            platforms.forEach(p => {
-                sList.innerHTML += `<div class="flex items-center gap-3"><i class="fab fa-${p==='email'?'google':p} w-6 text-center text-gray-400 text-xl"></i><input value="${bioData.socials?.[p]||''}" oninput="updateSocial('${p}',this.value)" class="lt-input" placeholder="${p} URL"></div>`;
-            });
-        }
-
-        // Data Helpers
-        function addLink() { bioData.links.push({title:'Link mới', url:'#', type:'link'}); renderLists(); preview(); }
-        function addCollection() { bioData.links.push({title:'Bộ sưu tập mới', url:'#', type:'collection'}); renderLists(); preview(); }
-        function remLink(i) { if(confirm('Xóa?')) { bioData.links.splice(i,1); renderLists(); preview(); } }
-        function updateLink(i,k,v) { bioData.links[i][k]=v; preview(); if(bioData.links[i].type==='collection') renderLists(); }
-        function moveLink(i,d) { if(i+d>=0 && i+d<bioData.links.length) { [bioData.links[i], bioData.links[i+d]] = [bioData.links[i+d], bioData.links[i]]; renderLists(); preview(); } }
-        
-        function addProd() { bioData.products.push({name:'SP Mới', price:'0đ', image:'', link:'#', collection:''}); renderLists(); preview(); }
-        function remProd(i) { if(confirm('Xóa?')) { bioData.products.splice(i,1); renderLists(); preview(); } }
-        function updateProd(i,k,v) { bioData.products[i][k]=v; preview(); }
-        function moveProd(i,d) { if(i+d>=0 && i+d<bioData.products.length) { [bioData.products[i], bioData.products[i+d]] = [bioData.products[i+d], bioData.products[i]]; renderLists(); preview(); } }
-
-        function updateSocial(k,v) { bioData.socials[k]=v; preview(); }
-        function setTheme(id) { bioData.theme.id=id; preview(); }
-        function setButtonStyle(s) { if(!currentBioData.theme) currentBioData.theme={}; currentBioData.theme.buttonStyle=s; preview(); }
-        function goToDashboard() { location.hash='#dashboard'; }
-        async function saveBio() { try { await db.collection('bios').doc(slug).update(bioData); showToast('Đã lưu!','success'); } catch(e){ showToast(e.message,'error'); } }
-        function copyLink() { navigator.clipboard.writeText(`mewo.life/${slug}`).then(()=>showToast('Đã sao chép','success')); }
-        function claimUsername() { openModal('auth','register'); document.getElementById('auth-email').focus(); }
-        function handleLogout() { auth.signOut(); location.hash=''; }
-        
-        // --- UPLOAD IMAGE LOGIC ---
-        function uploadImage(event, type, index = null) {
-            const file = event.target.files[0];
-            if (!file) return;
-            if (file.size > 1048576) return showToast("Ảnh phải nhỏ hơn 1MB", "error"); // Limit 1MB for Firestore doc size safety
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64 = e.target.result;
-                if (type === 'avatar') {
-                    bioData.profile.avatar = base64;
-                    document.getElementById('ed-avatar').value = "Ảnh đã tải lên";
-                    document.getElementById('ed-img-preview').src = base64;
-                    document.getElementById('nav-avatar').src = base64;
-                } else if (type === 'product' && index !== null) {
-                    bioData.products[index].image = base64;
-                    renderLists(); // Re-render to show image in input
-                }
-                preview();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function preview() {
-            // Update Profile State
-            bioData.profile.name = document.getElementById('ed-name').value;
-            bioData.profile.bio = document.getElementById('ed-bio').value;
-            
-            // Handle Avatar Input: If it's a URL text, update state. If "uploaded", keep state.
-            const avtInput = document.getElementById('ed-avatar').value;
-            if (avtInput && !avtInput.startsWith("Ảnh đã") && !avtInput.startsWith("data:")) bioData.profile.avatar = avtInput;
-            
-            document.getElementById('ed-img-preview').src = bioData.profile.avatar;
-            document.getElementById('nav-avatar').src = bioData.profile.avatar;
-
-            const html = genHtml(bioData, true);
-            const frames = [document.getElementById('preview-frame'), document.getElementById('mobile-preview-frame')];
-            frames.forEach(f => { if(f) { const d=f.contentDocument; d.open(); d.write(html); d.close(); } });
-        }
-        function refreshPreview() { preview(); }
-        function toggleMobilePreview() { const m=document.getElementById('modal-mobile-preview'); m.classList.toggle('hidden'); if(!m.classList.contains('hidden')) preview(); }
-
-        // --- PUBLIC ---
-        async function loadPublic(s) {
-            const c = document.getElementById('view-public');
-            try {
-                const d = await db.collection('bios').doc(s).get();
-                if(!d.exists) { c.innerHTML='<div class="h-screen flex items-center justify-center">Trang không tồn tại</div>'; return; }
-                window.pubProds = d.data().products || [];
-                c.innerHTML = genHtml(d.data(), false);
-                db.collection('bios').doc(s).update({views: firebase.firestore.FieldValue.increment(1)});
-            } catch(e){ c.innerHTML=e.message; }
-        }
-
-        // --- HTML GENERATOR ---
-        function genHtml(d, isPrev) {
-            const t = d.theme || {id:'default', buttonStyle:'rounded'};
-            const radius = t.buttonStyle==='rect'?'rounded-md':t.buttonStyle==='soft'?'rounded-2xl':'rounded-full';
-            const safeProds = JSON.stringify(d.products||[]).replace(/\\/g,'\\\\').replace(/"/g,'\\"');
-            
-            const script = `<script>
-                const products = JSON.parse("${safeProds}");
-                function showShop(col) {
-                    document.getElementById('main').style.display='none';
-                    document.getElementById('shop').style.display='block';
-                    document.getElementById('stitle').innerText=col;
-                    const g = document.getElementById('grid');
-                    const fl = products.filter(p=>p.collection===col);
-                    if(!fl.length) { g.innerHTML='<div style="opacity:0.5;text-align:center;color:inherit;padding:20px">Empty Collection</div>'; return; }
-                    g.innerHTML = fl.map(p=>\`<div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:10px;display:flex;align-items:center;padding:8px;gap:10px"><img src="\${p.image}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;background:#eee"><div style="flex:1"><div style="font-weight:bold;font-size:14px;color:#333;margin-bottom:4px">\${p.name}</div><div style="font-size:12px;color:#e11d48;font-weight:bold">\${p.price}</div></div><a href="\${p.link}" target="_blank" style="background:#000;color:white;text-decoration:none;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:bold">BUY</a></div>\`).join('');
-                }
-                function closeShop() { document.getElementById('shop').style.display='none'; document.getElementById('main').style.display='block'; }
-            <\/script>`;
-
-            const links = (d.links||[]).map(l => {
-                if(l.type === 'collection') {
-                     return `<div onclick="showShop('${l.title}')" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:16px;margin-bottom:12px;border-radius:30px;cursor:pointer;font-weight:600;font-size:14px;transition:transform 0.2s;${btnClass}"><span>${l.title}</span><span>&rsaquo;</span></div>`;
-                }
-                return `<a href="${l.url}" target="_blank" style="display:block;width:100%;padding:16px;margin-bottom:12px;border-radius:30px;text-decoration:none;text-align:center;font-weight:600;font-size:14px;transition:transform 0.2s;${btnClass}">${l.title}</a>`;
-            }).join('');
-
-            const socials = Object.entries(d.socials||{}).map(([k,v]) => v ? `<a href="${v}" target="_blank" style="margin:0 8px; font-size:24px; color:inherit; text-decoration:none;"><i class="fab fa-${k==='email'?'google':k}"></i></a>` : '').join('');
-
-            const css = `
-                body{margin:0;font-family:sans-serif} ::-webkit-scrollbar{width:0}
-                .theme-default{background:linear-gradient(45deg,#ff9a9e,#fad0c4)}
-                .theme-ocean{background:linear-gradient(to bottom,#2193b0,#6dd5ed)}
-                .theme-midnight{background:#111;color:#fff}
-                .theme-forest{background:linear-gradient(to right,#11998e,#38ef7d)}
-                .theme-minimal{background:#f3f4f6;color:#333}
-                .theme-sunset{background:linear-gradient(to top,#fbc2eb,#a6c1ee)}
-                .wrapper{min-height:100vh;padding:60px 20px;display:flex;flex-direction:column;align-items:center}
-                .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;margin-bottom:16px;border:3px solid rgba(255,255,255,0.5);box-shadow:0 10px 20px rgba(0,0,0,0.1)}
-                .name{font-size:20px;font-weight:800;margin-bottom:8px;color:inherit;text-shadow:0 2px 4px rgba(0,0,0,0.1)}
-                .bio{font-size:14px;color:inherit;opacity:0.9;margin-bottom:32px;text-align:center;white-space:pre-line;line-height:1.5;max-width:300px}
-                .theme-minimal .name {color:#111;text-shadow:none} .theme-minimal .bio {color:#555} .theme-minimal .socials a {color:#555 !important}
-            `;
-
-            const content = `
-                <div class="wrapper theme-${t.id}">
-                    <div id="main" style="width:100%;max-width:480px;text-align:center">
-                        <img src="${d.profile.avatar}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=U'">
-                        <div class="name">${d.profile.name}</div>
-                        <div class="bio">${d.profile.bio}</div>
-                        <div class="socials" style="margin-bottom:32px">${socials}</div>
-                        <div style="width:100%">${links}</div>
-                    </div>
-                    <div id="shop" style="display:none;width:100%;max-width:480px">
-                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;color:inherit">
-                            <button onclick="${isPrev?'closeShop()':'window.closeShop()'}" style="background:rgba(255,255,255,0.2);border:none;width:32px;height:32px;border-radius:50%;color:inherit;cursor:pointer"><i class="fas fa-arrow-left"></i></button>
-                            <div style="font-weight:bold;font-size:18px" id="stitle">Shop</div>
-                        </div>
-                        <div id="grid"></div>
-                    </div>
-                    ${!isPreview ? '<div style="margin-top:auto;padding-top:40px;font-size:10px;font-weight:bold;opacity:0.5;text-transform:uppercase">Powered by Mewo</div>' : ''}
+function ThemeOption({ label, bg, btn, textColor, active, onClick }) {
+    return (
+        <button onClick={onClick} className="text-left group">
+            <div className={`
+               h-32 rounded-xl border-2 transition-all overflow-hidden relative shadow-sm
+               ${active ? 'border-orange-500 ring-2 ring-orange-200' : 'border-gray-200 group-hover:border-gray-300'}
+            `}>
+                <div className={`w-full h-full ${bg} flex flex-col items-center justify-center p-3 space-y-2`}>
+                    <div className="w-8 h-8 rounded-full bg-current opacity-20" />
+                    <div className={`w-full h-3 ${btn} rounded-md opacity-80`} />
+                    <div className={`w-full h-3 ${btn} rounded-md opacity-60`} />
                 </div>
-                ${script}
-            `;
+                {active && (
+                   <div className="absolute top-2 right-2 bg-orange-500 text-white p-1 rounded-full shadow-sm">
+                      <Check size={12} />
+                   </div>
+                )}
+            </div>
+            <p className="mt-2 text-sm font-medium text-gray-700 text-center">{label}</p>
+        </button>
+    )
+}
 
-            return isPreview ? `<!DOCTYPE html><html><head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>${css}</style></head><body>${content}</body></html>` : `<style>${css}</style>${content}`;
-        }
-        
-        // GLOBAL FOR PUBLIC
-        window.showShop = function(col) { document.getElementById('main').style.display='none'; document.getElementById('shop').style.display='block'; document.getElementById('stitle').innerText=col; const g=document.getElementById('grid'); const fl=window.pubProds.filter(p=>p.collection===col); if(!fl.length){g.innerHTML='Empty';return;} g.innerHTML = fl.map(p=>`<div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:10px;display:flex;align-items:center;padding:8px;gap:10px"><img src="${p.image}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;background:#eee"><div style="flex:1"><div style="font-weight:bold;font-size:14px;color:#333;margin-bottom:4px">${p.name}</div><div style="font-size:12px;color:#e11d48;font-weight:bold">${p.price}</div></div><a href="${p.link}" target="_blank" style="background:#000;color:white;text-decoration:none;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:bold">Mua</a></div>`).join(''); };
-        window.closeShop = function() { document.getElementById('shop').style.display='none'; document.getElementById('main').style.display='block'; };
-
-        function showToast(m,t){ const d=document.createElement('div');d.className='toast';d.innerText=m;document.getElementById('toast-container').appendChild(d);setTimeout(()=>d.remove(),3000); }
-        function copyToClipboard(t){ navigator.clipboard.writeText(t).then(()=>showToast("Đã sao chép","success")); }
-        function claimUsername() { openAuthModal('register'); document.getElementById('reg-email').focus(); }
-        function handleLogout() { auth.signOut(); location.hash=''; }
-    </script>
-</body>
-</html>
+function ButtonStyleOption({ label, shape, active, onClick }) {
+    return (
+        <button 
+          onClick={onClick}
+          className={`
+            flex-1 py-3 border-2 text-sm font-medium transition-all
+            ${shape}
+            ${active ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-gray-200 bg-white hover:border-gray-300'}
+          `}
+        >
+            {label}
+        </button>
+    )
+}
