@@ -8,7 +8,7 @@
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Karla:wght@400;500;700;800&display=swap" rel="stylesheet">
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -19,12 +19,14 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['"Inter"', 'sans-serif'], display: ['"Be Vietnam Pro"', 'sans-serif'] },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Karla', 'sans-serif'] },
                     colors: { brand: { 50: '#fff1f2', 100: '#ffe4e6', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 900: '#881337' } },
-                    animation: { 'fade-in': 'fadeIn 0.4s ease-out', 'slide-up': 'slideUp 0.4s ease-out', 'pulse-slow': 'pulse 3s infinite' },
+                    animation: { 'fade-in': 'fadeIn 0.3s ease-out', 'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)', 'float': 'float 6s infinite', 'blob': 'blob 7s infinite' },
                     keyframes: { 
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }, 
-                        slideUp: { '0%': { transform: 'translateY(15px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }, 
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-20px)' } },
+                        blob: { "0%": { transform: "translate(0px, 0px) scale(1)" }, "33%": { transform: "translate(30px, -50px) scale(1.1)" }, "66%": { transform: "translate(-20px, 20px) scale(0.9)" }, "100%": { transform: "translate(0px, 0px) scale(1)" } }
                     }
                 }
             }
@@ -32,582 +34,596 @@
     </script>
 
     <style>
-        body { background-color: #f8fafc; overflow-x: hidden; }
+        body { background-color: #f3f3f1; overflow: hidden; height: 100vh; }
+        
+        /* Sidebar Nav Item */
+        .nav-item {
+            width: 100%; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #575757; transition: all 0.2s; border-radius: 12px; font-size: 0.7rem; gap: 6px; font-weight: 600; cursor: pointer;
+        }
+        .nav-item:hover { background-color: #f3f4f6; color: #111; }
+        .nav-item.active { background-color: #f0fdf4; color: #16a34a; } /* Linktree Green-ish active state */
+        .nav-icon { font-size: 1.25rem; }
+
+        /* Modern Card & Inputs */
+        .lt-card { background: white; border-radius: 24px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; transition: transform 0.2s; }
+        .lt-card:hover { border-color: #d1d5db; }
+        
+        .lt-input { width: 100%; padding: 12px 16px; background: #f3f4f6; border: 1px solid transparent; border-radius: 12px; font-size: 0.95rem; font-weight: 500; color: #111827; outline: none; transition: all 0.2s; }
+        .lt-input:focus { background: white; border-color: #111; box-shadow: 0 0 0 2px rgba(0,0,0,0.1); }
+        .lt-input::placeholder { color: #9ca3af; }
+
+        /* Phone Preview */
+        .preview-container {
+            width: 320px; height: 650px;
+            background: #fff; border-radius: 48px; border: 12px solid #111;
+            position: relative; overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            transform-origin: center center;
+        }
+        .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 96px; height: 26px; background: #000; border-radius: 20px; z-index: 50; }
+
+        /* Scrollbar */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        
         .hidden { display: none !important; }
+        #toast-container { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 9999; }
+        .toast { background: #111; color: white; padding: 12px 24px; border-radius: 99px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideUpToast 0.3s; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        @keyframes slideUpToast { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        /* Modern Inputs */
-        .input-group { margin-bottom: 12px; }
-        .input-label { display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.025em; }
-        .input-modern { width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; transition: all 0.2s; outline: none; font-weight: 500; color: #334155; }
-        .input-modern:focus { background: #fff; border-color: #cbd5e1; box-shadow: 0 0 0 3px rgba(226, 232, 240, 0.4); }
-        
-        /* Modern Card */
-        .modern-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.2s; position: relative; margin-bottom: 16px; }
-        .modern-card:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border-color: #cbd5e1; }
-        
-        /* Editor Tabs */
-        .modern-tab { padding: 10px 20px; border-radius: 99px; font-size: 0.85rem; font-weight: 600; color: #64748b; transition: all 0.2s; cursor: pointer; white-space: nowrap; }
-        .modern-tab:hover { color: #334155; background: #f1f5f9; }
-        .modern-tab.active { background: #0f172a; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-
-        /* Phone Mockup */
-        .phone-mockup {
-            width: 340px; height: 700px;
-            background: #fff;
-            border-radius: 50px;
-            border: 12px solid #1e293b;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            transform-origin: center top;
-        }
-        .dynamic-island {
-            position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-            width: 100px; height: 28px; background: #000; border-radius: 20px;
-            z-index: 50;
-        }
-
-        #toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; }
-        .toast { background: white; padding: 14px 20px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border-left: 4px solid #e11d48; margin-bottom: 10px; animation: slideIn 0.3s; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        /* Landing specific */
+        .hero-text-shadow { text-shadow: 0 4px 0 rgba(0,0,0,0.05); }
     </style>
 </head>
-<body class="text-slate-800 antialiased h-screen flex flex-col overflow-hidden font-sans">
+<body>
 
     <div id="toast-container"></div>
 
-    <!-- MAIN APP -->
-    <div id="app" class="flex-1 relative h-full w-full">
+    <div id="app" class="h-full w-full">
         
-        <!-- === VIEW: LANDING === -->
-        <div id="view-landing" class="view-section hidden h-full overflow-y-auto bg-[#fff1f2]">
-            <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full">
-                <div class="text-2xl font-black text-brand-600 tracking-tighter flex items-center gap-2"><i class="fas fa-cat"></i> Mewo</div>
-                <div class="flex gap-3">
-                    <button onclick="openAuthModal('login')" class="px-5 py-2.5 rounded-xl bg-white/60 hover:bg-white font-bold text-sm transition shadow-sm">Đăng nhập</button>
-                    <button onclick="openAuthModal('register')" class="px-5 py-2.5 rounded-full bg-brand-600 text-white font-bold text-sm shadow-lg hover:bg-brand-700 transition">Đăng ký</button>
+        <!-- 1. LANDING & AUTH (Giữ nguyên giao diện bạn thích) -->
+        <div id="view-landing" class="view-section hidden h-full overflow-y-auto bg-[#fff1f2] flex flex-col relative">
+            <!-- Blobs -->
+            <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#fecdd3] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#e9d5ff] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob animation-delay-2000"></div>
+
+            <nav class="flex justify-between items-center py-6 px-6 max-w-7xl mx-auto w-full z-10">
+                <div class="flex items-center gap-2 text-3xl font-extrabold font-display tracking-tighter text-brand-600"><i class="fas fa-cat"></i> Mewo</div>
+                <div class="flex gap-3 items-center">
+                    <button onclick="toggleAuth('login')" class="px-5 py-2.5 rounded-lg bg-white/60 hover:bg-white text-slate-700 font-bold transition shadow-sm backdrop-blur-sm">Đăng nhập</button>
+                    <button onclick="toggleAuth('register')" class="hidden sm:block px-6 py-2.5 rounded-full bg-brand-600 text-white hover:bg-brand-700 font-extrabold transition shadow-lg transform hover:scale-105">Đăng ký ngay</button>
                 </div>
             </nav>
-            <div class="flex flex-col lg:flex-row items-center justify-center gap-16 px-6 py-20 max-w-6xl mx-auto">
-                <div class="lg:w-1/2 text-center lg:text-left space-y-8">
-                    <h1 class="text-5xl lg:text-7xl font-black leading-tight text-slate-900 tracking-tight">Mọi kết nối.<br><span class="text-brand-600">Một link duy nhất.</span></h1>
-                    <p class="text-lg text-slate-600 font-medium leading-relaxed">Nền tảng Bio Link chuyên nghiệp, giúp bạn chia sẻ mọi thứ, bán hàng và phát triển thương hiệu.</p>
+
+            <div class="flex-grow flex flex-col lg:flex-row items-center justify-center px-6 max-w-7xl mx-auto w-full gap-16 py-12 z-10">
+                <div class="lg:w-1/2 space-y-8 text-center lg:text-left animate-slide-up">
+                    <h1 class="text-6xl lg:text-8xl font-black tracking-tighter leading-[0.95] font-display hero-text-shadow text-slate-900">Mọi kết nối.<br><span class="text-brand-600">Một link duy nhất.</span></h1>
+                    <p class="text-xl text-slate-600 max-w-lg font-medium mx-auto lg:mx-0 leading-relaxed">Nền tảng Bio Link chuyên nghiệp, miễn phí và cute nhất hệ mặt trời.</p>
                     <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto lg:mx-0">
                         <div class="flex-grow bg-white p-1 pl-5 rounded-2xl flex items-center border-4 border-white focus-within:border-brand-200 transition shadow-xl ring-1 ring-slate-100">
                             <span class="text-slate-400 font-bold select-none text-lg">mewo.life/</span>
-                            <input id="landing-slug" type="text" placeholder="username" class="flex-1 bg-transparent outline-none font-bold text-slate-900 ml-1 py-3 text-lg lowercase">
+                            <input id="landing-slug" type="text" placeholder="username" class="outline-none bg-transparent font-bold w-full ml-1 py-3 text-slate-900 placeholder-slate-300 text-lg lowercase">
                         </div>
-                        <button onclick="claimUsername()" class="px-8 py-3 bg-brand-600 text-white rounded-2xl font-extrabold text-lg shadow-xl shadow-brand-200 hover:bg-brand-700 transition transform active:scale-95">Bắt đầu</button>
+                        <button onclick="claimUsername()" class="px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-extrabold text-lg transition shadow-xl transform active:scale-95">Bắt đầu</button>
                     </div>
                 </div>
-                <div class="lg:w-1/2 flex justify-center perspective-1000">
-                    <div class="phone-mockup border-slate-900 shadow-2xl transform -rotate-2 hover:rotate-0 transition duration-500">
-                        <div class="dynamic-island"></div>
+                <div class="lg:w-1/2 flex justify-center perspective-1000 animate-float hidden md:flex">
+                    <div class="preview-container border-slate-900 shadow-2xl transform rotate-y-12 hover:rotate-0 transition duration-700">
+                        <div class="notch"></div>
                         <iframe src="about:blank" class="w-full h-full bg-slate-50" style="pointer-events: none;"></iframe>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- === VIEW: DASHBOARD === -->
-        <div id="view-dashboard" class="view-section hidden h-full flex flex-col bg-slate-50">
-            <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-20">
-                <div class="font-black text-xl text-brand-600 flex items-center gap-2"><i class="fas fa-cat"></i> Mewo</div>
-                <div class="flex items-center gap-4">
-                    <span id="user-email-display" class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full hidden sm:block">...</span>
-                    <button onclick="handleLogout()" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-500 transition"><i class="fas fa-power-off"></i></button>
-                </div>
-            </header>
-            
-            <main class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10">
-                <div class="max-w-6xl mx-auto">
-                    <div class="flex flex-col sm:flex-row justify-between items-end mb-8 gap-4">
-                        <div><h2 class="text-3xl font-bold text-slate-900">Trang của bạn</h2><p class="text-sm text-slate-500 mt-1">Quản lý và theo dõi hiệu quả hoạt động.</p></div>
-                        <button onclick="openCreateModal()" class="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-lg hover:bg-slate-800 transition flex items-center gap-2"><i class="fas fa-plus"></i> Tạo trang mới</button>
-                    </div>
-                    <div id="dashboard-loader" class="text-center py-20 hidden"><div class="inline-block w-10 h-10 border-4 border-slate-200 border-t-brand-600 rounded-full animate-spin"></div></div>
-                    <div id="bio-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
-                </div>
-            </main>
-        </div>
-
-        <!-- === VIEW: EDITOR (FIXED LAYOUT) === -->
-        <div id="view-editor" class="view-section hidden h-full flex overflow-hidden bg-slate-100">
-            
-            <!-- LEFT PANEL: Editor -->
-            <aside class="flex-1 flex flex-col h-full bg-[#f8fafc] border-r border-slate-200 z-10 overflow-hidden relative">
-                <!-- Header -->
-                <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-white sticky top-0 z-30">
-                    <button onclick="goToDashboard()" class="text-slate-500 hover:text-slate-900 font-bold text-sm flex items-center gap-2 transition bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-lg"><i class="fas fa-arrow-left"></i> Dashboard</button>
-                    <div class="flex gap-2">
-                        <button onclick="toggleMobilePreview()" class="md:hidden w-9 h-9 bg-slate-100 rounded-full flex items-center justify-center text-slate-600"><i class="fas fa-eye"></i></button>
-                        <button onclick="saveCurrentBio()" class="bg-slate-900 text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-slate-800 shadow-lg flex items-center gap-2 transition transform active:scale-95"><i class="fas fa-save"></i> Lưu</button>
-                    </div>
-                </div>
-
-                <!-- Tabs -->
-                <div class="px-6 py-4 bg-white border-b border-slate-200">
-                    <div class="flex gap-2 overflow-x-auto hide-scrollbar">
-                        <div onclick="switchEditorTab('links')" id="tab-links" class="modern-tab active"><i class="fas fa-link mr-1"></i> Liên kết</div>
-                        <div onclick="switchEditorTab('products')" id="tab-products" class="modern-tab"><i class="fas fa-shopping-bag mr-1"></i> Cửa hàng</div>
-                        <div onclick="switchEditorTab('appearance')" id="tab-appearance" class="modern-tab"><i class="fas fa-paint-brush mr-1"></i> Giao diện</div>
-                        <div onclick="switchEditorTab('settings')" id="tab-settings" class="modern-tab"><i class="fas fa-cog mr-1"></i> Cài đặt</div>
-                    </div>
-                </div>
-
-                <!-- Content -->
-                <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
-                    
-                    <!-- URL Info -->
-                    <div class="bg-white border border-slate-200 p-4 rounded-2xl flex justify-between items-center shadow-sm">
-                        <div class="flex items-center gap-3 overflow-hidden">
-                            <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shrink-0"></span>
-                            <a id="editor-url-display" href="#" target="_blank" class="text-sm font-bold text-slate-700 hover:text-brand-600 truncate font-mono transition">...</a>
-                        </div>
-                        <div class="flex gap-2 shrink-0">
-                            <button onclick="copyLink()" class="w-9 h-9 rounded-lg bg-slate-50 hover:bg-brand-50 flex items-center justify-center text-slate-500 hover:text-brand-600 transition" title="Sao chép"><i class="fas fa-copy"></i></button>
-                            <button onclick="showQRCode()" class="w-9 h-9 rounded-lg bg-slate-50 hover:bg-brand-50 flex items-center justify-center text-slate-500 hover:text-brand-600 transition" title="QR Code"><i class="fas fa-qrcode"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- TAB: LINKS -->
-                    <div id="content-links" class="tab-content space-y-6">
-                        <button onclick="addLinkItem()" class="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold shadow-lg shadow-brand-500/20 transition flex items-center justify-center gap-2 transform active:scale-[0.98] text-base"><i class="fas fa-plus-circle"></i> Thêm liên kết mới</button>
-                        <div id="links-container" class="space-y-4 pb-20"></div>
+            <!-- Auth Modal Overlay -->
+            <div id="modal-auth" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl relative animate-slide-up">
+                    <button onclick="closeModal('modal-auth')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800"><i class="fas fa-times"></i></button>
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-900" id="auth-title">Chào mừng!</h2>
+                        <p class="text-slate-500 text-sm mt-1">Đăng nhập để quản lý bio.</p>
                     </div>
                     
-                    <!-- TAB: PRODUCTS -->
-                    <div id="content-products" class="tab-content hidden space-y-6">
-                         <button onclick="addProductItem()" class="w-full py-4 bg-slate-800 hover:bg-slate-900 text-white rounded-2xl font-bold shadow-lg transition flex items-center justify-center gap-2 transform active:scale-[0.98] text-base"><i class="fas fa-box-open"></i> Thêm sản phẩm</button>
-                         <div class="p-4 bg-blue-50 text-blue-800 text-sm rounded-2xl font-medium border border-blue-100 flex items-start gap-3">
-                             <i class="fas fa-info-circle mt-0.5 text-lg"></i>
-                             <div>Mẹo: Để hiển thị sản phẩm, hãy tạo một liên kết loại <b>"Bộ sưu tập"</b> ở tab Liên kết.</div>
-                         </div>
-                         <div id="products-container" class="space-y-4 pb-20"></div>
-                    </div>
+                    <form id="form-auth" onsubmit="handleAuth(event)" class="space-y-4">
+                        <input id="auth-email" type="email" placeholder="Email" class="lt-input" required>
+                        <input id="auth-pass" type="password" placeholder="Mật khẩu" class="lt-input" required>
+                        <button type="submit" class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold hover:bg-black transition shadow-lg" id="btn-auth-submit">Tiếp tục</button>
+                    </form>
+                    
+                    <button onclick="handleGoogle()" class="w-full mt-4 flex items-center justify-center gap-3 py-3 border-2 border-slate-100 rounded-xl hover:bg-slate-50 font-bold text-slate-700 transition"><img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> Google</button>
+                </div>
+            </div>
+        </div>
 
-                    <!-- TAB: APPEARANCE -->
-                    <div id="content-appearance" class="tab-content hidden space-y-8">
-                        <div class="modern-card">
-                            <h3 class="font-bold text-base text-slate-900 mb-5">Hồ sơ cá nhân</h3>
-                            <div class="flex flex-col sm:flex-row gap-6 items-start">
-                                <div class="w-24 h-24 rounded-full bg-slate-100 overflow-hidden border-4 border-white shadow-md shrink-0 relative group">
-                                    <img id="editor-avatar-img" class="w-full h-full object-cover">
-                                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition">Sửa</div>
-                                </div>
-                                <div class="w-full space-y-4">
-                                    <div class="input-group">
-                                        <label class="input-label">Tên hiển thị</label>
-                                        <input id="inp-name" oninput="updatePreview()" class="input-modern" placeholder="Tên của bạn">
-                                    </div>
-                                    <div class="input-group">
-                                        <label class="input-label">Tiểu sử</label>
-                                        <textarea id="inp-bio" oninput="updatePreview()" class="input-modern resize-none" rows="2" placeholder="Mô tả ngắn..."></textarea>
-                                    </div>
-                                    <div class="input-group">
-                                        <label class="input-label">Link Avatar</label>
-                                        <input id="inp-avatar" oninput="updatePreview()" class="input-modern text-xs text-blue-500" placeholder="https://...">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <!-- 2. EDITOR LAYOUT (LINKTREE STYLE) -->
+        <div id="view-editor" class="view-section hidden h-full flex bg-[#f3f3f1]">
+            
+            <!-- A. SIDEBAR NAV (Left) -->
+            <aside class="w-[88px] bg-white border-r border-gray-200 flex flex-col items-center py-6 z-30 flex-shrink-0">
+                <div class="mb-8 text-2xl text-slate-900 cursor-pointer" onclick="goToDashboard()"><i class="fas fa-cat"></i></div>
+                
+                <div class="flex-1 w-full space-y-3 px-3">
+                    <div onclick="switchTab('links')" id="nav-links" class="nav-item active"><i class="fas fa-list nav-icon"></i><span>Liên kết</span></div>
+                    <div onclick="switchTab('products')" id="nav-products" class="nav-item"><i class="fas fa-store nav-icon"></i><span>Cửa hàng</span></div>
+                    <div onclick="switchTab('appearance')" id="nav-appearance" class="nav-item"><i class="fas fa-palette nav-icon"></i><span>Giao diện</span></div>
+                    <div onclick="switchTab('settings')" id="nav-settings" class="nav-item"><i class="fas fa-cog nav-icon"></i><span>Cài đặt</span></div>
+                </div>
 
-                        <div class="space-y-3">
-                            <h3 class="font-bold text-sm text-slate-900">Chủ đề</h3>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                <button onclick="setTheme('default')" class="h-20 rounded-xl bg-gradient-to-br from-pink-300 to-rose-400 hover:ring-4 ring-brand-100 transition"></button>
-                                <button onclick="setTheme('ocean')" class="h-20 rounded-xl bg-gradient-to-b from-blue-400 to-cyan-300 hover:ring-4 ring-blue-100 transition"></button>
-                                <button onclick="setTheme('midnight')" class="h-20 rounded-xl bg-slate-900 hover:ring-4 ring-slate-300 transition"></button>
-                                <button onclick="setTheme('forest')" class="h-20 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-400 hover:ring-4 ring-emerald-100 transition"></button>
-                                <button onclick="setTheme('minimal')" class="h-20 rounded-xl bg-white border border-slate-200 hover:ring-4 ring-slate-100 transition"></button>
-                                <button onclick="setTheme('sunset')" class="h-20 rounded-xl bg-gradient-to-tr from-orange-400 to-pink-500 hover:ring-4 ring-orange-100 transition"></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- TAB: SETTINGS -->
-                    <div id="content-settings" class="tab-content hidden space-y-6">
-                        <div class="modern-card">
-                            <h3 class="font-bold text-base text-slate-900 mb-5">Mạng xã hội</h3>
-                            <div id="list-socials" class="space-y-3"></div>
-                        </div>
+                <div class="mt-auto w-full px-3 space-y-3">
+                    <div onclick="handleLogout()" class="nav-item text-red-500 hover:text-red-600 hover:bg-red-50"><i class="fas fa-sign-out-alt nav-icon"></i></div>
+                    <div class="w-10 h-10 rounded-full bg-gray-200 mx-auto overflow-hidden border border-gray-300">
+                        <img id="nav-avatar" class="w-full h-full object-cover">
                     </div>
                 </div>
             </aside>
 
-            <!-- RIGHT PANEL: Preview -->
-            <div class="hidden md:flex w-[480px] bg-[#f1f5f9] border-l border-slate-200 flex-col items-center justify-center p-8 relative z-20">
-                <div class="phone-mockup transform scale-[0.85] xl:scale-100 transition-transform shadow-2xl">
-                    <div class="dynamic-island"></div>
+            <!-- B. MAIN CONTENT (Middle) -->
+            <main class="flex-1 flex flex-col h-full overflow-hidden relative min-w-0">
+                <!-- Header -->
+                <header class="h-16 bg-white border-b border-gray-200 flex justify-between items-center px-6 md:px-10 shrink-0 sticky top-0 z-20">
+                    <h2 class="font-bold text-lg text-slate-800">Chỉnh sửa Bio</h2>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-white border px-3 py-1.5 rounded-full text-xs font-mono text-gray-500 flex items-center gap-2 hover:border-gray-400 transition">
+                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            <a id="header-url" href="#" target="_blank" class="hover:text-black transition">mewo.life/...</a>
+                            <button onclick="copyLink()"><i class="fas fa-copy hover:text-black"></i></button>
+                        </div>
+                        <button onclick="saveBio()" class="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-black transition shadow-sm active:scale-95">Chia sẻ</button>
+                        <button onclick="toggleMobilePreview()" class="lg:hidden w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center"><i class="fas fa-eye"></i></button>
+                    </div>
+                </header>
+
+                <!-- Scrollable Form Area -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 bg-[#f3f3f1]">
+                    <div class="max-w-2xl mx-auto space-y-6 pb-20">
+                        
+                        <!-- TAB: LINKS -->
+                        <div id="tab-content-links" class="tab-content">
+                            <button onclick="addLink()" class="w-full py-4 bg-[#7B2CBF] hover:bg-[#6D23AC] text-white rounded-3xl font-bold shadow-lg shadow-purple-200/50 transition transform active:scale-[0.99] flex items-center justify-center gap-2 text-base">
+                                <i class="fas fa-plus"></i> Thêm liên kết mới
+                            </button>
+                            <div id="links-list" class="space-y-4 mt-6"></div>
+                        </div>
+
+                        <!-- TAB: PRODUCTS -->
+                        <div id="tab-content-products" class="tab-content hidden">
+                            <button onclick="addProd()" class="w-full py-4 bg-slate-900 hover:bg-black text-white rounded-3xl font-bold shadow-lg transition transform active:scale-[0.99] flex items-center justify-center gap-2 text-base">
+                                <i class="fas fa-shopping-bag"></i> Thêm sản phẩm
+                            </button>
+                            <div class="mt-4 p-4 bg-blue-50 text-blue-700 text-sm rounded-2xl border border-blue-100 flex gap-3">
+                                <i class="fas fa-lightbulb text-xl"></i>
+                                <div>Mẹo: Để hiển thị sản phẩm, hãy tạo một liên kết loại <b>"Bộ sưu tập"</b> ở tab Liên kết.</div>
+                            </div>
+                            <div id="products-list" class="space-y-4 mt-6"></div>
+                        </div>
+
+                        <!-- TAB: APPEARANCE -->
+                        <div id="tab-content-appearance" class="tab-content hidden space-y-8">
+                            <div class="lt-card">
+                                <h3 class="font-bold text-lg mb-6">Hồ sơ</h3>
+                                <div class="flex flex-col sm:flex-row gap-6 items-center">
+                                    <div class="relative group cursor-pointer w-24 h-24 shrink-0">
+                                        <div class="w-full h-full rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200">
+                                            <img id="ed-img-preview" class="w-full h-full object-cover">
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 w-full space-y-3">
+                                        <input id="ed-name" oninput="preview()" class="lt-input font-bold text-lg" placeholder="Tên hiển thị">
+                                        <textarea id="ed-bio" oninput="preview()" class="lt-input resize-none" rows="2" placeholder="Tiểu sử..."></textarea>
+                                        <input id="ed-avatar" oninput="preview()" class="lt-input text-xs font-mono" placeholder="Link ảnh avatar (URL)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <h3 class="font-bold text-lg px-1">Chủ đề</h3>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div onclick="setTheme('default')" class="aspect-[9/16] rounded-2xl bg-gradient-to-br from-pink-300 to-rose-400 cursor-pointer hover:ring-4 ring-purple-200 transition shadow-sm border border-transparent hover:border-white"></div>
+                                    <div onclick="setTheme('ocean')" class="aspect-[9/16] rounded-2xl bg-gradient-to-b from-blue-400 to-cyan-300 cursor-pointer hover:ring-4 ring-blue-200 transition shadow-sm border border-transparent hover:border-white"></div>
+                                    <div onclick="setTheme('midnight')" class="aspect-[9/16] rounded-2xl bg-slate-900 cursor-pointer hover:ring-4 ring-gray-400 transition shadow-sm border border-transparent hover:border-white"></div>
+                                    <div onclick="setTheme('forest')" class="aspect-[9/16] rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-400 cursor-pointer hover:ring-4 ring-emerald-200 transition shadow-sm border border-transparent hover:border-white"></div>
+                                    <div onclick="setTheme('minimal')" class="aspect-[9/16] rounded-2xl bg-white border cursor-pointer hover:ring-4 ring-gray-200 transition shadow-sm"></div>
+                                    <div onclick="setTheme('sunset')" class="aspect-[9/16] rounded-2xl bg-gradient-to-tr from-orange-400 to-pink-500 cursor-pointer hover:ring-4 ring-orange-200 transition shadow-sm border border-transparent hover:border-white"></div>
+                                </div>
+                            </div>
+
+                             <div class="space-y-4">
+                                <h3 class="font-bold text-lg px-1">Kiểu nút</h3>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <button onclick="setButtonStyle('rounded')" class="py-3 bg-white border rounded-full text-sm font-bold hover:border-black transition">Tròn</button>
+                                    <button onclick="setButtonStyle('soft')" class="py-3 bg-white border rounded-2xl text-sm font-bold hover:border-black transition">Bo góc</button>
+                                    <button onclick="setButtonStyle('rect')" class="py-3 bg-white border rounded-lg text-sm font-bold hover:border-black transition">Vuông</button>
+                                </div>
+                             </div>
+                        </div>
+
+                        <!-- TAB: SETTINGS -->
+                        <div id="tab-content-settings" class="tab-content hidden">
+                             <div class="lt-card">
+                                <h3 class="font-bold text-lg mb-6">Mạng xã hội</h3>
+                                <div id="socials-list" class="space-y-3"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </main>
+
+            <!-- C. PREVIEW PANEL (Right) -->
+            <aside class="hidden lg:flex w-[450px] border-l border-gray-200 bg-white items-center justify-center p-8 relative flex-shrink-0">
+                <div class="absolute top-0 right-0 p-4">
+                    <button onclick="preview()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition text-gray-500" title="Làm mới"><i class="fas fa-sync-alt"></i></button>
+                </div>
+                <div class="preview-container transform scale-[0.85] xl:scale-100 transition-transform">
+                    <div class="notch"></div>
                     <iframe id="preview-frame" class="w-full h-full bg-white border-none"></iframe>
                 </div>
-                <div class="mt-6 text-xs font-bold text-slate-400 uppercase tracking-widest bg-white px-3 py-1 rounded-full shadow-sm">Live Preview</div>
+            </aside>
+        </div>
+
+        <!-- 3. DASHBOARD -->
+        <div id="view-dashboard" class="view-section hidden h-full overflow-y-auto bg-[#f3f3f1]">
+            <nav class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
+                <div class="font-black text-xl flex items-center gap-2"><i class="fas fa-cat text-brand-600"></i> Mewo</div>
+                <button onclick="auth.signOut()" class="text-sm font-bold text-gray-500 hover:text-red-600">Đăng xuất</button>
+            </nav>
+            <div class="max-w-5xl mx-auto p-10 animate-fade-in">
+                <div class="flex justify-between items-end mb-8">
+                    <h1 class="text-3xl font-black text-slate-900">Trang của bạn</h1>
+                    <button onclick="openCreateModal()" class="bg-slate-900 text-white px-6 py-3 rounded-full font-bold text-sm shadow-lg hover:scale-105 transition flex items-center gap-2"><i class="fas fa-plus"></i> Tạo mới</button>
+                </div>
+                <div id="bio-grid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+                <div id="loader" class="text-center py-20 hidden"><i class="fas fa-circle-notch fa-spin text-3xl text-gray-300"></i></div>
             </div>
         </div>
 
-        <!-- === VIEW: PUBLIC === -->
+        <!-- 4. PUBLIC PAGE CONTAINER -->
         <div id="view-public" class="view-section hidden h-full w-full overflow-y-auto"></div>
 
     </div>
 
     <!-- MODALS -->
-    <!-- Auth Modal -->
-    <div id="modal-auth" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-8 shadow-2xl animate-fade-in relative">
-            <button onclick="closeModal('modal-auth')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800"><i class="fas fa-times"></i></button>
-            <h2 class="text-2xl font-bold text-center mb-1" id="auth-title">Đăng nhập</h2>
-            <p class="text-center text-slate-500 text-sm mb-6">Tiếp tục xây dựng thương hiệu của bạn.</p>
-            
-            <div class="flex bg-slate-100 p-1 rounded-xl mb-6">
-                <button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2.5 text-sm font-bold rounded-lg shadow-sm bg-white text-slate-900 transition">Đăng nhập</button>
-                <button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-700 transition">Đăng ký</button>
-            </div>
-
-            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-                <input id="login-email" type="email" placeholder="Email" class="input-modern" required>
-                <input id="login-password" type="password" placeholder="Mật khẩu" class="input-modern" required>
-                <button type="submit" class="btn-primary">Đăng nhập</button>
-                <p class="text-center text-xs text-slate-500 mt-2">Chưa có tài khoản? <a href="#" onclick="toggleAuthMode('register')" class="text-brand-600 font-bold">Đăng ký ngay</a></p>
-            </form>
-
-            <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
-                <input id="reg-email" type="email" placeholder="Email" class="input-modern" required>
-                <input id="reg-password" type="password" placeholder="Mật khẩu (min 6)" class="input-modern" minlength="6" required>
-                <button type="submit" class="btn-primary">Đăng ký</button>
-                <p class="text-center text-xs text-slate-500 mt-2">Đã có tài khoản? <a href="#" onclick="toggleAuthMode('login')" class="text-brand-600 font-bold">Đăng nhập</a></p>
-            </form>
-            
-            <div class="relative my-8"><div class="absolute inset-0 flex items-center"><div class="w-full border-t"></div></div><div class="relative flex justify-center text-xs uppercase font-bold tracking-wider text-slate-400 bg-white px-2">Hoặc</div></div>
-            <button onclick="handleGoogleLogin()" class="w-full py-3 border border-slate-200 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-50 font-bold text-sm text-slate-700 transition"><img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> Tiếp tục với Google</button>
-        </div>
-    </div>
-
-    <!-- Create Modal -->
-    <div id="modal-create" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-8 animate-fade-in">
-            <h3 class="font-bold text-xl mb-4 text-slate-900">Tạo Mewo mới</h3>
-            <div class="flex bg-slate-50 border border-slate-200 rounded-xl overflow-hidden mb-6 items-center">
-                <span class="pl-4 pr-1 text-slate-400 text-sm font-bold">mewo.life/</span>
-                <input id="create-slug" placeholder="username" class="flex-1 p-4 bg-transparent outline-none font-bold text-sm lowercase text-slate-800">
+    <div id="modal-create" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-sm animate-fade-in">
+            <h3 class="font-bold text-xl mb-6">Đặt tên cho Mewo</h3>
+            <div class="bg-gray-50 flex items-center rounded-xl px-4 py-3 border border-gray-200 focus-within:border-black focus-within:ring-1 ring-black transition mb-6">
+                <span class="text-gray-400 font-medium text-sm mr-1">mewo.life/</span>
+                <input id="create-slug" class="bg-transparent outline-none font-bold text-slate-900 w-full text-sm lowercase" placeholder="username">
             </div>
             <div class="flex justify-end gap-3">
-                <button onclick="closeModal('modal-create')" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-xl">Hủy</button>
-                <button onclick="createNewBio()" class="px-6 py-2.5 bg-brand-600 text-white text-sm font-bold rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-200" id="btn-create-action">Tạo ngay</button>
+                <button onclick="closeModal('modal-create')" class="px-5 py-2.5 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-100">Hủy</button>
+                <button onclick="createBio()" class="px-6 py-2.5 rounded-xl font-bold text-sm bg-slate-900 text-white hover:bg-black">Tạo trang</button>
             </div>
         </div>
     </div>
 
-    <!-- QR Modal -->
-    <div id="modal-qr" class="fixed inset-0 bg-black/80 z-[60] hidden flex items-center justify-center p-4" onclick="closeModal('modal-qr')">
-        <div class="bg-white p-8 rounded-3xl text-center shadow-2xl" onclick="event.stopPropagation()">
-            <h3 class="font-bold mb-4 text-lg">Mã QR của bạn</h3>
-            <img id="qr-img" class="w-48 h-48 mx-auto border-2 border-slate-100 rounded-xl mb-6">
-            <button onclick="closeModal('modal-qr')" class="w-full py-3 bg-slate-100 font-bold rounded-xl hover:bg-slate-200 transition">Đóng</button>
+    <div id="modal-mobile-preview" class="fixed inset-0 bg-white z-[60] hidden flex flex-col">
+        <div class="px-4 py-3 border-b flex justify-between items-center bg-white">
+            <span class="font-bold">Xem trước</span>
+            <button onclick="toggleMobilePreview()" class="w-8 h-8 bg-gray-100 rounded-full"><i class="fas fa-times"></i></button>
         </div>
-    </div>
-
-    <!-- Mobile Preview Modal -->
-    <div id="modal-mobile-preview" class="fixed inset-0 bg-black/90 z-[70] hidden flex flex-col items-center justify-center p-4">
-        <button onclick="toggleMobilePreview()" class="absolute top-4 right-4 w-10 h-10 bg-white/20 rounded-full text-white flex items-center justify-center backdrop-blur-md"><i class="fas fa-times"></i></button>
-        <div class="w-full h-full max-w-[340px] max-h-[680px] bg-white rounded-[40px] overflow-hidden shadow-2xl">
-            <iframe id="mobile-preview-frame" class="w-full h-full bg-white border-none"></iframe>
+        <div class="flex-1 bg-gray-100 p-4 flex justify-center">
+            <div class="preview-container transform scale-90 border-none shadow-none"><iframe id="mobile-preview-frame" class="w-full h-full bg-white"></iframe></div>
         </div>
     </div>
 
     <script>
-        // CONFIG
+        // --- CONFIG ---
         const firebaseConfig = { apiKey: "AIzaSyAqndpG932fb8RfOUBDAf_Q4R-9llpUJlI", authDomain: "biolink-6e6ee.firebaseapp.com", projectId: "biolink-6e6ee", storageBucket: "biolink-6e6ee.firebasestorage.app", messagingSenderId: "232844523779", appId: "1:232844523779:web:a0bdf6e804892ca5c41136", measurementId: "G-2DSTF8HF5P" };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        window.onerror = function(m) { console.error(m); showToast("Lỗi: "+m, "error"); };
+        let user = null, bioData = null, slug = null;
+        let isAuthLogin = true;
+        const socialPlatforms = ['facebook','instagram','tiktok','youtube','email'];
 
-        let currentUser = null, currentBioData = null, editingSlug = null;
-        const socialPlatforms = ['facebook','instagram','tiktok','youtube','twitter','email'];
-
-        // --- ROUTING ---
-        function handleRoute() {
-            if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', handleRoute); return; }
-            const hash = window.location.hash;
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            if(hash !== '' && hash !== '#') closeModal('modal-auth');
-
-            if (hash.startsWith('#u/')) {
-                document.getElementById('view-public').classList.remove('hidden');
-                loadPublicBio(hash.split('/')[1]);
-            } else if (hash === '#dashboard') {
-                if (currentUser) {
-                    document.getElementById('view-dashboard').classList.remove('hidden');
-                    loadDashboard();
-                } else window.location.hash = '';
-            } else if (hash.startsWith('#edit/')) {
-                if (currentUser) {
-                    document.getElementById('view-editor').classList.remove('hidden');
-                    loadEditor(hash.split('/')[1]);
-                } else window.location.hash = '';
-            } else {
-                if (currentUser) window.location.hash = '#dashboard';
-                else document.getElementById('view-landing').classList.remove('hidden');
-            }
-        }
-        window.addEventListener('hashchange', handleRoute);
-        window.addEventListener('load', handleRoute);
-
-        auth.onAuthStateChanged(async user => {
-            currentUser = user;
+        // --- AUTH ---
+        auth.onAuthStateChanged(u => {
+            user = u;
             if (user) {
-                document.getElementById('user-email-display').textContent = user.email || 'User';
-                if (!window.location.hash || window.location.hash === '#') window.location.hash = '#dashboard';
+                if(!location.hash || location.hash === '#') location.hash = '#dashboard';
+                else handleRoute();
             } else {
-                if (window.location.hash === '#dashboard' || window.location.hash.startsWith('#edit/')) window.location.hash = '';
+                if(location.hash.startsWith('#u/')) handleRoute(); 
+                else location.hash = ''; 
+                handleRoute();
             }
         });
 
-        // --- MODALS & AUTH ---
-        function openAuthModal(mode) { document.getElementById('modal-auth').classList.remove('hidden'); toggleAuthMode(mode); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function claimUsername() { openAuthModal('register'); setTimeout(()=>document.getElementById('reg-email').focus(), 100); }
-        function toggleAuthMode(mode) {
-            document.getElementById('form-login').classList.toggle('hidden', mode !== 'login');
-            document.getElementById('form-register').classList.toggle('hidden', mode !== 'register');
-            document.getElementById('auth-title').innerText = mode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản';
-            document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-            document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+        function toggleAuth(type) {
+            isAuthLogin = type === 'login';
+            document.getElementById('tab-login').className = isAuthLogin ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition' : 'flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition';
+            document.getElementById('tab-register').className = !isAuthLogin ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition' : 'flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition';
+            document.getElementById('btn-auth').innerText = isAuthLogin ? 'Đăng nhập' : 'Tạo tài khoản';
         }
 
-        async function handleLogin(e) { e.preventDefault(); authAction(auth.signInWithEmailAndPassword, 'login'); }
-        async function handleRegister(e) { e.preventDefault(); authAction(auth.createUserWithEmailAndPassword, 'register'); }
-        async function authAction(method, type) {
-            const email = document.getElementById(type==='login'?'login-email':'reg-email').value;
-            const pass = document.getElementById(type==='login'?'login-password':'reg-password').value;
-            try { await method(email, pass); closeModal('modal-auth'); showToast("Thành công!", "success"); } 
-            catch(err) { showToast("Lỗi: "+err.message, "error"); }
+        async function handleAuth(e) {
+            e.preventDefault();
+            const em = document.getElementById('auth-email').value, pw = document.getElementById('auth-pass').value;
+            const btn = document.getElementById('btn-auth');
+            btn.innerText = '...'; btn.disabled = true;
+            try {
+                if (isAuthLogin) await auth.signInWithEmailAndPassword(em, pw);
+                else await auth.createUserWithEmailAndPassword(em, pw);
+                showToast("Thành công!", "success");
+                closeModal('modal-auth');
+            } catch (err) { showToast(err.code, "error"); }
+            finally { btn.innerText = isAuthLogin?'Đăng nhập':'Tạo tài khoản'; btn.disabled=false; }
         }
-        async function handleGoogleLogin() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); closeModal('modal-auth'); } catch(e){ showToast(e.message, 'error'); } }
-        function handleLogout() { auth.signOut(); showToast("Đã đăng xuất"); }
+        
+        async function handleGoogle() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); closeModal('modal-auth'); } catch(e){ showToast(e.message,'error'); } }
+        function openAuthModal(mode) { document.getElementById('modal-auth').classList.remove('hidden'); toggleAuth(mode); }
+
+        // --- ROUTING ---
+        window.onhashchange = handleRoute;
+        function handleRoute() {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            const h = location.hash;
+            if (h.startsWith('#u/')) {
+                document.getElementById('view-public').classList.remove('hidden');
+                loadPublic(h.split('/')[1]);
+            } else if (h.startsWith('#edit/')) {
+                if (user) { document.getElementById('view-editor').classList.remove('hidden'); loadEditor(h.split('/')[1]); }
+                else location.hash = '';
+            } else if (h === '#dashboard') {
+                if (user) { document.getElementById('view-dashboard').classList.remove('hidden'); loadDashboard(); }
+                else location.hash = '';
+            } else {
+                if (user) location.hash = '#dashboard';
+                else document.getElementById('view-landing').classList.remove('hidden');
+            }
+        }
 
         // --- DASHBOARD ---
         async function loadDashboard() {
-            const list = document.getElementById('bio-list'); list.innerHTML = '';
-            document.getElementById('dashboard-loader').classList.remove('hidden');
+            const grid = document.getElementById('bio-grid'); grid.innerHTML = '';
+            document.getElementById('loader').classList.remove('hidden');
             try {
-                const snap = await db.collection('bios').where('ownerId','==',currentUser.uid).get();
-                if(snap.empty) list.innerHTML = `<div class="col-span-full text-center py-20 opacity-50"><i class="fas fa-ghost text-4xl mb-2"></i><p>Chưa có trang nào</p></div>`;
-                else snap.forEach(d => {
-                    const data = d.data();
-                    list.innerHTML += `
-                    <div class="modern-card hover:border-brand-500 cursor-pointer group" onclick="location.hash='#edit/${d.id}'">
-                        <div class="flex items-center gap-4 mb-4">
-                            <img src="${data.profile.avatar || 'https://ui-avatars.com/api/?background=random'}" class="w-14 h-14 rounded-full border bg-slate-100 object-cover">
-                            <div><h3 class="font-bold text-lg text-slate-800 truncate max-w-[150px]">${data.profile.name}</h3><div class="text-xs text-slate-400 font-mono">/${d.id}</div></div>
+                const snap = await db.collection('bios').where('ownerId', '==', user.uid).get();
+                if(snap.empty) grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400">Bạn chưa có trang nào.</div>`;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    grid.innerHTML += `
+                    <div onclick="location.hash='#edit/${doc.id}'" class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm hover:shadow-lg transition cursor-pointer group hover:border-gray-300">
+                        <div class="flex items-center gap-4">
+                            <img src="${d.profile.avatar}" class="w-16 h-16 rounded-full border bg-gray-50 object-cover">
+                            <div class="overflow-hidden">
+                                <h3 class="font-bold text-lg truncate text-slate-900">${d.profile.name}</h3>
+                                <div class="text-sm text-gray-500 truncate">mewo.life/${doc.id}</div>
+                            </div>
                         </div>
-                        <div class="flex justify-between border-t pt-3 mt-2">
-                            <div class="text-xs font-bold text-slate-400 uppercase">Views: <span class="text-slate-800 text-sm">${data.views||0}</span></div>
-                            <div class="text-brand-600 font-bold text-xs group-hover:underline">Chỉnh sửa &rarr;</div>
+                        <div class="mt-6 flex justify-between items-center pt-4 border-t border-gray-100">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">${d.views || 0} views</span>
+                            <span class="text-sm font-bold text-slate-900 group-hover:underline">Chỉnh sửa &rarr;</span>
                         </div>
                     </div>`;
                 });
-            } catch(e) { showToast(e.message, 'error'); } finally { document.getElementById('dashboard-loader').classList.add('hidden'); }
+            } catch(e){ showToast(e.message, 'error'); }
+            document.getElementById('loader').classList.add('hidden');
         }
+
         function openCreateModal() { document.getElementById('modal-create').classList.remove('hidden'); }
-        async function createNewBio() {
-            const btn = document.getElementById('btn-create-action'); if(btn.disabled) return;
-            const slug = document.getElementById('create-slug').value.trim().toLowerCase();
-            if(slug.length < 3) return showToast("Tên quá ngắn", "error");
-            btn.disabled = true; btn.innerText = "...";
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        
+        async function createBio() {
+            const s = document.getElementById('create-slug').value.trim().toLowerCase();
+            if(s.length < 3) return showToast('Tên quá ngắn', 'error');
             try {
-                if((await db.collection('bios').doc(slug).get()).exists) return showToast("Tên đã tồn tại", "error");
-                await db.collection('bios').doc(slug).set({ ownerId: currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(), profile: { name: "New User", bio: "Welcome", avatar: `https://ui-avatars.com/api/?name=${slug}&background=random` }, links: [], products: [], theme: { id: 'default', buttonStyle: 'rounded' }, socials: {}, views: 0 });
-                closeModal('modal-create'); loadDashboard(); showToast("Tạo thành công!", "success");
-            } catch(e) { showToast(e.message, 'error'); } finally { btn.disabled = false; btn.innerText = "Tạo ngay"; }
+                const ref = db.collection('bios').doc(s);
+                if((await ref.get()).exists) return showToast('Tên đã tồn tại', 'error');
+                await ref.set({
+                    ownerId: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    profile: { name: 'Mewo User', bio: 'Chào mừng!', avatar: `https://ui-avatars.com/api/?name=${s}` },
+                    links: [], products: [], theme: { id: 'default', buttonStyle: 'rounded' }, socials: {}, views: 0
+                });
+                closeModal('modal-create'); loadDashboard();
+            } catch(e) { showToast(e.message, 'error'); }
         }
 
         // --- EDITOR ---
-        async function loadEditor(slug) {
-            editingSlug = slug;
-            document.getElementById('editor-url-display').innerText = `mewo.life/${slug}`;
-            document.getElementById('editor-url-display').href = `#u/${slug}`;
-            const doc = await db.collection('bios').doc(slug).get();
-            if(!doc.exists) { window.location.hash = '#dashboard'; return; }
+        async function loadEditor(s) {
+            slug = s;
+            document.getElementById('header-url').innerText = `mewo.life/${slug}`;
+            document.getElementById('header-url').href = `#u/${slug}`;
             
-            currentBioData = doc.data();
-            currentBioData.links = currentBioData.links || [];
-            currentBioData.products = currentBioData.products || [];
-            currentBioData.socials = currentBioData.socials || {};
-            currentBioData.theme = currentBioData.theme || {id:'default'};
+            const doc = await db.collection('bios').doc(slug).get();
+            if(!doc.exists) { location.hash='#dashboard'; return; }
+            bioData = doc.data();
+            
+            bioData.links = bioData.links || [];
+            bioData.products = bioData.products || [];
+            bioData.socials = bioData.socials || {};
+            bioData.theme = bioData.theme || {id:'default', buttonStyle:'rounded'};
 
-            document.getElementById('inp-name').value = currentBioData.profile.name;
-            document.getElementById('inp-bio').value = currentBioData.profile.bio;
-            document.getElementById('inp-avatar').value = currentBioData.profile.avatar;
-            document.getElementById('editor-avatar-img').src = currentBioData.profile.avatar;
+            document.getElementById('ed-name').value = bioData.profile.name;
+            document.getElementById('ed-bio').value = bioData.profile.bio;
+            document.getElementById('ed-avatar').value = bioData.profile.avatar;
+            document.getElementById('nav-avatar').src = bioData.profile.avatar;
 
-            renderLinks(); renderProducts(); renderSocials(); switchTab('links'); updatePreview();
+            renderLists();
+            switchTab('links');
+            preview(); // Initial preview load
         }
 
         function switchTab(t) {
-            document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
-            document.getElementById(`content-${t}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden'));
+            document.getElementById(`tab-content-${t}`).classList.remove('hidden');
             ['links','products','appearance','settings'].forEach(k => {
-                const btn = document.getElementById(`tab-${k}`);
-                if(btn) btn.className = k===t ? 'modern-tab active' : 'modern-tab';
+                const nav = document.getElementById(`nav-${k}`);
+                if(nav) nav.className = k===t ? 'nav-item active' : 'nav-item';
             });
         }
 
-        const esc = (t) => t ? t.replace(/"/g, '&quot;') : '';
-        function renderLinks() {
-            const c = document.getElementById('links-container'); c.innerHTML='';
-            currentBioData.links.forEach((l, i) => {
-                c.innerHTML += `
-                <div class="modern-card group">
+        const esc = t => t ? t.replace(/"/g, '&quot;') : '';
+
+        function renderLists() {
+            const lList = document.getElementById('links-list'); lList.innerHTML = '';
+            bioData.links.forEach((l, i) => {
+                lList.innerHTML += `
+                <div class="lt-card group relative">
                     <div class="absolute top-4 right-4 flex gap-2">
-                        <button onclick="moveLink(${i}, -1)" class="text-slate-300 hover:text-brand-600"><i class="fas fa-arrow-up"></i></button>
-                        <button onclick="moveLink(${i}, 1)" class="text-slate-300 hover:text-brand-600"><i class="fas fa-arrow-down"></i></button>
-                        <button onclick="rmLink(${i})" class="text-slate-300 hover:text-red-500 ml-2"><i class="fas fa-trash"></i></button>
+                         <div class="flex flex-col gap-1 mr-2">
+                             <button onclick="moveLink(${i},-1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-up"></i></button>
+                             <button onclick="moveLink(${i},1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-down"></i></button>
+                         </div>
+                        <select onchange="updateLink(${i},'type',this.value)" class="text-xs bg-gray-50 border rounded p-1 h-8"><option value="link" ${l.type!=='collection'?'selected':''}>Link</option><option value="collection" ${l.type==='collection'?'selected':''}>Bộ sưu tập</option></select>
+                        <button onclick="remLink(${i})" class="text-gray-300 hover:text-red-500 h-8 w-8"><i class="fas fa-trash"></i></button>
                     </div>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="input-label">Loại liên kết</label>
-                            <select onchange="upLink(${i},'type',this.value)" class="input-modern py-2 text-xs w-auto"><option value="link" ${l.type!=='collection'?'selected':''}>Link thường</option><option value="collection" ${l.type==='collection'?'selected':''}>Bộ sưu tập</option></select>
-                        </div>
-                        <div><label class="input-label">Tiêu đề</label><input value="${esc(l.title)}" oninput="upLink(${i},'title',this.value)" class="input-modern font-bold" placeholder="Nhập tiêu đề"></div>
-                        <div><label class="input-label">Đường dẫn URL</label><input value="${esc(l.url)}" oninput="upLink(${i},'url',this.value)" class="input-modern text-brand-600" placeholder="https://..."></div>
+                    <div class="space-y-3 pr-24">
+                        <input value="${esc(l.title)}" oninput="updateLink(${i},'title',this.value)" class="lt-input font-bold" placeholder="Tiêu đề">
+                        <input value="${esc(l.url)}" oninput="updateLink(${i},'url',this.value)" class="lt-input text-sm text-gray-500" placeholder="URL">
                     </div>
                 </div>`;
             });
-        }
 
-        function renderProducts() {
-            const c = document.getElementById('products-container'); c.innerHTML='';
-            const cols = currentBioData.links.filter(l=>l.type==='collection').map(l=>`<option value="${l.title}">${l.title}</option>`).join('');
-            currentBioData.products.forEach((p, i) => {
-                c.innerHTML += `
-                <div class="modern-card flex flex-col sm:flex-row gap-4">
-                    <div class="w-full sm:w-20 h-20 bg-slate-100 rounded-lg overflow-hidden shrink-0"><img src="${p.image||'https://placehold.co/100'}" class="w-full h-full object-cover"></div>
-                    <div class="flex-1 space-y-3">
-                        <input value="${esc(p.name)}" oninput="upProd(${i},'name',this.value)" class="input-modern font-bold" placeholder="Tên sản phẩm">
+            const pList = document.getElementById('products-list'); pList.innerHTML = '';
+            const cols = bioData.links.filter(k=>k.type==='collection').map(k=>`<option value="${k.title}">${k.title}</option>`).join('');
+            bioData.products.forEach((p, i) => {
+                pList.innerHTML += `
+                <div class="lt-card flex gap-4 items-start relative">
+                    <img src="${p.image||'https://placehold.co/100'}" class="w-20 h-20 rounded-lg bg-gray-100 object-cover shrink-0 border border-gray-200">
+                    <div class="flex-1 space-y-2">
+                        <input value="${esc(p.name)}" oninput="updateProd(${i},'name',this.value)" class="lt-input font-bold" placeholder="Tên SP">
                         <div class="flex gap-2">
-                             <input value="${esc(p.price)}" oninput="upProd(${i},'price',this.value)" class="input-modern w-24 text-brand-600 font-bold" placeholder="Giá">
-                             <select onchange="upProd(${i},'collection',this.value)" class="input-modern w-full">${cols}<option value="" ${!p.collection?'selected':''}>Chọn BST...</option></select>
+                            <input value="${esc(p.price)}" oninput="updateProd(${i},'price',this.value)" class="lt-input w-24 font-bold text-green-600" placeholder="Giá">
+                            <select onchange="updateProd(${i},'collection',this.value)" class="lt-input text-xs">${cols}<option value="" ${!p.collection?'selected':''}>Chọn BST...</option></select>
                         </div>
-                        <input value="${esc(p.image)}" oninput="upProd(${i},'image',this.value)" class="input-modern text-xs" placeholder="Link ảnh">
-                        <input value="${esc(p.link)}" oninput="upProd(${i},'link',this.value)" class="input-modern text-xs text-blue-500" placeholder="Link mua hàng">
+                        <input value="${esc(p.image)}" oninput="updateProd(${i},'image',this.value)" class="lt-input text-xs" placeholder="Link ảnh">
+                        <input value="${esc(p.link)}" oninput="updateProd(${i},'link',this.value)" class="lt-input text-xs" placeholder="Link mua">
                     </div>
-                    <div class="flex flex-row sm:flex-col gap-2 justify-end sm:justify-start">
-                        <button onclick="moveProd(${i}, -1)" class="text-slate-300 hover:text-brand-600"><i class="fas fa-arrow-up"></i></button>
-                        <button onclick="moveProd(${i}, 1)" class="text-slate-300 hover:text-brand-600"><i class="fas fa-arrow-down"></i></button>
-                        <button onclick="rmProd(${i})" class="text-slate-300 hover:text-red-500 sm:mt-auto"><i class="fas fa-trash"></i></button>
+                    <div class="flex flex-col gap-2">
+                        <button onclick="moveProd(${i},-1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-up"></i></button>
+                        <button onclick="moveProd(${i},1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-down"></i></button>
+                        <button onclick="remProd(${i})" class="text-gray-300 hover:text-red-500 mt-2"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
             });
-        }
-        
-        function renderSocials() {
-            const c = document.getElementById('list-socials'); c.innerHTML='';
-            socialPlatforms.forEach(p => {
-                c.innerHTML += `<div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-200"><i class="fab fa-${p==='email'?'google':p} text-slate-400 w-6 text-center text-lg"></i><input value="${currentBioData.socials[p]||''}" oninput="upSocial('${p}',this.value)" class="flex-1 bg-transparent outline-none text-sm font-medium text-slate-700 placeholder-slate-400" placeholder="Dán link ${p}..."></div>`
+
+            const sList = document.getElementById('socials-list'); sList.innerHTML = '';
+            const platforms = ['facebook','instagram','tiktok','youtube','email'];
+            platforms.forEach(p => {
+                sList.innerHTML += `<div class="flex items-center gap-3"><i class="fab fa-${p==='email'?'google':p} w-6 text-center text-gray-400 text-xl"></i><input value="${bioData.socials[p]||''}" oninput="updateSocial('${p}',this.value)" class="lt-input" placeholder="${p} url..."></div>`;
             });
         }
 
-        // Functions
-        function addLinkItem() { currentBioData.links.push({title:'Link mới', url:'#', type:'link'}); renderLinks(); updatePreview(); }
-        function rmLink(i) { if(confirm('Xóa link này?')) { currentBioData.links.splice(i,1); renderLinks(); updatePreview(); } }
-        function upLink(i,k,v) { currentBioData.links[i][k]=v; updatePreview(); }
-        function moveLink(i, dir) { if(i+dir>=0 && i+dir<currentBioData.links.length) { [currentBioData.links[i], currentBioData.links[i+dir]] = [currentBioData.links[i+dir], currentBioData.links[i]]; renderLinks(); updatePreview(); } }
-
-        function addProductItem() { currentBioData.products.push({name:'Sản phẩm', price:'0đ', image:'', link:'#', collection:''}); renderProducts(); updatePreview(); }
-        function rmProd(i) { if(confirm('Xóa sản phẩm này?')) { currentBioData.products.splice(i,1); renderProducts(); updatePreview(); } }
-        function upProd(i,k,v) { currentBioData.products[i][k]=v; updatePreview(); }
-        function moveProd(i, dir) { if(i+dir>=0 && i+dir<currentBioData.products.length) { [currentBioData.products[i], currentBioData.products[i+dir]] = [currentBioData.products[i+dir], currentBioData.products[i]]; renderProducts(); updatePreview(); } }
-
-        function upSocial(k,v) { currentBioData.socials[k]=v; updatePreview(); }
-        function setTheme(id) { currentBioData.theme.id=id; updatePreview(); }
-        function setButtonStyle(s) { if(!currentBioData.theme) currentBioData.theme={}; currentBioData.theme.buttonStyle=s; updatePreview(); }
-        function goToDashboard() { window.location.hash = '#dashboard'; }
-
-        function updatePreview() {
-            currentBioData.profile.name = document.getElementById('inp-name').value;
-            currentBioData.profile.bio = document.getElementById('inp-bio').value;
-            currentBioData.profile.avatar = document.getElementById('inp-avatar').value;
-            document.getElementById('editor-avatar-img').src = currentBioData.profile.avatar;
-
-            const html = generatePublicHTML(currentBioData, true);
-            const frames = [document.getElementById('preview-frame'), document.getElementById('mobile-preview-frame')];
-            frames.forEach(f => { if(f) { const doc = f.contentDocument || f.contentWindow.document; doc.open(); doc.write(html); doc.close(); } });
-        }
-        async function saveCurrentBio() { try { await db.collection('bios').doc(editingSlug).update(currentBioData); showToast("Đã lưu!", "success"); } catch(e){ showToast(e.message, 'error'); } }
-        function toggleMobilePreview() { const m=document.getElementById('modal-mobile-preview'); m.classList.toggle('hidden'); if(!m.classList.contains('hidden')) updatePreview(); }
-        function showQRCode() { document.getElementById('modal-qr').classList.remove('hidden'); document.getElementById('qr-img').src=`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin+'/#u/'+editingSlug)}`; }
+        // Data Helpers
+        function addLink() { bioData.links.push({title:'Link mới', url:'#', type:'link'}); renderLists(); preview(); }
+        function remLink(i) { if(confirm('Xóa?')) { bioData.links.splice(i,1); renderLists(); preview(); } }
+        function updateLink(i,k,v) { bioData.links[i][k]=v; preview(); }
+        function moveLink(i,d) { if(i+d>=0 && i+d<bioData.links.length) { [bioData.links[i], bioData.links[i+d]] = [bioData.links[i+d], bioData.links[i]]; renderLists(); preview(); } }
         
-        async function loadPublicBio(slug) {
-            const container = document.getElementById('view-public');
+        function addProd() { bioData.products.push({name:'SP Mới', price:'0đ', image:'', link:'#', collection:''}); renderLists(); preview(); }
+        function remProd(i) { if(confirm('Xóa?')) { bioData.products.splice(i,1); renderLists(); preview(); } }
+        function updateProd(i,k,v) { bioData.products[i][k]=v; preview(); }
+        function moveProd(i,d) { if(i+d>=0 && i+d<bioData.products.length) { [bioData.products[i], bioData.products[i+d]] = [bioData.products[i+d], bioData.products[i]]; renderLists(); preview(); } }
+
+        function updateSocial(k,v) { bioData.socials[k]=v; preview(); }
+        function setTheme(id) { bioData.theme.id=id; preview(); }
+        function setButtonStyle(s) { bioData.theme.buttonStyle=s; preview(); }
+        function goToDashboard() { location.hash='#dashboard'; }
+        async function saveBio() { try { await db.collection('bios').doc(slug).update(bioData); showToast('Đã lưu!','success'); } catch(e){ showToast(e.message,'error'); } }
+        function copyLink() { navigator.clipboard.writeText(`mewo.life/${slug}`).then(()=>showToast('Đã sao chép','success')); }
+        
+        function preview() {
+            bioData.profile.name = document.getElementById('ed-name').value;
+            bioData.profile.bio = document.getElementById('ed-bio').value;
+            bioData.profile.avatar = document.getElementById('ed-avatar').value;
+            document.getElementById('ed-img-preview').src = bioData.profile.avatar;
+            document.getElementById('nav-avatar').src = bioData.profile.avatar;
+
+            const html = genHtml(bioData, true);
+            const frames = [document.getElementById('preview-frame'), document.getElementById('mobile-preview-frame')];
+            frames.forEach(f => { if(f) { const d=f.contentDocument; d.open(); d.write(html); d.close(); } });
+        }
+        function refreshPreview() { preview(); }
+        function toggleMobilePreview() { const m=document.getElementById('modal-mobile-preview'); m.classList.toggle('hidden'); if(!m.classList.contains('hidden')) preview(); }
+
+        // --- PUBLIC ---
+        async function loadPublic(s) {
+            const c = document.getElementById('view-public');
             try {
-                const doc = await db.collection('bios').doc(slug).get();
-                if(!doc.exists) { container.innerHTML = '<div class="h-screen flex items-center justify-center text-slate-500 font-bold">Trang không tồn tại</div>'; return; }
-                window.publicProducts = doc.data().products || [];
-                container.innerHTML = generatePublicHTML(doc.data(), false);
-                db.collection('bios').doc(slug).update({ views: firebase.firestore.FieldValue.increment(1) });
-            } catch(e) { container.innerHTML = 'Lỗi: '+e.message; }
+                const d = await db.collection('bios').doc(s).get();
+                if(!d.exists) { c.innerHTML='<div class="h-screen flex items-center justify-center">Trang không tồn tại</div>'; return; }
+                window.pubProds = d.data().products || [];
+                c.innerHTML = genHtml(d.data(), false);
+                db.collection('bios').doc(s).update({views: firebase.firestore.FieldValue.increment(1)});
+            } catch(e){ c.innerHTML=e.message; }
         }
 
-        function generatePublicHTML(data, isPreview) {
-            const theme = data.theme || {id:'default', buttonStyle:'rounded'};
-            const radius = theme.buttonStyle==='rect'?'rounded-md':theme.buttonStyle==='soft'?'rounded-2xl':'rounded-full';
-            const safeProducts = JSON.stringify(data.products || []).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+        // --- HTML GENERATOR ---
+        function genHtml(d, isPrev) {
+            const t = d.theme || {id:'default'};
+            const safeProds = JSON.stringify(d.products||[]).replace(/\\/g,'\\\\').replace(/"/g,'\\"');
             
             const script = `<script>
-                const products = JSON.parse("${safeProducts}");
+                const products = JSON.parse("${safeProds}");
                 function showShop(col) {
-                    document.getElementById('main-view').style.display='none';
-                    document.getElementById('shop-view').style.display='block';
-                    document.getElementById('shop-title').innerText = col;
-                    const grid = document.getElementById('prod-grid');
-                    const filtered = products.filter(p=>p.collection===col);
-                    if(filtered.length === 0) { grid.innerHTML='<div class="col-span-2 text-center text-white opacity-50 py-10">Chưa có sản phẩm</div>'; return; }
-                    grid.innerHTML = filtered.map(p=>\`<div class="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col"><div class="aspect-square bg-slate-100 relative"><img src="\${p.image}" class="w-full h-full object-cover"></div><div class="p-3 flex-1 flex flex-col"><div class="font-bold text-xs truncate text-slate-800 mb-1">\${p.name}</div><div class="flex justify-between items-center mt-auto"><span class="text-xs font-bold text-red-500">\${p.price}</span><a href="\${p.link}" target="_blank" class="bg-black text-white text-[10px] px-3 py-1.5 rounded-full font-bold">Mua</a></div></div></div>\`).join('');
+                    document.getElementById('main').style.display='none';
+                    document.getElementById('shop').style.display='block';
+                    document.getElementById('stitle').innerText=col;
+                    const g = document.getElementById('grid');
+                    const fl = products.filter(p=>p.collection===col);
+                    if(!fl.length) { g.innerHTML='<div style="opacity:0.5;text-align:center;color:inherit;padding:20px">Trống</div>'; return; }
+                    g.innerHTML = fl.map(p=>\`<div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:10px;display:flex;align-items:center;padding:8px;gap:10px"><img src="\${p.image}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;background:#eee"><div style="flex:1"><div style="font-weight:bold;font-size:14px;color:#333;margin-bottom:4px">\${p.name}</div><div style="font-size:12px;color:#e11d48;font-weight:bold">\${p.price}</div></div><a href="\${p.link}" target="_blank" style="background:#000;color:white;text-decoration:none;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:bold">Mua</a></div>\`).join('');
                 }
-                function closeShop() { document.getElementById('shop-view').style.display='none'; document.getElementById('main-view').style.display='block'; }
+                function closeShop() { document.getElementById('shop').style.display='none'; document.getElementById('main').style.display='block'; }
             <\/script>`;
 
-            const links = (data.links||[]).map(l => {
-                const safeTitle = l.title.replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                if(l.type === 'collection') {
-                    const act = isPreview ? `showShop('${safeTitle}')` : `window.showShop('${safeTitle}')`;
-                    return `<div onclick="${act}" class="cursor-pointer mb-4 p-4 bg-white/90 backdrop-blur-md shadow-sm border border-white/50 ${radius} flex justify-between items-center hover:bg-white transition transform hover:scale-[1.02]"><div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-600"><i class="fas fa-layer-group text-xs"></i></span><span class="font-bold text-sm text-slate-800">${l.title}</span></div><i class="fas fa-chevron-right text-slate-400"></i></div>`;
-                }
-                return `<a href="${l.url}" target="_blank" class="block mb-4 p-4 bg-white/90 backdrop-blur-md shadow-sm border border-white/50 ${radius} text-center font-bold text-sm text-slate-800 hover:bg-white transition transform hover:scale-[1.02]">${l.title}</a>`;
+            const links = (d.links||[]).map(l => {
+                const click = isPrev ? `showShop('${l.title}')` : `window.showShop('${l.title}')`;
+                const style = `display:block;margin-bottom:12px;padding:16px;background:rgba(255,255,255,0.9);backdrop-filter:blur(10px);border-radius:${d.theme?.buttonStyle==='rect'?'4px':d.theme?.buttonStyle==='soft'?'16px':'99px'};text-align:center;text-decoration:none;color:#111;font-weight:600;font-size:14px;box-shadow:0 2px 5px rgba(0,0,0,0.05);transition:transform 0.2s;border:1px solid rgba(255,255,255,0.5)`;
+                if(l.type==='collection') return `<div onclick="${click}" style="${style};cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding-left:24px;padding-right:24px"><span>${l.title}</span><i class="fas fa-chevron-right" style="opacity:0.4"></i></div>`;
+                return `<a href="${l.url}" target="_blank" style="${style}">${l.title}</a>`;
             }).join('');
-            
-            const socials = Object.entries(data.socials||{}).map(([k,v]) => v ? `<a href="${v}" target="_blank" class="text-2xl text-white/80 hover:text-white transition transform hover:scale-110"><i class="fab fa-${k==='email'?'google':k}"></i></a>` : '').join('');
 
-            const css = `body{margin:0;font-family:sans-serif} ::-webkit-scrollbar{width:0} .theme-default{background:linear-gradient(45deg,#ff9a9e,#fad0c4)} .theme-ocean{background:linear-gradient(to bottom,#2193b0,#6dd5ed)} .theme-midnight{background:#111;color:#fff} .theme-forest{background:linear-gradient(to right,#11998e,#38ef7d)} .theme-minimal{background:#f3f4f6;color:#333} .theme-sunset{background:linear-gradient(to top,#fbc2eb,#a6c1ee)} .wrapper{min-height:100vh;padding:60px 20px;display:flex;flex-direction:column;align-items:center}`;
-            
+            const socials = Object.entries(d.socials||{}).map(([k,v]) => v?`<a href="${v}" target="_blank" style="font-size:24px;color:rgba(255,255,255,0.9);margin:0 10px"><i class="fab fa-${k==='email'?'google':k}"></i></a>`:'').join('');
+
+            const css = `
+                body{margin:0;font-family:sans-serif} ::-webkit-scrollbar{width:0}
+                .theme-default{background:linear-gradient(45deg,#ff9a9e,#fad0c4)}
+                .theme-ocean{background:linear-gradient(to bottom,#2193b0,#6dd5ed)}
+                .theme-midnight{background:#111;color:#fff}
+                .theme-forest{background:linear-gradient(to right,#11998e,#38ef7d)}
+                .theme-minimal{background:#f3f4f6;color:#333}
+                .theme-sunset{background:linear-gradient(to top,#fbc2eb,#a6c1ee)}
+                .wrapper{min-height:100vh;padding:60px 20px;display:flex;flex-direction:column;align-items:center}
+                .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;border:4px solid rgba(255,255,255,0.3);margin-bottom:16px;box-shadow:0 10px 20px rgba(0,0,0,0.1)}
+                .name{font-size:20px;font-weight:800;margin-bottom:4px;color:inherit;text-shadow:0 2px 4px rgba(0,0,0,0.1)}
+                .bio{font-size:14px;color:inherit;opacity:0.9;margin-bottom:32px;text-align:center;white-space:pre-line;line-height:1.5;max-width:300px}
+            `;
+
             const content = `
-                <div class="wrapper theme-${theme.id}">
-                    <div id="main-view" class="w-full max-w-md text-center">
-                        <img src="${data.profile.avatar}" class="w-24 h-24 rounded-full border-4 border-white/40 shadow-2xl mx-auto mb-5 object-cover" onerror="this.src='https://ui-avatars.com/api/?name=User'">
-                        <h1 class="text-2xl font-extrabold mb-2 text-white drop-shadow-md tracking-tight">${data.profile.name}</h1>
-                        <p class="text-sm text-white/90 mb-8 font-medium whitespace-pre-line leading-relaxed max-w-xs mx-auto">${data.profile.bio}</p>
-                        <div class="flex justify-center gap-5 mb-10">${socials}</div>
-                        <div class="w-full text-left perspective-1000">${links}</div>
+                <div class="wrapper theme-${t.id}">
+                    <div id="main" style="width:100%;max-width:480px;text-align:center">
+                        <img src="${d.profile.avatar}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=U'">
+                        <div class="name">${d.profile.name}</div>
+                        <div class="bio">${d.profile.bio}</div>
+                        <div class="socials" style="margin-bottom:32px">${socials}</div>
+                        <div style="width:100%">${links}</div>
                     </div>
-                    <div id="shop-view" class="w-full max-w-md hidden" style="display:none">
-                        <div class="flex items-center gap-4 mb-6 text-white sticky top-0 py-2 z-10"><button onclick="${isPreview?'closeShop()':'window.closeShop()'}" class="w-10 h-10 bg-white/20 backdrop-blur rounded-full flex items-center justify-center hover:bg-white/30 transition"><i class="fas fa-arrow-left"></i></button><h2 class="font-bold text-xl drop-shadow-md" id="shop-title">Shop</h2></div>
-                        <div id="prod-grid" class="grid grid-cols-2 gap-3 pb-20"></div>
+                    <div id="shop" style="display:none;width:100%;max-width:480px">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;color:inherit">
+                            <button onclick="${isPreview?'closeShop()':'window.closeShop()'}" style="background:rgba(255,255,255,0.2);border:none;width:32px;height:32px;border-radius:50%;color:inherit;cursor:pointer"><i class="fas fa-arrow-left"></i></button>
+                            <div style="font-weight:bold;font-size:18px" id="stitle">Shop</div>
+                        </div>
+                        <div id="grid"></div>
                     </div>
-                    ${!isPreview ? '<footer class="mt-auto pt-16 text-[10px] uppercase font-bold text-white/40 tracking-widest">Powered by Mewo</footer>' : ''}
+                    ${!isPreview ? '<div style="margin-top:auto;padding-top:40px;font-size:10px;font-weight:bold;opacity:0.5;text-transform:uppercase">Powered by Mewo</div>' : ''}
                 </div>
                 ${script}
             `;
-            return isPreview ? `<!DOCTYPE html><html><head><script src="https://cdn.tailwindcss.com"><\/script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>${css}</style></head><body>${content}</body></html>` : `<style>${css}</style>${content}`;
+
+            return isPreview ? `<!DOCTYPE html><html><head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>${css}</style></head><body>${content}</body></html>` : `<style>${css}</style>${content}`;
         }
         
-        window.showShop = function(col) { document.getElementById('main-view').style.display='none'; document.getElementById('shop-view').style.display='block'; document.getElementById('shop-title').innerText = col; const g=document.getElementById('prod-grid'); g.innerHTML=window.publicProducts.filter(p=>p.collection===col).map(p=>`<div class="bg-white rounded-xl overflow-hidden shadow-sm flex flex-col"><div class="aspect-square bg-slate-100 relative"><img src="${p.image}" class="w-full h-full object-cover"></div><div class="p-3 flex-1 flex flex-col"><div class="font-bold text-xs truncate text-slate-800 mb-1">${p.name}</div><div class="flex justify-between items-center mt-auto"><span class="text-xs font-bold text-red-500">${p.price}</span><a href="${p.link}" target="_blank" class="bg-black text-white text-[10px] px-3 py-1.5 rounded-full font-bold">Mua</a></div></div></div>`).join(''); if(!g.innerHTML) g.innerHTML='<div class="col-span-2 text-center text-white opacity-50 py-10">Trống</div>'; };
-        window.closeShop = function() { document.getElementById('shop-view').style.display='none'; document.getElementById('main-view').style.display='block'; };
-        function showToast(m,t='info'){ const d=document.createElement('div');d.className='toast';d.innerText=m;document.getElementById('toast-container').appendChild(d);setTimeout(()=>d.remove(),3000); }
+        // GLOBAL FOR PUBLIC
+        window.showShop = function(col) { document.getElementById('main').style.display='none'; document.getElementById('shop').style.display='block'; document.getElementById('stitle').innerText=col; const g=document.getElementById('grid'); const fl=window.pubProds.filter(p=>p.collection===col); if(!fl.length){g.innerHTML='Empty';return;} g.innerHTML = fl.map(p=>`<div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:10px;display:flex;align-items:center;padding:8px;gap:10px"><img src="${p.image}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;background:#eee"><div style="flex:1"><div style="font-weight:bold;font-size:14px;color:#333;margin-bottom:4px">${p.name}</div><div style="font-size:12px;color:#e11d48;font-weight:bold">${p.price}</div></div><a href="${p.link}" target="_blank" style="background:#000;color:white;text-decoration:none;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:bold">Mua</a></div>`).join(''); };
+        window.closeShop = function() { document.getElementById('shop').style.display='none'; document.getElementById('main').style.display='block'; };
+
+        function showToast(m,t){ const d=document.createElement('div');d.className='toast';d.innerText=m;document.getElementById('toast-container').appendChild(d);setTimeout(()=>d.remove(),3000); }
         function copyToClipboard(t){ navigator.clipboard.writeText(t).then(()=>showToast("Đã sao chép","success")); }
     </script>
 </body>
