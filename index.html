@@ -48,9 +48,19 @@
         .lt-card:hover { border-color: #d1d5db; }
         .lt-card.collection-card { background: #FDF4FF; border-color: #E9D5FF; }
         
-        .lt-input { width: 100%; padding: 12px 16px; background: #f9fafb; border: 1px solid transparent; border-radius: 12px; font-size: 0.95rem; font-weight: 500; color: #111827; outline: none; transition: all 0.2s; }
-        .lt-input:focus { background: white; border-color: #111; box-shadow: 0 0 0 2px rgba(0,0,0,0.1); }
+        .lt-input { width: 100%; padding: 10px 14px; background: #f9fafb; border: 1px solid transparent; border-radius: 12px; font-size: 0.95rem; font-weight: 500; color: #111827; outline: none; transition: all 0.2s; }
+        .lt-input:focus { background: white; border-color: #d1d5db; box-shadow: 0 0 0 3px rgba(0,0,0,0.03); }
         .lt-input::placeholder { color: #9ca3af; }
+        .collection-card .lt-input { background: white; }
+
+        /* Upload Button */
+        .upload-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 8px 16px; background-color: #f3f4f6; color: #4b5563;
+            border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            border: 1px dashed #d1d5db;
+        }
+        .upload-btn:hover { background-color: #e5e7eb; border-color: #9ca3af; color: #1f2937; }
 
         /* Preview Phone */
         .preview-wrapper {
@@ -70,6 +80,8 @@
         #toast-container { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 9999; }
         .toast { background: #111; color: white; padding: 12px 24px; border-radius: 99px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideUpToast 0.3s; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         @keyframes slideUpToast { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .hero-text-shadow { text-shadow: 0 4px 0 rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -136,8 +148,8 @@
                         </div>
                         <button onclick="saveBio()" class="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-black transition shadow-sm active:scale-95">Lưu thay đổi</button>
                         
-                        <!-- Toggle Preview Button (Visible on screens < 1024px) -->
-                        <button onclick="toggleMobilePreview()" class="lg:hidden w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition"><i class="fas fa-eye text-slate-700"></i></button>
+                        <!-- Toggle Preview Button (Visible only on small screens) -->
+                        <button onclick="toggleMobilePreview()" class="md:hidden w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition"><i class="fas fa-eye text-slate-700"></i></button>
                     </div>
                 </header>
 
@@ -217,12 +229,13 @@
                 </div>
             </main>
 
-            <!-- C. PREVIEW PANEL (Right) - ALWAYS VISIBLE ON LG SCREENS -->
-            <aside class="hidden lg:flex w-[400px] xl:w-[480px] border-l border-gray-200 bg-white items-center justify-center p-8 relative flex-shrink-0 z-20">
+            <!-- C. PREVIEW PANEL (Right) - VISIBLE ON MD+ SCREENS -->
+            <aside class="hidden md:flex w-[350px] lg:w-[450px] border-l border-gray-200 bg-white items-center justify-center p-4 lg:p-8 relative flex-shrink-0 z-20">
                 <div class="absolute top-4 right-4">
-                    <button onclick="preview()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition text-gray-500" title="Làm mới"><i class="fas fa-sync-alt"></i></button>
+                    <button onclick="refreshPreview()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition text-gray-500" title="Làm mới"><i class="fas fa-sync-alt"></i></button>
                 </div>
-                <div class="preview-wrapper transform scale-[0.85] xl:scale-95 transition-transform origin-center shadow-2xl">
+                <!-- Scalable Phone Wrapper -->
+                <div class="preview-wrapper transform scale-[0.75] xl:scale-90 transition-transform origin-center shadow-2xl">
                     <div class="notch"></div>
                     <iframe id="preview-frame" class="w-full h-full bg-white border-none"></iframe>
                 </div>
@@ -264,11 +277,13 @@
         </div>
     </div>
 
-    <!-- Mobile Preview Modal -->
-    <div id="modal-mobile-preview" class="fixed inset-0 bg-black/90 z-[60] hidden flex flex-col items-center justify-center p-4">
-        <button onclick="toggleMobilePreview()" class="absolute top-4 right-4 w-10 h-10 bg-white/20 rounded-full text-white flex items-center justify-center"><i class="fas fa-times"></i></button>
-        <div class="w-full h-full max-w-[340px] max-h-[650px] bg-white rounded-[30px] overflow-hidden">
-            <iframe id="mobile-preview-frame" class="w-full h-full bg-white border-none"></iframe>
+    <div id="modal-mobile-preview" class="fixed inset-0 bg-white z-[60] hidden flex flex-col">
+        <div class="px-4 py-3 border-b flex justify-between items-center bg-white">
+            <span class="font-bold">Xem trước</span>
+            <button onclick="toggleMobilePreview()" class="w-8 h-8 bg-gray-100 rounded-full"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="flex-1 bg-gray-100 p-4 flex justify-center">
+            <div class="preview-wrapper transform scale-90 border-none shadow-none"><iframe id="mobile-preview-frame" class="w-full h-full bg-white"></iframe></div>
         </div>
     </div>
 
@@ -407,7 +422,7 @@
 
             renderLists();
             switchTab('links');
-            setTimeout(preview, 500); // Small delay to ensure iframe is ready
+            setTimeout(preview, 500); 
         }
 
         function switchTab(t) {
