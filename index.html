@@ -277,11 +277,11 @@
             </main>
 
             <!-- C. PREVIEW PANEL (Right) -->
-            <aside class="hidden lg:flex w-[450px] border-l border-gray-200 bg-white items-center justify-center p-8 relative flex-shrink-0">
+            <aside class="hidden md:flex w-[350px] lg:w-[480px] border-l border-gray-200 bg-white items-center justify-center p-4 lg:p-8 relative flex-shrink-0 transition-all duration-300">
                 <div class="absolute top-0 right-0 p-4">
                     <button onclick="refreshPreview()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition text-gray-500" title="Làm mới"><i class="fas fa-sync-alt"></i></button>
                 </div>
-                <div class="preview-wrapper transform scale-[0.85] xl:scale-100 transition-transform">
+                <div class="preview-wrapper transform scale-[0.75] lg:scale-[0.85] xl:scale-100 transition-transform origin-center shadow-2xl">
                     <div class="notch"></div>
                     <iframe id="preview-frame" class="w-full h-full bg-white border-none"></iframe>
                 </div>
@@ -552,7 +552,7 @@
             });
 
             const sList = document.getElementById('socials-list'); sList.innerHTML = '';
-            const platforms = ['facebook','instagram','tiktok','youtube','email'];
+            const platforms = ['facebook','instagram','tiktok','youtube','twitter','email'];
             platforms.forEach(p => {
                 sList.innerHTML += `<div class="flex items-center gap-3"><i class="fab fa-${p==='email'?'google':p} w-6 text-center text-gray-400 text-xl"></i><input value="${bioData.socials[p]||''}" oninput="updateSocial('${p}',this.value)" class="lt-input" placeholder="${p} url..."></div>`;
             });
@@ -691,12 +691,12 @@
                         </div>
                         <div id="grid"></div>
                     </div>
-                    ${!isPrev ? '<div style="margin-top:auto;padding-top:40px;font-size:10px;font-weight:bold;opacity:0.5;text-transform:uppercase">Powered by Mewo</div>' : ''}
+                    ${!isPreview ? '<div style="margin-top:auto;padding-top:40px;font-size:10px;font-weight:bold;opacity:0.5;color:white;text-transform:uppercase">Powered by Mewo</div>' : ''}
                 </div>
                 ${script}
             `;
 
-            return isPrev ? `<!DOCTYPE html><html><head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>${css}</style></head><body>${content}</body></html>` : `<style>${css}</style>${content}`;
+            return isPreview ? `<!DOCTYPE html><html><head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>${css}</style></head><body>${content}</body></html>` : `<style>${css}</style>${content}`;
         }
         
         // GLOBAL FOR PUBLIC
