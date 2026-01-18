@@ -221,16 +221,16 @@
                         </div>
                     </div>
 
-                    <!-- TAB 1: LINKS -->
+                    <!-- TAB 1: LINKS (Collections & Links) -->
                     <div id="editor-tab-links" class="editor-tab-content space-y-4">
                         <div class="flex justify-between items-center"><h3 class="font-bold text-slate-800 text-sm">Danh sách liên kết</h3><button onclick="addLinkItem()" class="text-xs bg-slate-900 text-white px-3 py-1.5 rounded font-bold shadow-sm">+ Thêm</button></div>
                         <div id="ed-links-list" class="space-y-3 pb-10"></div>
                     </div>
 
-                    <!-- TAB 2: PRODUCTS -->
+                    <!-- TAB 2: PRODUCTS (Affiliate) -->
                     <div id="editor-tab-products" class="editor-tab-content hidden space-y-4">
                         <div class="flex justify-between items-center"><h3 class="font-bold text-slate-800 text-sm">Sản phẩm tiếp thị</h3><button onclick="addProductItem()" class="text-xs bg-slate-900 text-white px-3 py-1.5 rounded font-bold shadow-sm">+ Thêm SP</button></div>
-                        <p class="text-xs text-slate-500 bg-slate-100 p-2 rounded">Chọn loại "Bộ sưu tập" ở tab Liên kết để nhóm sản phẩm.</p>
+                        <p class="text-xs text-slate-500 bg-slate-100 p-2 rounded">Chọn loại "Bộ sưu tập" ở tab Liên kết để nhóm các sản phẩm này.</p>
                         <div id="ed-products-list" class="space-y-3 pb-10"></div>
                     </div>
 
@@ -277,25 +277,6 @@
             </div>
         </div>
 
-        <!-- PUBLIC VIEW TEMPLATE (Hidden, used to render preview & public) -->
-        <div id="public-template" class="hidden">
-            <style>/* Injected dynamically based on theme */</style>
-            <div id="public-body" class="min-h-screen flex flex-col items-center py-12 px-4 transition-colors duration-500">
-                <div class="w-full max-w-md text-center animate-slide-up">
-                    <img id="p-avatar" class="w-24 h-24 rounded-full object-cover border-4 border-white/50 shadow-xl mx-auto mb-4">
-                    <h1 id="p-name" class="text-xl font-bold mb-1 drop-shadow-sm"></h1>
-                    <p id="p-bio" class="text-sm opacity-90 mb-6 font-medium max-w-xs mx-auto"></p>
-                    
-                    <!-- Socials -->
-                    <div id="p-socials" class="flex justify-center gap-3 mb-8 flex-wrap"></div>
-
-                    <!-- Links -->
-                    <div id="p-links" class="space-y-3 w-full"></div>
-                </div>
-                <footer class="mt-auto pt-10 text-xs opacity-60 font-bold">Powered by Mewo</footer>
-            </div>
-        </div>
-
         <!-- REAL PUBLIC VIEW CONTAINER -->
         <div id="view-public" class="view-section hidden flex-grow min-h-screen"></div>
 
@@ -326,9 +307,16 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
+        // GLOBAL ERROR HANDLER
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error("Global Error:", message);
+            showToast("Lỗi hệ thống: " + message, "error");
+        };
+
         // STATE & GLOBALS
         let currentUser = null, currentBioData = null, editingSlug = null;
         let confirmationResult = null;
+        let isDashboardLoading = false; // Fix: Prevent race condition
         const socialPlatforms = [
             { id: 'facebook', icon: 'fab fa-facebook', label: 'Facebook' },
             { id: 'instagram', icon: 'fab fa-instagram', label: 'Instagram' },
@@ -341,21 +329,32 @@
         // --- GLOBAL PUBLIC FUNCTIONS (FOR SHOP LOGIC) ---
         window.publicProducts = []; // Store products for current view
         window.openCollection = function(filter) {
-            document.getElementById('main-tab').classList.add('hidden');
-            document.getElementById('shop-tab').classList.remove('hidden');
-            window.renderProducts(filter);
+            const mainTab = document.getElementById('main-tab');
+            const shopTab = document.getElementById('shop-tab');
+            if (mainTab && shopTab) {
+                mainTab.classList.add('hidden');
+                shopTab.classList.remove('hidden');
+                window.renderProducts(filter);
+            }
         };
         window.closeShop = function() {
-            document.getElementById('shop-tab').classList.add('hidden');
-            document.getElementById('main-tab').classList.remove('hidden');
+            const mainTab = document.getElementById('main-tab');
+            const shopTab = document.getElementById('shop-tab');
+            if (mainTab && shopTab) {
+                shopTab.classList.add('hidden');
+                mainTab.classList.remove('hidden');
+            }
         };
         window.renderProducts = function(filter) {
             const grid = document.getElementById('product-grid');
-            document.getElementById('shop-title').innerText = filter;
+            if (!grid) return;
+            
+            const titleEl = document.getElementById('shop-title');
+            if (titleEl) titleEl.innerText = filter;
             
             const filtered = window.publicProducts.filter(p => p.collection === filter);
             if(filtered.length === 0) {
-                grid.innerHTML = '<div class="col-span-2 text-center py-10 opacity-60 text-white/80">Chưa có sản phẩm</div>';
+                grid.innerHTML = '<div class="col-span-2 text-center py-10 opacity-60 text-white/80">Chưa có sản phẩm trong bộ sưu tập này</div>';
                 return;
             }
             
@@ -374,11 +373,14 @@
                 </div>
             `).join('');
             
-            // Sub-tabs
+            // Sub-tabs (Safe Filter)
             const cats = [...new Set(window.publicProducts.map(p=>p.collection))].filter(c=>c);
-            document.getElementById('sub-tabs').innerHTML = cats.map(c => 
-                `<button onclick="window.renderProducts('${c}')" class="px-4 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap ${c===filter ? 'bg-white text-slate-900' : 'bg-white/20 text-white hover:bg-white/40'}">${c}</button>`
-            ).join('');
+            const subTabs = document.getElementById('sub-tabs');
+            if (subTabs) {
+                subTabs.innerHTML = cats.map(c => 
+                    `<button onclick="window.renderProducts('${c.replace(/'/g, "\\'")}')" class="px-4 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap ${c===filter ? 'bg-white text-slate-900' : 'bg-white/20 text-white hover:bg-white/40'}">${c}</button>`
+                ).join('');
+            }
         };
 
         // ROUTER
@@ -400,14 +402,21 @@
             }
         }
         window.addEventListener('hashchange', handleRoute);
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             currentUser = user;
             if (user) { 
                 document.getElementById('user-email-display').textContent = user.email || user.phoneNumber || 'User'; 
-                syncUserToDB(user);
-                if(!window.location.hash) window.location.hash = '#dashboard'; 
+                await syncUserToDB(user);
+                
+                // Fix: Prevent double route triggering
+                if(!window.location.hash) {
+                    window.location.hash = '#dashboard'; // Triggers hashchange -> handleRoute
+                } else {
+                    handleRoute(); // Manual trigger for refresh
+                }
+            } else {
+                handleRoute();
             }
-            handleRoute();
         });
 
         async function syncUserToDB(user) {
@@ -470,20 +479,42 @@
             catch(e) { showToast("Mã sai","error"); }
         }
         function handleLogout() { auth.signOut(); showToast("Đã đăng xuất"); }
-        function getErrorMessage(c) { return c; } // Keep simple or map codes
+        function getErrorMessage(code) {
+            switch (code) {
+                case 'auth/email-already-in-use': return "Email này đã được sử dụng.";
+                case 'auth/invalid-email': return "Email không hợp lệ.";
+                case 'auth/user-not-found': return "Tài khoản không tồn tại.";
+                case 'auth/wrong-password': return "Mật khẩu không đúng.";
+                case 'auth/operation-not-allowed': return "Lỗi: Chưa bật phương thức đăng nhập này trong Firebase.";
+                default: return "Lỗi: " + code;
+            }
+        }
 
         // DASHBOARD & EDITOR
         async function loadDashboard() {
-            const list = document.getElementById('bio-list'); list.innerHTML='';
+            // Fix: Prevent double loading
+            if(isDashboardLoading) return;
+            isDashboardLoading = true;
+
+            const list = document.getElementById('bio-list'), loader = document.getElementById('dashboard-loader');
+            list.innerHTML = ''; 
+            loader.classList.remove('hidden');
+            
             try {
                 const snap = await db.collection('bios').where('ownerId','==',currentUser.uid).get();
-                snap.forEach(d => {
-                    const data = d.data();
-                    list.innerHTML += `<div class="bg-white p-5 rounded-xl shadow-sm border"><div class="flex gap-3 mb-3"><img src="${data.profile.avatar}" class="w-12 h-12 rounded-full border"><div class="overflow-hidden"><h3 class="font-bold truncate">${data.profile.name}</h3><span class="text-xs bg-slate-100 px-2 rounded text-slate-500">/${d.id}</span></div></div><div class="flex gap-2"><a href="#edit/${d.id}" class="flex-1 bg-slate-900 text-white text-center py-2 rounded-lg text-sm font-bold">Sửa</a><a href="#u/${d.id}" target="_blank" class="px-3 bg-slate-100 rounded-lg flex items-center"><i class="fas fa-external-link-alt"></i></a></div></div>`;
-                });
-                if(snap.empty) list.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400">Bạn chưa có trang Bio nào.</div>';
+                if (snap.empty) { 
+                    list.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400">Bạn chưa có trang Bio nào.</div>'; 
+                } else {
+                    snap.forEach(d => {
+                        const data = d.data();
+                        list.innerHTML += `<div class="bg-white p-5 rounded-xl shadow-sm border"><div class="flex gap-3 mb-3"><img src="${data.profile.avatar}" class="w-12 h-12 rounded-full border"><div class="overflow-hidden"><h3 class="font-bold truncate">${data.profile.name}</h3><span class="text-xs bg-slate-100 px-2 rounded text-slate-500">/${d.id}</span></div></div><div class="flex gap-2"><a href="#edit/${d.id}" class="flex-1 bg-slate-900 text-white text-center py-2 rounded-lg text-sm font-bold">Sửa</a><a href="#u/${d.id}" target="_blank" class="px-3 bg-slate-100 rounded-lg flex items-center"><i class="fas fa-external-link-alt"></i></a></div></div>`;
+                    });
+                }
             } catch(e) { showToast(e.message,'error'); }
-            document.getElementById('dashboard-loader').classList.add('hidden');
+            finally { 
+                loader.classList.add('hidden'); 
+                isDashboardLoading = false;
+            }
         }
         function openCreateModal() { document.getElementById('modal-create').classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
@@ -580,23 +611,17 @@
 
         function generatePublicHTML(data, isPreview) {
             const theme = data.theme || { id: 'default', buttonStyle: 'rounded' };
-            const btnStyleMap = {
-                'rounded': 'rounded-full',
-                'rect': 'rounded-md',
-                'soft': 'rounded-2xl'
-            };
+            const btnStyleMap = { 'rounded': 'rounded-full', 'rect': 'rounded-md', 'soft': 'rounded-2xl' };
             const radiusClass = btnStyleMap[theme.buttonStyle] || 'rounded-full';
             
-            // Fix 1: Ensure click handler works for both Preview (local) and Public (global window)
+            // Fix 1: Robust escaping for HTML attributes
             const getClickAttr = (title) => {
-                const safeTitle = title.replace(/'/g, "\\'");
-                // For preview (iframe), function is local. For public (SPA), function is on window.
+                const safeTitle = title.replace(/"/g, '&quot;').replace(/'/g, "\\'");
                 return isPreview ? `onclick="openCollection('${safeTitle}')"` : `onclick="window.openCollection('${safeTitle}')"`;
             };
 
             const linksHtml = (data.links||[]).map(l => {
                 if(l.type === 'collection') {
-                    // Collection Button
                     return `<div ${getClickAttr(l.title)} class="cursor-pointer block mb-4 group"><div class="relative w-full p-4 flex items-center justify-between bg-white/90 backdrop-blur-md shadow-sm border border-white/40 rounded-2xl hover:bg-white transition"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-brand-100 rounded-lg flex items-center justify-center text-brand-600"><i class="fas fa-layer-group"></i></div><span class="font-bold text-sm text-slate-800">${l.title}</span></div><i class="fas fa-chevron-right text-slate-400"></i></div></div>`;
                 } else {
                     return `<a href="${l.url}" target="_blank" class="block mb-4 group transition hover:-translate-y-1"><div class="relative w-full p-4 flex items-center justify-center bg-white/90 backdrop-blur-md shadow-sm border border-white/40 rounded-2xl hover:bg-white transition"><span class="font-bold text-sm text-slate-800">${l.title}</span></div></a>`;
@@ -609,7 +634,7 @@
             }
 
             // Script for Iframe Preview only (Local functions)
-            // Fix 2: Escaping JSON properly to avoid script breaking
+            // Fix 2: Double escape for JSON inside script tag inside string
             const safeProducts = JSON.stringify(data.products || []).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
             const iframeScript = isPreview ? `
                 <script>
@@ -627,7 +652,6 @@
                                 <div class="p-3"><h3 class="font-bold text-xs line-clamp-2">\${p.name}</h3><div class="flex justify-between items-center mt-2"><span class="text-red-500 font-bold text-xs">\${p.price}</span><a href="\${p.link}" target="_blank" class="bg-black text-white text-[10px] px-2 py-1 rounded">Mua</a></div></div>
                             </div>\`).join('');
                         
-                        // Update Sub-tabs
                         const cats = [...new Set(products.map(p=>p.collection))].filter(c=>c);
                         document.getElementById('sub-tabs').innerHTML = cats.map(c => 
                             \`<button onclick="openCollection('\${c}')" class="px-3 py-1 rounded-full text-[10px] font-bold transition whitespace-nowrap \${c===filter ? 'bg-white text-slate-900' : 'bg-white/20 text-white'}">\${c}</button>\`
@@ -638,101 +662,50 @@
 
             // Common Styles (Shared)
             const stylesCss = `
-                /* Scrollbar */
                 ::-webkit-scrollbar { width: 0px; background: transparent; }
-                
-                /* Animations */
+                .animate-enter { animation: fadeIn 0.6s forwards; opacity: 0; }
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .animate-enter { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-                
-                /* Theme Backgrounds */
                 .theme-bg-default { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: white; }
                 .theme-bg-ocean { background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); color: white; }
-                .theme-bg-midnight { background-color: #000000; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 30px 30px; color: white; }
+                .theme-bg-midnight { background-color: #000000; color: white; }
                 .theme-bg-forest { background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); color: white; }
                 .theme-bg-minimal { background-color: #f3f4f6; color: #1f2937; }
                 .theme-bg-sunset { background: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%); color: #1e293b; }
-                
                 @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-                
-                /* Wrapper ensuring full height */
                 .bio-wrapper { min-height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; }
             `;
 
-            // Body Content (Shared)
             const bodyContent = `
                 <div class="bio-wrapper theme-bg-${theme.id}">
                     <div class="w-full max-w-lg px-6 py-12 flex flex-col items-center min-h-screen relative">
-                        
-                        <!-- Profile -->
                         <div class="text-center mb-8 animate-enter" style="animation-delay: 0ms">
                             <div class="relative w-28 h-28 mx-auto mb-4 group">
-                                <div class="absolute inset-0 bg-white/30 rounded-full blur-md group-hover:blur-lg transition-all duration-500"></div>
-                                <img src="${data.profile.avatar}" class="relative w-full h-full rounded-full object-cover border-4 border-white/50 shadow-2xl" 
-                                     onerror="this.src='https://ui-avatars.com/api/?name=Mewo&background=random'">
+                                <img src="${data.profile.avatar}" class="relative w-full h-full rounded-full object-cover border-4 border-white/50 shadow-2xl" onerror="this.src='https://ui-avatars.com/api/?name=Mewo&background=random'">
                             </div>
                             <h1 class="text-2xl font-extrabold mb-2 drop-shadow-md tracking-tight">${data.profile.name}</h1>
                             <p class="text-sm font-medium opacity-90 max-w-xs mx-auto leading-relaxed whitespace-pre-line">${data.profile.bio}</p>
                         </div>
-
-                        <!-- Socials -->
-                        <div class="flex gap-4 mb-10 flex-wrap justify-center animate-enter" style="animation-delay: 100ms">
-                            ${socialsHtml}
-                        </div>
-
-                        <!-- Main Tab: Links & Collections -->
-                        <div id="main-tab" class="w-full space-y-4 animate-enter" style="animation-delay: 200ms">
-                            ${linksHtml}
-                        </div>
-
-                        <!-- Shop Tab (Hidden) -->
+                        <div class="flex gap-4 mb-10 flex-wrap justify-center animate-enter" style="animation-delay: 100ms">${socialsHtml}</div>
+                        <div id="main-tab" class="w-full space-y-4 animate-enter" style="animation-delay: 200ms">${linksHtml}</div>
+                        
                         <div id="shop-tab" class="w-full hidden animate-enter pb-20" style="animation-delay: 0ms">
                             <div class="sticky top-0 z-20 pb-4 pt-2 flex items-center gap-3">
                                 <button onclick="${isPreview?'closeShop()':'window.closeShop()'}" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full text-white hover:bg-white/40 backdrop-blur-md"><i class="fas fa-arrow-left"></i></button>
                                 <h2 class="font-bold text-lg text-white drop-shadow-sm" id="shop-title">Shop</h2>
                             </div>
-                            <div class="flex overflow-x-auto gap-2 hide-scrollbar pb-2 mb-2" id="sub-tabs">
-                                <!-- Filter buttons injected by script -->
-                            </div>
-                            <div id="product-grid" class="grid grid-cols-2 gap-3">
-                                <!-- Products injected by script -->
-                            </div>
+                            <div class="flex overflow-x-auto gap-2 hide-scrollbar pb-2 mb-2" id="sub-tabs"></div>
+                            <div id="product-grid" class="grid grid-cols-2 gap-3"></div>
                         </div>
 
-                        ${!isPreview ? `
-                        <footer class="mt-auto pt-16 pb-4 text-center animate-enter" style="animation-delay: 500ms">
-                            <a href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors text-xs font-bold opacity-80 hover:opacity-100">
-                                <i class="fas fa-cat"></i> Created with Mewo
-                            </a>
-                        </footer>` : ''}
+                        ${!isPreview ? `<footer class="mt-auto pt-16 pb-4 text-center animate-enter" style="animation-delay: 500ms"><a href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors text-xs font-bold opacity-80 hover:opacity-100"><i class="fas fa-cat"></i> Created with Mewo</a></footer>` : ''}
                     </div>
                 </div>
                 ${iframeScript}
             `;
 
             if (isPreview) {
-                // Return FULL HTML Document for Iframe
-                return `
-                    <!DOCTYPE html>
-                    <html lang="vi">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <script src="https://cdn.tailwindcss.com"><\/script>
-                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-                        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-                        <style>
-                            body { font-family: 'Be Vietnam Pro', sans-serif; margin:0; min-height:100vh; overflow-x: hidden; }
-                            ${stylesCss}
-                        </style>
-                    </head>
-                    <body>
-                        ${bodyContent}
-                    </body>
-                    </html>
-                `;
+                return `<!DOCTYPE html><html><head><script src="https://cdn.tailwindcss.com"><\/script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{font-family:sans-serif;margin:0}${stylesCss}</style></head><body>${bodyContent}</body></html>`;
             } else {
-                // Return HTML Fragment + Style for SPA Div (No html/head/body tags)
                 return `<style>${stylesCss}</style>${bodyContent}`;
             }
         }
