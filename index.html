@@ -35,23 +35,51 @@
 
     <style>
         body { background-color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
+        
+        /* Themes Definitions */
         .theme-default { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: meshMove 15s ease infinite; color: white; }
         .theme-ocean { background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); color: white; }
         .theme-midnight { background-color: #000000; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 30px 30px; color: white; }
         .theme-forest { background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); color: white; }
         .theme-minimal { background-color: #f3f4f6; color: #1f2937; }
         .theme-sunset { background: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%); color: #1e293b; }
+
         @keyframes meshMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .btn-style-rounded { border-radius: 9999px; } .btn-style-rect { border-radius: 4px; } .btn-style-soft { border-radius: 16px; }
+
+        /* Button Styles */
+        .btn-style-rounded { border-radius: 9999px; }
+        .btn-style-rect { border-radius: 8px; }
+        .btn-style-soft { border-radius: 16px; }
+        
+        /* UI Utils */
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(0,0,0,0.05); }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .hidden { display: none !important; }
-        .input-modern { width: 100%; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; transition: all 0.2s; outline: none; }
-        .input-modern:focus { border-color: #e11d48; box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1); background: white; }
+        
+        /* Modern Admin UI Styles */
+        .modern-input { width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid transparent; border-radius: 10px; font-size: 0.9rem; transition: all 0.2s; outline: none; font-weight: 500; color: #334155; }
+        .modern-input:focus { background: #fff; border-color: #cbd5e1; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .modern-input::placeholder { color: #94a3b8; font-weight: 400; }
+        
+        .modern-card { background: white; border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; transition: all 0.2s; position: relative; }
+        .modern-card:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); border-color: #e2e8f0; }
+
+        .modern-tab-container { background: #f1f5f9; padding: 4px; border-radius: 12px; display: flex; gap: 4px; }
+        .modern-tab { flex: 1; text-align: center; padding: 8px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #64748b; transition: all 0.2s; cursor: pointer; }
+        .modern-tab:hover { color: #334155; }
+        .modern-tab.active { background: white; color: #0f172a; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        /* Cat SVG */
         .cat-paws { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); transform-box: fill-box; transform-origin: center top; }
         .cat-heart { opacity: 0; transform: scale(0) translateY(10px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: center; transform-box: fill-box; }
-        .loving-it .cat-paws-left { transform: translate(10px, -25px) rotate(30deg); } .loving-it .cat-paws-right { transform: translate(-10px, -25px) rotate(-30deg); } .loving-it .cat-heart { opacity: 1; transform: scale(1.2) translateY(-5px); animation: heartBeat 1s infinite; }
-        .covering-eyes .cat-paws-left { transform: translate(12px, -45px) rotate(10deg); } .covering-eyes .cat-paws-right { transform: translate(-12px, -45px) rotate(-10deg); }
+        .loving-it .cat-paws-left { transform: translate(10px, -25px) rotate(30deg); }
+        .loving-it .cat-paws-right { transform: translate(-10px, -25px) rotate(-30deg); }
+        .loving-it .cat-heart { opacity: 1; transform: scale(1.2) translateY(-5px); animation: heartBeat 1s infinite; }
+        .covering-eyes .cat-paws-left { transform: translate(12px, -45px) rotate(10deg); }
+        .covering-eyes .cat-paws-right { transform: translate(-12px, -45px) rotate(-10deg); }
+
+        /* Toast */
         .toast { background: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); margin-bottom: 12px; border-left: 4px solid #e11d48; animation: slideInRight 0.4s; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 0.9rem; position: fixed; top: 24px; right: 24px; z-index: 9999; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
@@ -60,10 +88,11 @@
 
     <div id="toast-container"></div>
 
-    <div id="app" class="min-h-screen flex flex-col">
+    <div id="app" class="min-h-screen flex flex-col relative">
         
         <!-- AUTH VIEW -->
         <div id="view-auth" class="view-section hidden flex-grow min-h-screen flex flex-col lg:flex-row bg-white">
+            <!-- Left Side Branding -->
             <div class="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden flex-col justify-between p-12 text-white">
                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 24px 24px;"></div>
                 <div class="relative z-10 flex items-center gap-3"><i class="fas fa-cat text-brand-500 text-2xl"></i> <span class="font-bold text-2xl">Mewo</span></div>
@@ -71,6 +100,7 @@
                 <div class="relative z-10 text-sm text-slate-500">© 2024 Mewo Inc.</div>
             </div>
 
+            <!-- Right Side Auth Forms -->
             <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 bg-white relative">
                 <div class="w-full max-w-sm">
                     <!-- Cat SVG -->
@@ -96,29 +126,32 @@
                         </svg>
                     </div>
                     
+                    <!-- Main Auth Container -->
                     <div id="auth-main-container">
                         <div class="text-center mb-6"><h1 class="text-2xl font-bold text-slate-900">Xin chào 👋</h1><p class="text-slate-500 text-sm">Đăng nhập để quản lý Mewo của bạn.</p></div>
                         <div class="flex bg-slate-100 p-1 rounded-lg mb-6"><button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900">Đăng nhập</button><button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500">Đăng ký</button></div>
                         
                         <!-- Login Form -->
                         <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-                            <input type="email" id="login-email" placeholder="Email" class="input-modern track-input" required>
-                            <input type="password" id="login-password" placeholder="Mật khẩu" class="input-modern pass-input" required>
+                            <input type="email" id="login-email" placeholder="Email" class="input-modern track-input" style="padding: 14px; border: 1px solid #e2e8f0;" required>
+                            <input type="password" id="login-password" placeholder="Mật khẩu" class="input-modern pass-input" style="padding: 14px; border: 1px solid #e2e8f0;" required>
                             <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng nhập</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="login-loader"></div></button>
                         </form>
                         
                         <!-- Register Form -->
                         <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
-                            <input type="email" id="reg-email" placeholder="Email" class="input-modern track-input" required>
-                            <input type="password" id="reg-password" placeholder="Mật khẩu (min 6 ký tự)" class="input-modern pass-input" minlength="6" required>
+                            <input type="email" id="reg-email" placeholder="Email" class="input-modern track-input" style="padding: 14px; border: 1px solid #e2e8f0;" required>
+                            <input type="password" id="reg-password" placeholder="Mật khẩu (min 6 ký tự)" class="input-modern pass-input" style="padding: 14px; border: 1px solid #e2e8f0;" minlength="6" required>
                             <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng ký</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="reg-loader"></div></button>
                         </form>
 
+                        <!-- Social Login Divider -->
                         <div class="relative my-6">
                             <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
                             <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-slate-500">Hoặc tiếp tục với</span></div>
                         </div>
 
+                        <!-- Social Buttons -->
                         <div class="w-full">
                             <button onclick="handleGoogleLogin()" class="w-full flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
                                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> <span class="text-sm font-medium">Google</span>
@@ -145,83 +178,118 @@
             </div>
         </div>
 
-        <!-- EDITOR VIEW -->
+        <!-- EDITOR VIEW - MODERN UI UPDATE -->
         <div id="view-editor" class="view-section hidden flex-grow bg-slate-100 flex flex-col md:flex-row h-screen overflow-hidden">
             <!-- Left Panel -->
-            <div class="w-full md:w-[450px] bg-white border-r border-slate-200 flex flex-col h-full z-20 shadow-xl animate-slide-up md:animate-none">
-                <div class="px-5 py-3 border-b border-slate-100 flex justify-between items-center bg-white z-10">
-                    <button onclick="goToDashboard()" class="text-slate-500 hover:text-slate-900 font-medium text-sm flex items-center gap-1"><i class="fas fa-chevron-left"></i> Dashboard</button>
-                    <button onclick="saveCurrentBio()" class="bg-brand-600 text-white px-4 py-1.5 rounded-md font-bold text-sm hover:bg-brand-700 shadow flex items-center gap-2"><i class="fas fa-save"></i> Lưu</button>
+            <div class="w-full md:w-[450px] bg-[#f9fafb] border-r border-slate-200 flex flex-col h-full z-20 shadow-xl animate-slide-up md:animate-none">
+                <div class="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-white z-10 sticky top-0">
+                    <button onclick="goToDashboard()" class="text-slate-500 hover:text-slate-900 font-bold text-sm flex items-center gap-2 transition"><i class="fas fa-arrow-left"></i> Dashboard</button>
+                    <button onclick="saveCurrentBio()" class="bg-slate-900 text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-slate-800 shadow-md flex items-center gap-2 transition hover:scale-105 active:scale-95"><i class="fas fa-save"></i> Lưu</button>
                 </div>
                 
-                <!-- Editor Tabs -->
-                <div class="flex border-b border-slate-100 px-5 pt-2">
-                    <button onclick="switchEditorTab('links')" id="tab-editor-links" class="flex-1 py-2 text-sm font-bold border-b-2 border-brand-600 text-brand-600">Liên kết</button>
-                    <button onclick="switchEditorTab('products')" id="tab-editor-products" class="flex-1 py-2 text-sm font-medium text-slate-500 hover:text-slate-800">Sản phẩm</button>
-                    <button onclick="switchEditorTab('appearance')" id="tab-editor-appearance" class="flex-1 py-2 text-sm font-medium text-slate-500 hover:text-slate-800">Giao diện</button>
+                <!-- Modern Tabs -->
+                <div class="p-4 bg-white border-b border-slate-200">
+                    <div class="modern-tab-container">
+                        <div onclick="switchEditorTab('links')" id="tab-editor-links" class="modern-tab active">Liên kết</div>
+                        <div onclick="switchEditorTab('products')" id="tab-editor-products" class="modern-tab">Sản phẩm</div>
+                        <div onclick="switchEditorTab('appearance')" id="tab-editor-appearance" class="modern-tab">Giao diện</div>
+                    </div>
                 </div>
 
-                <div class="overflow-y-auto flex-1 p-5 space-y-6 custom-scrollbar bg-slate-50/50">
-                    <!-- URL Info -->
-                    <div class="bg-blue-50 px-4 py-2 rounded border border-blue-100 flex justify-between items-center">
-                        <span class="text-xs text-blue-600 font-mono truncate max-w-[200px]" id="editor-url-display">...</span>
-                        <div class="flex gap-2">
-                            <button onclick="showQRCode()" class="text-blue-500 hover:text-blue-700" title="QR Code"><i class="fas fa-qrcode"></i></button>
-                            <a id="live-preview-link" href="#" target="_blank" class="text-blue-500 hover:text-blue-700"><i class="fas fa-external-link-alt"></i></a>
+                <div class="overflow-y-auto flex-1 p-5 space-y-6 custom-scrollbar">
+                    <!-- URL Info Card -->
+                    <div class="modern-card flex justify-between items-center !py-3">
+                        <div class="flex items-center gap-2 overflow-hidden">
+                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            <a id="live-preview-link" href="#" target="_blank" class="text-xs font-bold text-slate-600 hover:text-brand-600 truncate transition font-mono" id="editor-url-display">...</a>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="copyToClipboard(document.getElementById('editor-url-display').innerText)" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition" title="Sao chép"><i class="fas fa-copy"></i></button>
+                            <button onclick="showQRCode()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition" title="QR Code"><i class="fas fa-qrcode"></i></button>
                         </div>
                     </div>
 
                     <!-- TAB 1: LINKS -->
                     <div id="editor-tab-links" class="editor-tab-content space-y-4">
-                        <div class="flex justify-between items-center"><h3 class="font-bold text-slate-800 text-sm">Danh sách liên kết</h3><button onclick="addLinkItem()" class="text-xs bg-slate-900 text-white px-3 py-1.5 rounded font-bold shadow-sm">+ Thêm</button></div>
+                        <button onclick="addLinkItem()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2 transform active:scale-95">
+                            <i class="fas fa-plus-circle"></i> Thêm liên kết mới
+                        </button>
+                        
                         <div id="ed-links-list" class="space-y-3 pb-10"></div>
                     </div>
 
                     <!-- TAB 2: PRODUCTS -->
                     <div id="editor-tab-products" class="editor-tab-content hidden space-y-4">
-                        <div class="flex justify-between items-center"><h3 class="font-bold text-slate-800 text-sm">Sản phẩm tiếp thị</h3><button onclick="addProductItem()" class="text-xs bg-slate-900 text-white px-3 py-1.5 rounded font-bold shadow-sm">+ Thêm SP</button></div>
-                        <p class="text-xs text-slate-500 bg-slate-100 p-2 rounded">Chọn loại "Bộ sưu tập" ở tab Liên kết để nhóm các sản phẩm này.</p>
+                        <button onclick="addProductItem()" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold shadow-lg transition flex items-center justify-center gap-2 transform active:scale-95">
+                            <i class="fas fa-shopping-bag"></i> Thêm sản phẩm
+                        </button>
+                        <div class="p-3 bg-blue-50 text-blue-700 text-xs rounded-xl font-medium border border-blue-100 flex items-start gap-2">
+                            <i class="fas fa-info-circle mt-0.5"></i>
+                            <div>Tạo một liên kết loại <b>"Bộ sưu tập"</b> ở tab Liên kết để hiển thị nhóm sản phẩm này.</div>
+                        </div>
                         <div id="ed-products-list" class="space-y-3 pb-10"></div>
                     </div>
 
                     <!-- TAB 3: APPEARANCE -->
                     <div id="editor-tab-appearance" class="editor-tab-content hidden space-y-6">
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
-                            <h3 class="font-bold text-xs uppercase text-slate-400 mb-2">Hồ sơ</h3>
-                            <div class="flex gap-3 items-center"><img id="editor-avatar-preview" class="w-12 h-12 rounded-full bg-slate-100 object-cover border"><input type="text" id="ed-avatar" oninput="updatePreview()" placeholder="URL Ảnh đại diện" class="input-modern flex-1"></div>
-                            <input type="text" id="ed-name" oninput="updatePreview()" placeholder="Tên hiển thị" class="input-modern font-bold">
-                            <textarea id="ed-bio" oninput="updatePreview()" placeholder="Mô tả ngắn" rows="2" class="input-modern resize-none text-sm"></textarea>
-                        </div>
-                        <div class="space-y-3">
-                            <h3 class="font-bold text-xs uppercase text-slate-400">Chủ đề</h3>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button onclick="setTheme('default')" class="h-16 rounded-lg border-2 border-transparent hover:border-brand-500 bg-gradient-to-br from-pink-200 to-pink-400"></button>
-                                <button onclick="setTheme('ocean')" class="h-16 rounded-lg border-2 border-transparent hover:border-brand-500 bg-gradient-to-b from-blue-600 to-cyan-400"></button>
-                                <button onclick="setTheme('midnight')" class="h-16 rounded-lg border-2 border-transparent hover:border-brand-500 bg-slate-800"></button>
-                                <button onclick="setTheme('forest')" class="h-16 rounded-lg border-2 border-transparent hover:border-brand-500 bg-gradient-to-br from-green-700 to-green-400"></button>
-                                <button onclick="setTheme('minimal')" class="h-16 rounded-lg border-2 border-transparent hover:border-brand-500 bg-white border-slate-200"></button>
-                                <button onclick="setTheme('sunset')" class="h-16 rounded-lg border-2 border-transparent hover:border-brand-500 bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-400"></button>
+                        <!-- Profile -->
+                        <div class="modern-card space-y-4">
+                            <h3 class="font-bold text-sm text-slate-900">Hồ sơ</h3>
+                            <div class="flex gap-4 items-center">
+                                <div class="w-16 h-16 rounded-full bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
+                                    <img id="editor-avatar-preview" class="w-full h-full object-cover">
+                                </div>
+                                <input type="text" id="ed-avatar" oninput="updatePreview()" placeholder="Dán link ảnh avatar..." class="modern-input">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase ml-1">Tên hiển thị</label>
+                                <input type="text" id="ed-name" oninput="updatePreview()" placeholder="Ví dụ: Mewo Official" class="modern-input mt-1">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase ml-1">Tiểu sử (Bio)</label>
+                                <textarea id="ed-bio" oninput="updatePreview()" placeholder="Giới thiệu ngắn về bạn..." rows="3" class="modern-input mt-1 resize-none"></textarea>
                             </div>
                         </div>
+
+                        <!-- Themes -->
+                        <div class="space-y-2">
+                            <h3 class="font-bold text-sm text-slate-900 ml-1">Chủ đề</h3>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button onclick="setTheme('default')" class="h-24 rounded-xl bg-gradient-to-br from-pink-200 to-pink-400 shadow-sm hover:ring-4 ring-brand-200 transition transform hover:scale-105"></button>
+                                <button onclick="setTheme('ocean')" class="h-24 rounded-xl bg-gradient-to-b from-blue-600 to-cyan-400 shadow-sm hover:ring-4 ring-blue-200 transition transform hover:scale-105"></button>
+                                <button onclick="setTheme('midnight')" class="h-24 rounded-xl bg-slate-800 shadow-sm hover:ring-4 ring-slate-400 transition transform hover:scale-105"></button>
+                                <button onclick="setTheme('forest')" class="h-24 rounded-xl bg-gradient-to-br from-green-700 to-green-400 shadow-sm hover:ring-4 ring-green-200 transition transform hover:scale-105"></button>
+                                <button onclick="setTheme('minimal')" class="h-24 rounded-xl bg-white border border-slate-200 shadow-sm hover:ring-4 ring-slate-200 transition transform hover:scale-105"></button>
+                                <button onclick="setTheme('sunset')" class="h-24 rounded-xl bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-400 shadow-sm hover:ring-4 ring-purple-200 transition transform hover:scale-105"></button>
+                            </div>
+                        </div>
+
                         <!-- Button Style -->
-                        <div class="space-y-3">
-                            <h3 class="font-bold text-xs uppercase text-slate-400">Kiểu nút</h3>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button onclick="setButtonStyle('rounded')" class="py-2 border border-slate-200 bg-white rounded-full text-xs font-bold hover:border-brand-500">Tròn</button>
-                                <button onclick="setButtonStyle('soft')" class="py-2 border border-slate-200 bg-white rounded-xl text-xs font-bold hover:border-brand-500">Bo góc</button>
-                                <button onclick="setButtonStyle('rect')" class="py-2 border border-slate-200 bg-white rounded text-xs font-bold hover:border-brand-500">Vuông</button>
+                        <div class="space-y-2">
+                            <h3 class="font-bold text-sm text-slate-900 ml-1">Kiểu nút</h3>
+                            <div class="grid grid-cols-3 gap-2 bg-slate-200 p-1 rounded-xl">
+                                <button onclick="setButtonStyle('rounded')" class="py-2 bg-white rounded-lg text-xs font-bold shadow-sm hover:text-brand-600 transition">Tròn</button>
+                                <button onclick="setButtonStyle('soft')" class="py-2 bg-slate-200/50 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:shadow-sm transition">Bo góc</button>
+                                <button onclick="setButtonStyle('rect')" class="py-2 bg-slate-200/50 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:shadow-sm transition">Vuông</button>
                             </div>
                         </div>
-                        <!-- Socials in Appearance Tab -->
-                        <div class="space-y-2" id="socials-list"></div>
+
+                        <!-- Socials -->
+                        <div class="modern-card space-y-3">
+                            <h3 class="font-bold text-sm text-slate-900">Mạng xã hội</h3>
+                            <div class="space-y-2" id="socials-list">
+                                <!-- Injected JS -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Right Preview -->
-            <div class="flex-1 bg-slate-200 flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
-                <div class="w-[340px] h-[680px] bg-black rounded-[48px] border-[8px] border-black shadow-2xl overflow-hidden relative z-10">
-                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-xl z-20"></div>
+            <div class="flex-1 bg-slate-100 flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
+                <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
+                <div class="w-[350px] h-[700px] bg-white rounded-[50px] border-[12px] border-slate-900 shadow-2xl overflow-hidden relative z-10 ring-8 ring-slate-900/5">
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-slate-900 rounded-b-2xl z-20"></div>
                     <iframe id="preview-frame" class="w-full h-full bg-white"></iframe>
                 </div>
             </div>
@@ -237,7 +305,7 @@
         <div class="bg-white rounded-2xl p-6 w-full max-w-xs animate-slide-up">
             <h3 class="font-bold text-lg mb-4">Tạo Mewo mới</h3>
             <div class="flex bg-slate-50 border rounded-lg overflow-hidden mb-4"><span class="px-3 py-2 text-slate-500 text-sm border-r">/u/</span><input id="new-slug" placeholder="username" class="flex-1 p-2 bg-transparent outline-none text-sm font-bold lowercase"></div>
-            <div class="flex justify-end gap-2"><button onclick="closeModal('modal-create')" class="px-4 py-2 text-sm text-slate-500 font-bold">Hủy</button><button onclick="createNewBio()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold">Tạo ngay</button></div>
+            <div class="flex justify-end gap-2"><button onclick="closeModal('modal-create')" class="px-4 py-2 text-sm text-slate-500 font-bold">Hủy</button><button onclick="createNewBio()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold" id="btn-create-bio">Tạo ngay</button></div>
         </div>
     </div>
 
@@ -257,22 +325,15 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // GLOBAL ERROR HANDLER
-        window.onerror = function(message, source, lineno, colno, error) {
-            console.error("Global Error:", message);
-            showToast("Lỗi hệ thống: " + message, "error");
-        };
-
         // STATE & GLOBALS
         let currentUser = null, currentBioData = null, editingSlug = null;
         let isDashboardLoading = false; // Fix: Prevent race condition
         const socialPlatforms = [
-            { id: 'facebook', icon: 'fab fa-facebook', label: 'Facebook' },
-            { id: 'instagram', icon: 'fab fa-instagram', label: 'Instagram' },
-            { id: 'tiktok', icon: 'fab fa-tiktok', label: 'TikTok' },
-            { id: 'youtube', icon: 'fab fa-youtube', label: 'YouTube' },
-            { id: 'twitter', icon: 'fab fa-twitter', label: 'Twitter' },
-            { id: 'email', icon: 'fas fa-envelope', label: 'Email' }
+            { id: 'facebook', icon: 'fab fa-facebook', label: 'Facebook', color: 'text-blue-600' },
+            { id: 'instagram', icon: 'fab fa-instagram', label: 'Instagram', color: 'text-pink-500' },
+            { id: 'tiktok', icon: 'fab fa-tiktok', label: 'TikTok', color: 'text-black' },
+            { id: 'youtube', icon: 'fab fa-youtube', label: 'YouTube', color: 'text-red-600' },
+            { id: 'email', icon: 'fas fa-envelope', label: 'Email', color: 'text-slate-500' }
         ];
         
         // --- GLOBAL PUBLIC FUNCTIONS (FOR SHOP LOGIC) ---
@@ -535,14 +596,41 @@
             renderEditorLinks(); renderEditorProducts(); renderSocialsInput();
             switchEditorTab('links'); updatePreview();
         }
+        
         function switchEditorTab(t) {
+            // Update Active Tab UI
+            const tabs = ['links', 'products', 'appearance'];
+            tabs.forEach(tab => {
+                const el = document.getElementById(`tab-editor-${tab}`);
+                if (t === tab) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+
+            // Show Content
             document.querySelectorAll('.editor-tab-content').forEach(e=>e.classList.add('hidden'));
             document.getElementById(`editor-tab-${t}`).classList.remove('hidden');
         }
+
         function renderEditorLinks() {
             const l = document.getElementById('ed-links-list'); l.innerHTML='';
             currentBioData.links.forEach((link,i) => {
-                l.innerHTML += `<div class="bg-white p-3 rounded shadow-sm border relative"><div class="absolute top-2 right-2 flex gap-2"><select onchange="updateLink(${i},'type',this.value)" class="text-xs border rounded"><option value="link" ${link.type!=='collection'?'selected':''}>Link</option><option value="collection" ${link.type==='collection'?'selected':''}>Bộ sưu tập</option></select><button onclick="removeLink(${i})" class="text-red-500"><i class="fas fa-trash"></i></button></div><input value="${link.title}" oninput="updateLink(${i},'title',this.value)" class="font-bold w-full outline-none mb-1"><input value="${link.url}" oninput="updateLink(${i},'url',this.value)" class="text-xs w-full outline-none text-blue-500"></div>`;
+                l.innerHTML += `
+                <div class="modern-card group">
+                    <div class="absolute top-3 right-3 flex gap-2">
+                        <select onchange="updateLink(${i},'type',this.value)" class="text-xs border border-slate-200 rounded-lg p-1 bg-slate-50 outline-none">
+                            <option value="link" ${link.type!=='collection'?'selected':''}>Link</option>
+                            <option value="collection" ${link.type==='collection'?'selected':''}>Bộ sưu tập</option>
+                        </select>
+                        <button onclick="removeLink(${i})" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="space-y-2">
+                         <input value="${link.title}" oninput="updateLink(${i},'title',this.value)" class="font-bold w-full bg-transparent outline-none text-slate-800 placeholder-slate-300" placeholder="Tiêu đề">
+                         <input value="${link.url}" oninput="updateLink(${i},'url',this.value)" class="text-xs w-full bg-transparent outline-none text-brand-600 placeholder-slate-300" placeholder="https://...">
+                    </div>
+                </div>`;
             });
         }
         function renderEditorProducts() {
@@ -550,13 +638,32 @@
             const cols = currentBioData.links.filter(k=>k.type==='collection');
             currentBioData.products.forEach((p,i) => {
                 const opts = cols.map(c=>`<option value="${c.title}" ${p.collection===c.title?'selected':''}>${c.title}</option>`).join('');
-                l.innerHTML += `<div class="bg-white p-3 rounded shadow-sm border flex gap-3"><div class="flex-1"><input value="${p.name}" oninput="updateProduct(${i},'name',this.value)" class="font-bold w-full text-sm outline-none"><input value="${p.price}" oninput="updateProduct(${i},'price',this.value)" class="text-xs text-brand-600 font-bold"><select onchange="updateProduct(${i},'collection',this.value)" class="text-xs border rounded">${opts}</select></div><div class="flex flex-col gap-1"><button onclick="removeProduct(${i})" class="text-red-500 text-xs text-right"><i class="fas fa-trash"></i></button><input value="${p.image}" oninput="updateProduct(${i},'image',this.value)" class="text-[10px] border rounded" placeholder="Img"><input value="${p.link}" oninput="updateProduct(${i},'link',this.value)" class="text-[10px] border rounded" placeholder="Link"></div></div>`;
+                l.innerHTML += `
+                <div class="modern-card flex gap-3">
+                    <div class="w-16 h-16 bg-slate-100 rounded-lg overflow-hidden shrink-0">
+                         <img src="${p.image || 'https://placehold.co/100'}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 space-y-1">
+                        <input value="${p.name}" oninput="updateProduct(${i},'name',this.value)" class="font-bold w-full text-sm outline-none bg-transparent placeholder-slate-300" placeholder="Tên sản phẩm">
+                        <div class="flex gap-2">
+                             <input value="${p.price}" oninput="updateProduct(${i},'price',this.value)" class="text-xs w-20 text-brand-600 font-bold outline-none bg-slate-50 px-1 rounded" placeholder="Giá">
+                             <select onchange="updateProduct(${i},'collection',this.value)" class="text-xs border rounded px-1 bg-white outline-none">${opts}</select>
+                        </div>
+                        <input value="${p.image}" oninput="updateProduct(${i},'image',this.value)" class="text-[10px] w-full border-none bg-transparent outline-none text-slate-400" placeholder="Link ảnh (URL)">
+                        <input value="${p.link}" oninput="updateProduct(${i},'link',this.value)" class="text-[10px] w-full border-none bg-transparent outline-none text-blue-400" placeholder="Link tiếp thị (Affiliate)">
+                    </div>
+                    <button onclick="removeProduct(${i})" class="text-slate-300 hover:text-red-500 self-start"><i class="fas fa-trash"></i></button>
+                </div>`;
             });
         }
         function renderSocialsInput() {
             const l = document.getElementById('socials-list'); l.innerHTML='';
             socialPlatforms.forEach(p => {
-                l.innerHTML += `<div class="flex items-center gap-2 border rounded px-2 py-1 mb-1"><i class="${p.icon} text-slate-400"></i><input value="${currentBioData.socials[p.id]||''}" oninput="updateSocial('${p.id}',this.value)" class="text-sm w-full outline-none" placeholder="${p.label}"></div>`;
+                l.innerHTML += `
+                <div class="flex items-center gap-3 p-2 border border-slate-100 rounded-xl bg-slate-50 focus-within:bg-white focus-within:border-brand-200 transition">
+                    <i class="${p.icon} ${p.color} text-lg w-6 text-center"></i>
+                    <input value="${currentBioData.socials[p.id]||''}" oninput="updateSocial('${p.id}',this.value)" class="text-sm w-full bg-transparent outline-none text-slate-700 placeholder-slate-400" placeholder="Dán link ${p.label}...">
+                </div>`;
             });
         }
 
@@ -568,11 +675,14 @@
         function updateProduct(i,k,v){ currentBioData.products[i][k]=v; renderEditorProducts(); updatePreview(); }
         function updateSocial(k,v){ currentBioData.socials[k]=v; updatePreview(); }
         function setTheme(id){ currentBioData.theme.id=id; updatePreview(); }
+        function setButtonStyle(s){ if(!currentBioData.theme) currentBioData.theme={}; currentBioData.theme.buttonStyle=s; updatePreview(); }
 
         function updatePreview() {
             currentBioData.profile.name = document.getElementById('ed-name').value;
             currentBioData.profile.bio = document.getElementById('ed-bio').value;
             currentBioData.profile.avatar = document.getElementById('ed-avatar').value;
+            document.getElementById('editor-avatar-preview').src = currentBioData.profile.avatar;
+            document.getElementById('editor-url-display').innerText = `${window.location.origin}/#u/${editingSlug}`;
             
             const frame = document.getElementById('preview-frame');
             const doc = frame.contentDocument || frame.contentWindow.document;
@@ -580,7 +690,7 @@
             doc.write(generatePublicHTML(currentBioData, true));
             doc.close();
         }
-        function goToDashboard() { window.location.hash = '#dashboard'; } // Fixed: Added goToDashboard
+        function goToDashboard() { window.location.hash = '#dashboard'; } 
         async function saveCurrentBio() { try { await db.collection('bios').doc(editingSlug).update(currentBioData); showToast("Lưu thành công","success"); } catch(e){ showToast(e.message,'error'); } }
         function showQRCode() { document.getElementById('modal-qr').classList.remove('hidden'); document.getElementById('qr-image').src=`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin+'/#u/'+editingSlug)}`; }
 
