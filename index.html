@@ -237,7 +237,7 @@
         <div class="bg-white rounded-2xl p-6 w-full max-w-xs animate-slide-up">
             <h3 class="font-bold text-lg mb-4">Tạo Mewo mới</h3>
             <div class="flex bg-slate-50 border rounded-lg overflow-hidden mb-4"><span class="px-3 py-2 text-slate-500 text-sm border-r">/u/</span><input id="new-slug" placeholder="username" class="flex-1 p-2 bg-transparent outline-none text-sm font-bold lowercase"></div>
-            <div class="flex justify-end gap-2"><button onclick="closeModal('modal-create')" class="px-4 py-2 text-sm text-slate-500 font-bold">Hủy</button><button onclick="createNewBio()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold" id="btn-create-bio">Tạo ngay</button></div>
+            <div class="flex justify-end gap-2"><button onclick="closeModal('modal-create')" class="px-4 py-2 text-sm text-slate-500 font-bold">Hủy</button><button onclick="createNewBio()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold">Tạo ngay</button></div>
         </div>
     </div>
 
@@ -401,6 +401,9 @@
         const catContainer = document.getElementById('cat-container');
         document.addEventListener('mousemove', (e) => {
             if(!catContainer) return;
+            // Check if modal is visible to save performance
+            if(document.getElementById('modal-auth') && document.getElementById('modal-auth').classList.contains('hidden')) return;
+            
             const rect = catContainer.getBoundingClientRect();
             const dx = (e.clientX - (rect.left+rect.width/2))/25, dy = (e.clientY - (rect.top+rect.height/2))/25;
             const lx = Math.min(Math.max(dx,-5),5), ly = Math.min(Math.max(dy,-5),5);
@@ -577,6 +580,7 @@
             doc.write(generatePublicHTML(currentBioData, true));
             doc.close();
         }
+        function goToDashboard() { window.location.hash = '#dashboard'; } // Fixed: Added goToDashboard
         async function saveCurrentBio() { try { await db.collection('bios').doc(editingSlug).update(currentBioData); showToast("Lưu thành công","success"); } catch(e){ showToast(e.message,'error'); } }
         function showQRCode() { document.getElementById('modal-qr').classList.remove('hidden'); document.getElementById('qr-image').src=`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin+'/#u/'+editingSlug)}`; }
 
