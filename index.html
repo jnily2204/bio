@@ -46,6 +46,11 @@
 
         @keyframes meshMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
+        /* Button Styles */
+        .btn-style-rounded { border-radius: 9999px; }
+        .btn-style-rect { border-radius: 4px; }
+        .btn-style-soft { border-radius: 16px; }
+        
         /* UI Utils */
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(0,0,0,0.05); }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
@@ -76,12 +81,15 @@
         
         <!-- AUTH VIEW -->
         <div id="view-auth" class="view-section hidden flex-grow min-h-screen flex flex-col lg:flex-row bg-white">
+            <!-- Left Side Branding -->
             <div class="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden flex-col justify-between p-12 text-white">
                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 24px 24px;"></div>
                 <div class="relative z-10 flex items-center gap-3"><i class="fas fa-cat text-brand-500 text-2xl"></i> <span class="font-bold text-2xl">Mewo</span></div>
                 <div class="relative z-10 max-w-md"><h2 class="text-5xl font-bold mb-6">Liên kết mọi thứ.<br>Một nơi duy nhất.</h2><p class="text-slate-400 text-lg">Nền tảng Bio Link miễn phí, mạnh mẽ và cute nhất vũ trụ.</p></div>
                 <div class="relative z-10 text-sm text-slate-500">© 2024 Mewo Inc.</div>
             </div>
+
+            <!-- Right Side Auth Forms -->
             <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 bg-white relative">
                 <div class="w-full max-w-sm">
                     <!-- Cat SVG -->
@@ -106,42 +114,67 @@
                             <g><ellipse class="cat-paws cat-paws-left" cx="25" cy="95" rx="10" ry="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/><ellipse class="cat-paws cat-paws-right" cx="95" cy="95" rx="10" ry="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/></g>
                         </svg>
                     </div>
-                    <div class="text-center mb-6"><h1 class="text-2xl font-bold text-slate-900">Xin chào 👋</h1><p class="text-slate-500 text-sm">Đăng nhập để quản lý Mewo của bạn.</p></div>
-                    <div class="flex bg-slate-100 p-1 rounded-lg mb-6"><button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900">Đăng nhập</button><button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500">Đăng ký</button></div>
                     
-                    <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-                        <input type="email" id="login-email" placeholder="Email" class="input-modern track-input" required>
-                        <input type="password" id="login-password" placeholder="Mật khẩu" class="input-modern pass-input" required>
-                        <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng nhập</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="login-loader"></div></button>
-                    </form>
-                    <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
-                        <input type="email" id="reg-email" placeholder="Email" class="input-modern track-input" required>
-                        <input type="password" id="reg-password" placeholder="Mật khẩu (min 6 ký tự)" class="input-modern pass-input" minlength="6" required>
-                        <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng ký</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="reg-loader"></div></button>
-                    </form>
-                    
-                    <!-- Social Login -->
-                    <div class="relative my-6"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-slate-500">Hoặc</span></div></div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-2 py-2.5 border rounded-lg hover:bg-slate-50"><img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"><span class="text-sm font-medium">Google</span></button>
-                        <button onclick="switchAuthView('phone')" class="flex items-center justify-center gap-2 py-2.5 border rounded-lg hover:bg-slate-50"><i class="fas fa-phone text-slate-600"></i><span class="text-sm font-medium">SĐT</span></button>
+                    <!-- Main Auth Container -->
+                    <div id="auth-main-container">
+                        <div class="text-center mb-6"><h1 class="text-2xl font-bold text-slate-900">Xin chào 👋</h1><p class="text-slate-500 text-sm">Đăng nhập để quản lý Mewo của bạn.</p></div>
+                        <div class="flex bg-slate-100 p-1 rounded-lg mb-6"><button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900">Đăng nhập</button><button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500">Đăng ký</button></div>
+                        
+                        <!-- Login Form -->
+                        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                            <input type="email" id="login-email" placeholder="Email" class="input-modern track-input" required>
+                            <input type="password" id="login-password" placeholder="Mật khẩu" class="input-modern pass-input" required>
+                            <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng nhập</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="login-loader"></div></button>
+                        </form>
+                        
+                        <!-- Register Form -->
+                        <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                            <input type="email" id="reg-email" placeholder="Email" class="input-modern track-input" required>
+                            <input type="password" id="reg-password" placeholder="Mật khẩu (min 6 ký tự)" class="input-modern pass-input" minlength="6" required>
+                            <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng ký</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="reg-loader"></div></button>
+                        </form>
+
+                        <!-- Social Login Divider -->
+                        <div class="relative my-6">
+                            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+                            <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-slate-500">Hoặc tiếp tục với</span></div>
+                        </div>
+
+                        <!-- Social Buttons -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> <span class="text-sm font-medium">Google</span>
+                            </button>
+                            <button onclick="switchAuthView('phone')" class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                                <i class="fas fa-phone text-slate-600"></i> <span class="text-sm font-medium">Số điện thoại</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Phone Auth Container -->
-                    <div id="auth-phone-container" class="hidden w-full absolute top-0 left-0 h-full bg-white p-6 z-20 flex flex-col">
-                        <button onclick="switchAuthView('main')" class="text-sm text-slate-500 hover:text-slate-900 mb-6 flex items-center gap-1"><i class="fas fa-arrow-left"></i> Quay lại</button>
+                    <!-- Phone Auth Container (Hidden by default) -->
+                    <div id="auth-phone-container" class="hidden">
+                        <button onclick="switchAuthView('main')" class="text-sm text-slate-500 hover:text-slate-900 mb-4 flex items-center gap-1"><i class="fas fa-arrow-left"></i> Quay lại</button>
                         <h2 class="text-xl font-bold mb-4">Đăng nhập bằng SĐT</h2>
+                        
+                        <!-- Step 1: Input Phone -->
                         <div id="phone-step-1">
-                            <div class="flex gap-2 mb-4"><div class="w-20 p-2.5 bg-slate-50 border rounded-lg text-center text-sm font-bold flex items-center justify-center">🇻🇳 +84</div><input type="tel" id="phone-input" placeholder="912345678" class="flex-1 input-modern" oninput="this.value = this.value.replace(/[^0-9]/g, '')"></div>
+                            <div class="flex gap-2 mb-4">
+                                <div class="w-20 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-center text-sm font-bold flex items-center justify-center gap-1">🇻🇳 +84</div>
+                                <input type="tel" id="phone-input" placeholder="912345678" class="flex-1 input-modern" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            </div>
                             <div id="recaptcha-container" class="mb-4"></div>
-                            <button onclick="sendOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold" id="btn-send-otp">Gửi mã xác thực</button>
+                            <button onclick="sendOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition mt-2" id="btn-send-otp">Gửi mã xác thực</button>
                         </div>
+
+                        <!-- Step 2: Input OTP -->
                         <div id="phone-step-2" class="hidden">
-                            <p class="text-sm text-slate-500 mb-4">Nhập mã OTP:</p>
+                            <p class="text-sm text-slate-500 mb-4">Nhập mã OTP (6 số) đã gửi đến số điện thoại của bạn.</p>
                             <input type="text" id="otp-input" placeholder="123456" class="input-modern text-center tracking-widest text-lg font-bold mb-4" maxlength="6">
-                            <button onclick="verifyOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold">Xác nhận</button>
+                            <button onclick="verifyOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition">Xác nhận</button>
+                            <button onclick="switchAuthView('phone')" class="w-full text-slate-500 py-2 text-sm mt-2 hover:text-slate-700">Gửi lại / Đổi số</button>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -220,6 +253,15 @@
                                 <button onclick="setTheme('sunset')" class="h-16 rounded-lg border-2 border-transparent hover:border-brand-500 bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-400"></button>
                             </div>
                         </div>
+                        <!-- Button Style -->
+                        <div class="space-y-3">
+                            <h3 class="font-bold text-xs uppercase text-slate-400">Kiểu nút</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="setButtonStyle('rounded')" class="py-2 border border-slate-200 bg-white rounded-full text-xs font-bold hover:border-brand-500">Tròn</button>
+                                <button onclick="setButtonStyle('soft')" class="py-2 border border-slate-200 bg-white rounded-xl text-xs font-bold hover:border-brand-500">Bo góc</button>
+                                <button onclick="setButtonStyle('rect')" class="py-2 border border-slate-200 bg-white rounded text-xs font-bold hover:border-brand-500">Vuông</button>
+                            </div>
+                        </div>
                         <!-- Socials in Appearance Tab -->
                         <div class="space-y-2" id="socials-list"></div>
                     </div>
@@ -232,6 +274,25 @@
                     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-xl z-20"></div>
                     <iframe id="preview-frame" class="w-full h-full bg-white"></iframe>
                 </div>
+            </div>
+        </div>
+
+        <!-- PUBLIC VIEW TEMPLATE (Hidden, used to render preview & public) -->
+        <div id="public-template" class="hidden">
+            <style>/* Injected dynamically based on theme */</style>
+            <div id="public-body" class="min-h-screen flex flex-col items-center py-12 px-4 transition-colors duration-500">
+                <div class="w-full max-w-md text-center animate-slide-up">
+                    <img id="p-avatar" class="w-24 h-24 rounded-full object-cover border-4 border-white/50 shadow-xl mx-auto mb-4">
+                    <h1 id="p-name" class="text-xl font-bold mb-1 drop-shadow-sm"></h1>
+                    <p id="p-bio" class="text-sm opacity-90 mb-6 font-medium max-w-xs mx-auto"></p>
+                    
+                    <!-- Socials -->
+                    <div id="p-socials" class="flex justify-center gap-3 mb-8 flex-wrap"></div>
+
+                    <!-- Links -->
+                    <div id="p-links" class="space-y-3 w-full"></div>
+                </div>
+                <footer class="mt-auto pt-10 text-xs opacity-60 font-bold">Powered by Mewo</footer>
             </div>
         </div>
 
@@ -273,6 +334,7 @@
             { id: 'instagram', icon: 'fab fa-instagram', label: 'Instagram' },
             { id: 'tiktok', icon: 'fab fa-tiktok', label: 'TikTok' },
             { id: 'youtube', icon: 'fab fa-youtube', label: 'YouTube' },
+            { id: 'twitter', icon: 'fab fa-twitter', label: 'Twitter' },
             { id: 'email', icon: 'fas fa-envelope', label: 'Email' }
         ];
         
