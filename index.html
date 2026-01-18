@@ -686,17 +686,17 @@
                     </div>
                     <div id="shop" style="display:none;width:100%;max-width:480px">
                         <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;color:inherit">
-                            <button onclick="${isPreview?'closeShop()':'window.closeShop()'}" style="background:rgba(255,255,255,0.2);border:none;width:32px;height:32px;border-radius:50%;color:inherit;cursor:pointer"><i class="fas fa-arrow-left"></i></button>
+                            <button onclick="${isPrev?'closeShop()':'window.closeShop()'}" style="background:rgba(255,255,255,0.2);border:none;width:32px;height:32px;border-radius:50%;color:inherit;cursor:pointer"><i class="fas fa-arrow-left"></i></button>
                             <div style="font-weight:bold;font-size:18px" id="stitle">Shop</div>
                         </div>
                         <div id="grid"></div>
                     </div>
-                    ${!isPreview ? '<div style="margin-top:auto;padding-top:40px;font-size:10px;font-weight:bold;opacity:0.5;text-transform:uppercase">Powered by Mewo</div>' : ''}
+                    ${!isPrev ? '<div style="margin-top:auto;padding-top:40px;font-size:10px;font-weight:bold;opacity:0.5;text-transform:uppercase">Powered by Mewo</div>' : ''}
                 </div>
                 ${script}
             `;
 
-            return isPreview ? `<!DOCTYPE html><html><head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>${css}</style></head><body>${content}</body></html>` : `<style>${css}</style>${content}`;
+            return isPrev ? `<!DOCTYPE html><html><head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>${css}</style></head><body>${content}</body></html>` : `<style>${css}</style>${content}`;
         }
         
         // GLOBAL FOR PUBLIC
