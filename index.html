@@ -36,7 +36,7 @@
     <style>
         body { background-color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
         
-        /* Themes Definitions (Used in Editor Preview Swatches only) */
+        /* Themes Definitions */
         .theme-default { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: meshMove 15s ease infinite; color: white; }
         .theme-ocean { background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); color: white; }
         .theme-midnight { background-color: #000000; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 30px 30px; color: white; }
@@ -438,20 +438,27 @@
 
         // Phone Login Logic
         function setupRecaptcha() {
-            // Clean up existing verifier if any, to avoid "already rendered" issues when switching views
+            // Xóa verifier cũ nếu có để tránh lỗi "already rendered"
             if (window.recaptchaVerifier) {
                 window.recaptchaVerifier.clear();
                 window.recaptchaVerifier = null;
             }
             
+            // Tạo RecaptchaVerifier mới (Invisible - Ẩn)
+            // Gắn vào 'recaptcha-container' thay vì nút bấm để tránh xung đột sự kiện click
             window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-                'size': 'normal',
+                'size': 'invisible',
                 'callback': (response) => {
-                    // reCAPTCHA solved, allow signInWithPhoneNumber.
+                    // ReCAPTCHA solved
                     console.log("Recaptcha Verified");
+                },
+                'expired-callback': () => {
+                    // Response expired
+                    showToast("Captcha hết hạn, vui lòng thử lại", "error");
+                    window.recaptchaVerifier.clear();
+                    setupRecaptcha();
                 }
             });
-            window.recaptchaVerifier.render();
         }
 
         async function sendOTP() {
@@ -461,23 +468,39 @@
                 return showToast("Số điện thoại không hợp lệ", "error");
             }
 
-            const phoneNumber = '+84' + rawPhone.replace(/^0+/, ''); // Format to +84...
+            // Định dạng số điện thoại (Mặc định +84)
+            const phoneNumber = '+84' + rawPhone.replace(/^0+/, ''); 
             const appVerifier = window.recaptchaVerifier;
             
             const btn = document.getElementById('btn-send-otp');
+            const originalText = btn.innerText;
             btn.innerText = "Đang gửi...";
             btn.disabled = true;
 
             try {
-                confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, appVerifier);
+                // Hàm signInWithPhoneNumber của Compat SDK (Tương đương code bạn gửi)
+                const confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, appVerifier);
+                
+                // Lưu kết quả xác thực vào window như yêu cầu
+                window.confirmationResult = confirmationResult;
+                
                 showToast("Đã gửi mã OTP!", "success");
+                
+                // Chuyển giao diện sang nhập OTP
                 document.getElementById('phone-step-1').classList.add('hidden');
                 document.getElementById('phone-step-2').classList.remove('hidden');
+                
             } catch (error) {
+                console.error("SMS Error:", error);
                 showToast(getErrorMessage(error.code), "error");
-                btn.innerText = "Gửi mã xác thực";
+                
+                // Reset lại để thử lại
+                btn.innerText = originalText;
                 btn.disabled = false;
-                if(window.recaptchaVerifier) window.recaptchaVerifier.reset(); // Reset on error
+                if(window.recaptchaVerifier) {
+                    window.recaptchaVerifier.clear();
+                    setupRecaptcha();
+                }
             }
         }
 
@@ -485,15 +508,22 @@
             const code = document.getElementById('otp-input').value;
             
             if(!code) return showToast("Vui lòng nhập mã OTP", "error");
-            if(!confirmationResult) return showToast("Vui lòng gửi mã xác thực trước", "error");
+            if(!window.confirmationResult) return showToast("Vui lòng gửi mã xác thực trước", "error");
 
             try {
-                await confirmationResult.confirm(code);
+                // ConfirmationResult.confirm(code)
+                const result = await window.confirmationResult.confirm(code);
+                
+                // User signed in successfully
+                const user = result.user;
+                console.log("User signed in:", user);
+                
                 showToast("Đăng nhập thành công!", "success");
-                // Auth listener will handle redirect
+                // Auth listener handles redirection
             } catch (error) {
+                // User couldn't sign in (bad verification code?)
                 console.error("OTP Error:", error);
-                showToast("Mã xác thực không đúng (" + error.code + ")", "error");
+                showToast("Mã xác thực không đúng hoặc đã hết hạn", "error");
             }
         }
 
@@ -514,6 +544,7 @@
                 case 'auth/invalid-phone-number': return "Số điện thoại không hợp lệ.";
                 case 'auth/missing-phone-number': return "Vui lòng nhập số điện thoại.";
                 case 'auth/quota-exceeded': return "Hết hạn ngạch SMS. Vui lòng thử lại sau.";
+                case 'auth/operation-not-allowed': return "Lỗi: Bạn chưa bật phương thức đăng nhập này trong Firebase Console.";
                 default: return "Lỗi: " + code;
             }
         }
