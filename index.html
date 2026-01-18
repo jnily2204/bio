@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mewo | Link in Bio Tool</title>
+    <title>Mewo - Link in Bio</title>
     
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Karla:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Karla:wght@400;500;700;800&display=swap" rel="stylesheet">
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -21,56 +21,63 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Karla', 'sans-serif'] },
                     colors: { 
-                        brand: { 50: '#fff1f2', 100: '#ffe4e6', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 900: '#881337' },
-                        bg: '#f3f4f6'
+                        brand: { 500: '#7B2CBF', 600: '#6D23AC', 50: '#F5F0FF' }, 
+                        bg: '#f3f3f1' 
                     },
-                    boxShadow: {
-                        'soft': '0 2px 10px rgba(0,0,0,0.03)',
-                        'float': '0 10px 40px -10px rgba(0,0,0,0.1)'
-                    }
+                    animation: { 'fade-in': 'fadeIn 0.3s ease-out' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } } }
                 }
             }
         }
     </script>
 
     <style>
-        body { background-color: #f3f4f6; height: 100vh; overflow: hidden; }
+        body { background-color: #f3f3f1; overflow: hidden; height: 100vh; }
         
         /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
         
-        /* Linktree-like Components */
-        .lt-nav-link {
-            padding: 0 16px; height: 100%; display: flex; align-items: center; gap: 6px;
-            font-size: 0.9rem; font-weight: 600; color: #6b7280; border-bottom: 2px solid transparent; transition: all 0.2s; cursor: pointer;
+        /* Sidebar Nav Item */
+        .nav-item {
+            width: 100%; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #575757; transition: all 0.2s; border-radius: 12px; font-size: 0.7rem; gap: 6px; font-weight: 600; cursor: pointer;
         }
-        .lt-nav-link:hover { color: #1f2937; background-color: #f9fafb; }
-        .lt-nav-link.active { color: #1f2937; border-bottom-color: #1f2937; }
+        .nav-item:hover { background-color: #f3f4f6; color: #111; }
+        .nav-item.active { background-color: #f0fdf4; color: #16a34a; }
+        .nav-icon { font-size: 1.25rem; }
 
-        .lt-card {
-            background: white; border-radius: 24px; padding: 24px; margin-bottom: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .lt-card:hover { border-color: #d1d5db; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        /* Modern Card */
+        .lt-card { background: white; border-radius: 24px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; transition: transform 0.2s, box-shadow 0.2s; }
+        .lt-card:hover { transform: translateY(-1px); border-color: #d1d5db; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .lt-card.collection-card { background: #FDF4FF; border-color: #E9D5FF; }
 
-        .lt-input {
-            width: 100%; padding: 12px 16px; background: #f9fafb; border: 1px solid transparent;
-            border-radius: 12px; font-size: 0.95rem; font-weight: 500; color: #111827; outline: none; transition: all 0.2s;
-        }
+        /* Inputs */
+        .lt-input { width: 100%; padding: 10px 14px; background: #f9fafb; border: 1px solid transparent; border-radius: 12px; font-size: 0.95rem; font-weight: 500; color: #111827; outline: none; transition: all 0.2s; }
         .lt-input:focus { background: white; border-color: #d1d5db; box-shadow: 0 0 0 3px rgba(0,0,0,0.03); }
+        .lt-input::placeholder { color: #9ca3af; }
+        .collection-card .lt-input { background: white; }
 
-        /* Phone Preview */
+        /* Upload Button */
+        .upload-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 8px 16px; background-color: #f3f4f6; color: #4b5563;
+            border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            border: 1px dashed #d1d5db;
+        }
+        .upload-btn:hover { background-color: #e5e7eb; border-color: #9ca3af; color: #1f2937; }
+
+        /* Phone Preview Wrapper */
         .preview-wrapper {
-            width: 310px; height: 640px;
-            background: #fff; border-radius: 45px; border: 12px solid #1f2937;
+            width: 300px; height: 620px;
+            background: #fff; border-radius: 40px; border: 12px solid #111;
             position: relative; overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
             transform-origin: top center;
         }
-        .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 26px; background: #1f2937; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; z-index: 50; }
+        .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 90px; height: 24px; background: #111; border-radius: 20px; z-index: 50; }
 
         .hidden { display: none !important; }
         
@@ -78,6 +85,8 @@
         #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; }
         .toast { background: #1f2937; color: white; padding: 12px 24px; border-radius: 99px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideUp 0.3s; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .hero-text-shadow { text-shadow: 0 4px 0 rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -87,7 +96,7 @@
     <!-- APP ROOT -->
     <div id="app" class="h-full w-full">
         
-        <!-- 1. LANDING PAGE (Pink Theme) -->
+        <!-- 1. LANDING & AUTH -->
         <div id="view-landing" class="view-section hidden h-full overflow-y-auto bg-[#fff1f2] flex flex-col font-sans">
             <nav class="flex justify-between items-center py-6 px-6 max-w-7xl mx-auto w-full">
                 <div class="flex items-center gap-2 text-3xl font-black font-display tracking-tight text-brand-600">
@@ -103,7 +112,7 @@
                 <div class="lg:w-1/2 space-y-8 text-center lg:text-left max-w-xl">
                     <h1 class="text-6xl lg:text-7xl font-black font-display leading-[0.95] text-slate-900">
                         Mọi thứ của bạn.<br>
-                        <span class="text-brand-500">Một link duy nhất.</span>
+                        <span class="text-brand-500">Một liên kết.</span>
                     </h1>
                     <p class="text-xl text-slate-600 font-medium leading-relaxed">Tham gia cùng cộng đồng sáng tạo trên Mewo. Chia sẻ, bán hàng và phát triển thương hiệu của bạn chỉ với một đường dẫn Bio.</p>
                     
@@ -130,18 +139,19 @@
             </div>
         </div>
 
-        <!-- 2. EDITOR (Linktree Style) -->
+        <!-- 2. EDITOR LAYOUT (TOP NAVIGATION - LINKTREE STYLE) -->
         <div id="view-editor" class="view-section hidden h-full flex flex-col bg-[#f3f3f1]">
             
-            <!-- HEADER (Top Nav) -->
+            <!-- A. HEADER (Top Nav) -->
             <header class="h-16 bg-white border-b border-gray-200 flex justify-between items-center px-4 md:px-6 shrink-0 z-40">
-                <div class="flex items-center gap-8 h-full">
-                    <button onclick="goToDashboard()" class="text-2xl text-brand-600 hover:scale-110 transition" title="Dashboard">
+                <div class="flex items-center gap-6 h-full">
+                    <button onclick="goToDashboard()" class="text-2xl text-brand-600 hover:scale-105 transition" title="Dashboard">
                         <i class="fas fa-cat"></i>
                     </button>
-                    <!-- Tabs -->
+                    <!-- Desktop Tabs -->
                     <nav class="hidden md:flex gap-1 h-full">
                         <div onclick="switchTab('links')" id="nav-links" class="lt-nav-link active"><i class="fas fa-list text-xs"></i> Links</div>
+                        <div onclick="switchTab('products')" id="nav-products" class="lt-nav-link"><i class="fas fa-store text-xs"></i> Store</div>
                         <div onclick="switchTab('appearance')" id="nav-appearance" class="lt-nav-link"><i class="fas fa-palette text-xs"></i> Appearance</div>
                         <div onclick="switchTab('settings')" id="nav-settings" class="lt-nav-link"><i class="fas fa-cog text-xs"></i> Settings</div>
                     </nav>
@@ -171,8 +181,16 @@
                     <button onclick="toggleMobilePreview()" class="lg:hidden w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-600"><i class="fas fa-eye"></i></button>
                 </div>
             </header>
+            
+            <!-- Mobile Tab Bar (Visible only on small screens) -->
+            <div class="md:hidden flex justify-between bg-white border-b px-4 py-3 overflow-x-auto hide-scrollbar gap-2 shrink-0">
+                 <button onclick="switchTab('links')" id="mob-nav-links" class="px-4 py-1.5 rounded-full text-sm font-bold bg-slate-900 text-white whitespace-nowrap">Links</button>
+                 <button onclick="switchTab('products')" id="mob-nav-products" class="px-4 py-1.5 rounded-full text-sm font-bold text-gray-500 bg-gray-50 whitespace-nowrap">Store</button>
+                 <button onclick="switchTab('appearance')" id="mob-nav-appearance" class="px-4 py-1.5 rounded-full text-sm font-bold text-gray-500 bg-gray-50 whitespace-nowrap">Design</button>
+                 <button onclick="switchTab('settings')" id="mob-nav-settings" class="px-4 py-1.5 rounded-full text-sm font-bold text-gray-500 bg-gray-50 whitespace-nowrap">Settings</button>
+            </div>
 
-            <!-- WORKSPACE -->
+            <!-- MAIN WORKSPACE -->
             <div class="flex-1 flex overflow-hidden">
                 
                 <!-- Left: Editor Content -->
@@ -187,6 +205,17 @@
                             <div id="links-list" class="space-y-4"></div>
                         </div>
 
+                        <!-- TAB: PRODUCTS -->
+                        <div id="tab-products" class="tab-content hidden space-y-6">
+                            <div class="p-4 bg-white border rounded-2xl shadow-sm text-sm text-gray-600 mb-6">
+                                <span class="font-bold text-brand-600">Tip:</span> Use "Collection" type in Links tab to organize products.
+                            </div>
+                            <button onclick="addProd()" class="w-full py-3.5 bg-slate-900 hover:bg-black text-white rounded-3xl font-bold shadow-lg transition transform active:scale-[0.99] flex items-center justify-center gap-2 text-base">
+                                <i class="fas fa-shopping-bag"></i> Add Product
+                            </button>
+                            <div id="products-list" class="space-y-4"></div>
+                        </div>
+
                         <!-- TAB: APPEARANCE -->
                         <div id="tab-appearance" class="tab-content hidden space-y-8">
                             <!-- Profile -->
@@ -196,7 +225,7 @@
                                     <div class="relative group cursor-pointer w-24 h-24 shrink-0">
                                         <div class="w-full h-full rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200 relative"><img id="ed-img-preview" class="w-full h-full object-cover"></div>
                                         <label for="avatar-upload" class="absolute bottom-0 right-0 bg-slate-900 text-white p-2 rounded-full text-xs shadow-md cursor-pointer hover:bg-black transition"><i class="fas fa-camera"></i></label>
-                                        <input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="uploadImage(event)">
+                                        <input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="uploadImage(event, 'avatar')">
                                     </div>
                                     <div class="flex-1 w-full space-y-3">
                                         <div class="w-full"><input id="ed-title" oninput="updatePreview()" class="lt-input font-bold text-lg" placeholder="Profile Title"></div>
@@ -213,7 +242,7 @@
                                     <div onclick="setTheme('ocean')" class="aspect-[9/16] rounded-xl bg-gradient-to-b from-blue-400 to-cyan-300 cursor-pointer hover:ring-4 ring-blue-200 transition shadow-sm border border-white"></div>
                                     <div onclick="setTheme('midnight')" class="aspect-[9/16] rounded-xl bg-slate-900 cursor-pointer hover:ring-4 ring-gray-400 transition shadow-sm border border-white"></div>
                                     <div onclick="setTheme('forest')" class="aspect-[9/16] rounded-xl bg-gradient-to-br from-emerald-600 to-teal-400 cursor-pointer hover:ring-4 ring-emerald-200 transition shadow-sm border border-white"></div>
-                                    <div onclick="setTheme('minimal')" class="aspect-[9/16] rounded-xl bg-white border cursor-pointer hover:ring-4 ring-gray-200 transition shadow-sm"></div>
+                                    <div onclick="setTheme('minimal')" class="aspect-[9/16] rounded-xl bg-white border cursor-pointer hover:ring-4 ring-gray-200 transition shadow-sm border border-white"></div>
                                     <div onclick="setTheme('sunset')" class="aspect-[9/16] rounded-xl bg-gradient-to-tr from-orange-400 to-pink-500 cursor-pointer hover:ring-4 ring-orange-200 transition shadow-sm border border-white"></div>
                                 </div>
                             </div>
@@ -230,12 +259,12 @@
                     </div>
                 </main>
 
-                <!-- Right: Preview (Fixed) -->
-                <aside class="hidden lg:flex w-[450px] border-l border-gray-200 bg-white items-center justify-center p-8 relative flex-shrink-0 z-20">
+                <!-- Right: Preview (Fixed - MD+) -->
+                <aside class="hidden md:flex w-[400px] xl:w-[480px] border-l border-gray-200 bg-white items-center justify-center p-8 relative flex-shrink-0 z-20">
                     <div class="absolute top-4 right-4">
-                        <button onclick="preview()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition text-gray-500" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+                        <button onclick="refreshPreview()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition text-gray-500" title="Refresh"><i class="fas fa-sync-alt"></i></button>
                     </div>
-                    <div class="preview-wrapper transform scale-[0.85] xl:scale-90 transition-transform origin-center shadow-2xl">
+                    <div class="preview-wrapper transform scale-[0.8] xl:scale-90 transition-transform origin-center shadow-2xl">
                         <div class="notch"></div>
                         <iframe id="preview-frame" class="w-full h-full bg-white border-none"></iframe>
                     </div>
@@ -327,14 +356,33 @@
             }
         });
 
+        function toggleAuth(type) {
+            isLoginMode = type === 'login';
+            switchAuthMode();
+            document.getElementById('modal-auth').classList.remove('hidden');
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            const em = document.getElementById('auth-email').value, pw = document.getElementById('auth-pass').value;
+            const btn = document.getElementById('btn-auth'); // Fixed ID
+            btn.innerText = '...'; btn.disabled = true;
+            try {
+                if (isLoginMode) await auth.signInWithEmailAndPassword(em, pw);
+                else await auth.createUserWithEmailAndPassword(em, pw);
+                showToast("Thành công!", "success");
+                closeModal('modal-auth');
+            } catch (err) { showToast(err.code, "error"); }
+            finally { btn.innerText = isLoginMode?'Log in':'Create account'; btn.disabled=false; } // Reset correct text
+        }
+        
+        async function handleGoogle() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e){ showToast(e.message,'error'); } }
+
         // --- ROUTING ---
         window.onhashchange = handleRoute;
-        window.addEventListener('load', handleRoute);
         function handleRoute() {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             const h = location.hash;
-            document.querySelectorAll('.view-section').forEach(e => e.classList.add('hidden'));
-            if(h !== '' && h !== '#') closeModal('modal-auth');
-
             if (h.startsWith('#u/')) {
                 document.getElementById('view-public').classList.remove('hidden');
                 loadPublic(h.split('/')[1]);
@@ -358,12 +406,14 @@
                 if(snap.empty) grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400">No pages yet. Create one!</div>`;
                 snap.forEach(doc => {
                     const d = doc.data();
+                    const profileName = d.profile?.name || 'Untitled';
+                    const profileAvatar = d.profile?.avatar || 'https://ui-avatars.com/api/?name=U';
                     grid.innerHTML += `
                     <div onclick="location.hash='#edit/${doc.id}'" class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm hover:shadow-lg transition cursor-pointer group hover:border-gray-300">
                         <div class="flex items-center gap-4">
-                            <img src="${d.profile.avatar}" class="w-16 h-16 rounded-full border bg-gray-50 object-cover">
+                            <img src="${profileAvatar}" class="w-16 h-16 rounded-full border bg-gray-50 object-cover">
                             <div class="overflow-hidden">
-                                <h3 class="font-bold text-lg truncate text-slate-900">${d.profile.name}</h3>
+                                <h3 class="font-bold text-lg truncate text-slate-900">${profileName}</h3>
                                 <div class="text-sm text-gray-500 truncate">mewo.life/${doc.id}</div>
                             </div>
                         </div>
@@ -377,6 +427,33 @@
             document.getElementById('loader').classList.add('hidden');
         }
 
+        function openModal(id, mode) {
+            document.getElementById('modal-'+id).classList.remove('hidden');
+            if(id==='auth') {
+                isLoginMode = mode === 'login';
+                switchAuthMode();
+            }
+        }
+        function closeModal(id) { document.getElementById('modal-'+id).classList.add('hidden'); }
+        function switchAuthMode() {
+            document.getElementById('auth-title').innerText = isLoginMode ? 'Welcome back!' : 'Create your account';
+            document.getElementById('btn-submit-auth').innerText = isLoginMode ? 'Log in' : 'Create account';
+            document.getElementById('auth-switch-text').innerText = isLoginMode ? "Don't have an account? Sign up." : "Already have an account? Log in.";
+            isLoginMode = !isLoginMode; // toggle logic
+        }
+        function claimUsername() { openModal('auth','register'); document.getElementById('auth-email').focus(); }
+        
+        async function createBio() {
+            const s = document.getElementById('create-slug').value.trim().toLowerCase();
+            if(s.length < 3) return showToast('Name too short', true);
+            try {
+                const ref = db.collection('bios').doc(s);
+                if((await ref.get()).exists) return showToast('Taken', true);
+                await ref.set({ ownerId: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(), profile: { name: 'Mewo User', bio: 'Welcome!', avatar: `https://ui-avatars.com/api/?name=${s}` }, links: [], theme: 'default', socials: {}, views: 0 });
+                closeModal('modal-create'); loadDashboard();
+            } catch(e) { showToast(e.message, true); }
+        }
+
         // --- EDITOR ---
         async function loadEditor(s) {
             slug = s;
@@ -387,17 +464,16 @@
             if(!doc.exists) { location.hash='#dashboard'; return; }
             bioData = doc.data();
             
-            // Init Defaults
+            // Init Defaults to avoid null errors
             bioData.links = bioData.links || [];
             bioData.socials = bioData.socials || {};
             bioData.theme = bioData.theme || 'default';
+            bioData.profile = bioData.profile || {};
 
-            // Bind Profile
-            document.getElementById('ed-name').value = bioData.profile.name;
-            document.getElementById('ed-bio').value = bioData.profile.bio;
-            document.getElementById('ed-avatar').value = bioData.profile.avatar;
-            document.getElementById('ed-img-preview').src = bioData.profile.avatar;
-            document.getElementById('nav-avatar').src = bioData.profile.avatar;
+            document.getElementById('ed-name').value = bioData.profile.name || '';
+            document.getElementById('ed-bio').value = bioData.profile.bio || '';
+            document.getElementById('ed-img-preview').src = bioData.profile.avatar || '';
+            document.getElementById('nav-avatar').src = bioData.profile.avatar || '';
 
             renderLists();
             switchTab('links');
@@ -409,6 +485,7 @@
             document.getElementById(`tab-${t}`).classList.remove('hidden');
             ['links','appearance','settings'].forEach(k => {
                 const nav = document.getElementById(`nav-${k}`);
+                const mobNav = document.getElementById(`mob-nav-${k}`); // Mobile check
                 if(nav) nav.className = k===t ? 'lt-nav-link active' : 'lt-nav-link';
             });
         }
@@ -419,17 +496,50 @@
             // Links
             const lList = document.getElementById('links-list'); lList.innerHTML = '';
             (bioData.links || []).forEach((l, i) => {
+                // Determine card type class
+                const isCollection = l.type === 'collection';
+                const cardClass = isCollection ? 'lt-card collection-card' : 'lt-card';
+                const typeLabel = isCollection ? '<span class="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded">COLLECTION</span>' : '<span class="text-xs font-bold text-gray-400">LINK</span>';
+
                 lList.innerHTML += `
-                <div class="lt-card group relative">
-                    <div class="absolute top-4 right-4 flex gap-2">
-                        <button onclick="moveLink(${i},-1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-up"></i></button>
-                        <button onclick="moveLink(${i},1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-down"></i></button>
-                        <button onclick="remLink(${i})" class="text-gray-300 hover:text-red-500 ml-2"><i class="fas fa-trash-alt"></i></button>
+                <div class="${cardClass} group relative">
+                    <div class="flex justify-between items-center mb-3">
+                        ${typeLabel}
+                        <div class="flex gap-2">
+                             <button onclick="moveLink(${i},-1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-up"></i></button>
+                             <button onclick="moveLink(${i},1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-down"></i></button>
+                             <select onchange="updateLink(${i},'type',this.value)" class="text-xs border rounded p-1 bg-gray-50"><option value="link" ${!isCollection?'selected':''}>Link</option><option value="collection" ${isCollection?'selected':''}>Collection</option></select>
+                             <button onclick="remLink(${i})" class="text-gray-300 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                        </div>
                     </div>
-                    <div class="space-y-3 pr-24">
+                    <div class="space-y-3">
                         <input value="${esc(l.title)}" oninput="updateLink(${i},'title',this.value)" class="lt-input font-bold" placeholder="Title">
-                        <input value="${esc(l.url)}" oninput="updateLink(${i},'url',this.value)" class="lt-input text-sm text-gray-500" placeholder="URL">
+                        ${!isCollection ? `<input value="${esc(l.url)}" oninput="updateLink(${i},'url',this.value)" class="lt-input text-sm text-gray-500" placeholder="URL">` : ''}
                     </div>
+                </div>`;
+            });
+            
+            // Products List
+            const pList = document.getElementById('products-list'); pList.innerHTML = '';
+            const cols = (bioData.links||[]).filter(k=>k.type==='collection').map(k=>`<option value="${k.title}">${k.title}</option>`).join('');
+            
+            (bioData.products || []).forEach((p, i) => {
+                pList.innerHTML += `
+                <div class="lt-card flex gap-4 items-start relative">
+                    <div class="relative w-16 h-16 shrink-0">
+                         <img src="${p.image||'https://placehold.co/100'}" class="w-full h-full rounded bg-gray-100 object-cover border border-gray-200">
+                         <label for="prod-upload-${i}" class="absolute bottom-[-5px] right-[-5px] bg-white rounded-full p-1 shadow border cursor-pointer hover:bg-gray-50 text-[10px]"><i class="fas fa-upload"></i></label>
+                         <input type="file" id="prod-upload-${i}" class="hidden" accept="image/*" onchange="uploadImage(event, 'product', ${i})">
+                    </div>
+                    <div class="flex-1 space-y-2">
+                        <input value="${esc(p.name)}" oninput="updateProd(${i},'name',this.value)" class="lt-input font-bold py-2" placeholder="Product Name">
+                        <div class="flex gap-2">
+                            <input value="${esc(p.price)}" oninput="updateProd(${i},'price',this.value)" class="lt-input w-20 font-bold text-green-600 py-2" placeholder="Price">
+                            <select onchange="updateProd(${i},'collection',this.value)" class="lt-input text-xs py-2 h-full">${cols}<option value="" ${!p.collection?'selected':''}>Select Collection...</option></select>
+                        </div>
+                        <input value="${esc(p.link)}" oninput="updateProd(${i},'link',this.value)" class="lt-input text-xs py-2" placeholder="Affiliate Link">
+                    </div>
+                    <button onclick="remProd(${i})" class="text-gray-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
                 </div>`;
             });
 
@@ -441,24 +551,37 @@
         }
 
         // Functions
-        function addLink() { bioData.links.unshift({ title: '', url: '' }); renderLists(); preview(); }
+        function addLink() { bioData.links.unshift({ title: '', url: '', type: 'link' }); renderLists(); preview(); }
         function remLink(i) { if(confirm('Delete?')) { bioData.links.splice(i,1); renderLists(); preview(); } }
-        function updateLink(i, k, v) { bioData.links[i][k] = v; preview(); }
+        function updateLink(i, k, v) { bioData.links[i][k] = v; if(k==='type') renderLists(); preview(); }
         function moveLink(i, d) { if(i+d>=0 && i+d<bioData.links.length) { [bioData.links[i], bioData.links[i+d]] = [bioData.links[i+d], bioData.links[i]]; renderLists(); preview(); } }
+        
+        function addProd() { if(!bioData.products) bioData.products=[]; bioData.products.push({name:'', price:'', image:'', link:'', collection:''}); renderLists(); preview(); }
+        function remProd(i) { if(confirm('Delete Product?')) { bioData.products.splice(i,1); renderLists(); preview(); } }
+        function updateProd(i, k, v) { bioData.products[i][k]=v; preview(); }
+
         function updateSocial(k, v) { bioData.socials[k] = v; preview(); }
         function setTheme(t) { bioData.theme = t; preview(); }
         
         async function saveBio() { try { await db.collection('bios').doc(slug).update(bioData); showToast("Saved!"); } catch(e) { showToast(e.message, true); } }
         function goToDashboard() { location.hash='#dashboard'; }
         function copyLink() { navigator.clipboard.writeText(`mewo.life/${slug}`).then(()=>showToast('Copied!')); }
-        function uploadImage(e) { const f=e.target.files[0]; if(f){const r=new FileReader(); r.onload=function(res){bioData.profile.avatar=res.target.result; renderEditor();}; r.readAsDataURL(f);} }
+        function uploadImage(e, type, idx) { 
+            const f=e.target.files[0]; 
+            if(f){
+                const r=new FileReader(); 
+                r.onload=function(res){
+                    if(type==='avatar') { bioData.profile.avatar=res.target.result; renderEditor(); }
+                    else if(type==='product') { bioData.products[idx].image=res.target.result; renderLists(); }
+                    preview();
+                }; 
+                r.readAsDataURL(f);
+            } 
+        }
 
         function preview() {
             bioData.profile.name = document.getElementById('ed-name').value;
             bioData.profile.bio = document.getElementById('ed-bio').value;
-            const avt = document.getElementById('ed-avatar').value;
-            if(avt && !avt.startsWith('data:')) bioData.profile.avatar = avt;
-            document.getElementById('ed-img-preview').src = bioData.profile.avatar;
             
             const html = generateHtml(bioData);
             [document.getElementById('preview-frame'), document.getElementById('mobile-preview-frame')].forEach(f => {
@@ -491,10 +614,32 @@
             };
             const btnClass = d.theme === 'minimal' ? 'background: white; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.05);' : 'background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); color: inherit; border: 1px solid rgba(255,255,255,0.3);';
 
-            const links = (d.links||[]).map(l => `<a href="${l.url}" target="_blank" style="display:block; width:100%; padding:16px; margin-bottom:12px; border-radius:30px; text-decoration:none; text-align:center; font-weight:600; font-size:14px; transition:transform 0.2s; ${btnClass}">${l.title}</a>`).join('');
+            // Scripts for Shop
+            const safeProds = JSON.stringify(d.products||[]).replace(/\\/g,'\\\\').replace(/"/g,'\\"');
+            const script = `<script>
+                const products = JSON.parse("${safeProds}");
+                function showShop(col) {
+                    document.getElementById('main').style.display='none';
+                    document.getElementById('shop').style.display='block';
+                    document.getElementById('stitle').innerText=col;
+                    const g = document.getElementById('grid');
+                    const fl = products.filter(p=>p.collection===col);
+                    if(!fl.length) { g.innerHTML='<div style="opacity:0.5;text-align:center;color:inherit;padding:20px">Empty Collection</div>'; return; }
+                    g.innerHTML = fl.map(p=>\`<div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:10px;display:flex;align-items:center;padding:8px;gap:10px"><img src="\${p.image}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;background:#eee"><div style="flex:1"><div style="font-weight:bold;font-size:14px;color:#333;margin-bottom:4px">\${p.name}</div><div style="font-size:12px;color:#e11d48;font-weight:bold">\${p.price}</div></div><a href="\${p.link}" target="_blank" style="background:#000;color:white;text-decoration:none;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:bold">BUY</a></div>\`).join('');
+                }
+                function closeShop() { document.getElementById('shop').style.display='none'; document.getElementById('main').style.display='block'; }
+            <\/script>`;
+
+            const links = (d.links||[]).map(l => {
+                if(l.type === 'collection') {
+                     return `<div onclick="showShop('${l.title}')" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:16px;margin-bottom:12px;border-radius:30px;cursor:pointer;font-weight:600;font-size:14px;transition:transform 0.2s;${btnClass}"><span>${l.title}</span><span>&rsaquo;</span></div>`;
+                }
+                return `<a href="${l.url}" target="_blank" style="display:block;width:100%;padding:16px;margin-bottom:12px;border-radius:30px;text-decoration:none;text-align:center;font-weight:600;font-size:14px;transition:transform 0.2s;${btnClass}">${l.title}</a>`;
+            }).join('');
+
             const socials = Object.entries(d.socials||{}).map(([k,v]) => v ? `<a href="${v}" target="_blank" style="margin:0 8px; font-size:24px; color:inherit; text-decoration:none;"><i class="fab fa-${k==='email'?'google':k}"></i></a>` : '').join('');
 
-            return `<!DOCTYPE html><html><head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{margin:0;font-family:sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px;box-sizing:border-box;${themeMap[d.theme]||themeMap['default']}} .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;margin-bottom:16px;border:3px solid rgba(255,255,255,0.5);box-shadow:0 10px 20px rgba(0,0,0,0.1)} .title{font-size:20px;font-weight:800;margin-bottom:8px} .bio{font-size:14px;opacity:0.9;margin-bottom:32px;text-align:center;line-height:1.5;max-width:300px} .links{width:100%;max-width:480px} a:hover{transform:scale(1.02)}</style></head><body><img src="${d.profile.avatar}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=U'"><div class="title">${d.profile.name}</div><div class="bio">${d.profile.bio}</div><div style="margin-bottom:30px">${socials}</div><div class="links">${links}</div><div style="margin-top:auto;font-size:10px;font-weight:bold;opacity:0.5">POWERED BY MEWO</div></body></html>`;
+            return `<!DOCTYPE html><html><head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{margin:0;font-family:sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px;box-sizing:border-box;${themeMap[d.theme]||themeMap['default']}} .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;margin-bottom:16px;border:3px solid rgba(255,255,255,0.5);box-shadow:0 10px 20px rgba(0,0,0,0.1)} .title{font-size:20px;font-weight:800;margin-bottom:8px} .bio{font-size:14px;opacity:0.9;margin-bottom:32px;text-align:center;line-height:1.5;max-width:300px} .links{width:100%;max-width:480px} a:hover{transform:scale(1.02)}</style></head><body><div id="main" style="width:100%;display:flex;flex-direction:column;align-items:center"><img src="${d.profile.avatar}" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=U'"><div class="title">${d.profile.name}</div><div class="bio">${d.profile.bio}</div><div style="margin-bottom: 30px">${socials}</div><div class="links">${links}</div></div><div id="shop" style="display:none;width:100%;max-width:480px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;cursor:pointer" onclick="closeShop()"><i class="fas fa-arrow-left"></i> <span style="font-weight:bold" id="stitle">Shop</span></div><div id="grid"></div></div><div style="margin-top:auto;font-size:10px;font-weight:bold;opacity:0.5;margin-top:40px">POWERED BY MEWO</div>${script}</body></html>`;
         }
 
         // --- HELPERS ---
@@ -508,36 +653,10 @@
         function closeModal(id) { document.getElementById('modal-'+id).classList.add('hidden'); }
         function switchAuthMode() {
             document.getElementById('auth-title').innerText = isLoginMode ? 'Welcome back!' : 'Create your account';
-            document.getElementById('btn-auth').innerText = isLoginMode ? 'Log in' : 'Create account';
-            document.getElementById('tab-login').className = isLoginMode ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition' : 'flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition';
-            document.getElementById('tab-register').className = !isLoginMode ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition' : 'flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition';
+            document.getElementById('btn-submit-auth').innerText = isLoginMode ? 'Log in' : 'Create account';
             isLoginMode = !isLoginMode;
         }
         function claimUsername() { openModal('auth','register'); document.getElementById('auth-email').focus(); }
-        
-        async function handleAuth(e) {
-            e.preventDefault();
-            const em = document.getElementById('auth-email').value;
-            const pw = document.getElementById('auth-pass').value;
-            try {
-                if(document.getElementById('btn-auth').innerText === 'Log in') await auth.signInWithEmailAndPassword(em, pw);
-                else await auth.createUserWithEmailAndPassword(em, pw);
-                closeModal('modal-auth');
-            } catch(e) { showToast(e.message, true); }
-        }
-        async function handleGoogle() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); closeModal('modal-auth'); } catch(e){ showToast(e.message, true); } }
-        
-        async function createBio() {
-            const s = document.getElementById('create-slug').value.trim().toLowerCase();
-            if(s.length < 3) return showToast('Name too short', true);
-            try {
-                const ref = db.collection('bios').doc(s);
-                if((await ref.get()).exists) return showToast('Taken', true);
-                await ref.set({ ownerId: user.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(), profile: { name: 'Mewo User', bio: 'Welcome!', avatar: `https://ui-avatars.com/api/?name=${s}` }, links: [], theme: 'default', socials: {}, views: 0 });
-                closeModal('modal-create'); loadDashboard();
-            } catch(e) { showToast(e.message, true); }
-        }
-
         function showToast(m, err) { const t=document.getElementById('toast'); t.innerHTML = `<div class="toast-content"><i class="fas fa-${err?'exclamation-triangle text-red-400':'check-circle text-green-400'}"></i> ${m}</div>`; t.style.display='block'; setTimeout(()=>t.style.display='none', 3000); }
         function copyLink() { navigator.clipboard.writeText(`mewo.life/${slug}`).then(()=>showToast('Copied!')); }
         function handleLogout() { auth.signOut(); location.hash=''; }
