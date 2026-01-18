@@ -24,7 +24,7 @@ import {
 // --- FIREBASE IMPORTS ---
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
-import { getAnalytics } from 'firebase/analytics';
+// import { getAnalytics } from 'firebase/analytics'; // Tạm ẩn Analytics để tránh lỗi môi trường demo
 
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
@@ -41,7 +41,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-// const analytics = getAnalytics(app); // Analytics có thể được kích hoạt nếu môi trường hỗ trợ
 
 // --- 1. CÁC COMPONENT PHỤ TRỢ (UI ELEMENTS) ---
 
@@ -67,7 +66,7 @@ const AuthPage = () => {
     setErrorMsg("");
     try {
       await signInWithPopup(auth, provider);
-      // Không cần gọi onLogin thủ công ở đây, onAuthStateChanged ở App sẽ tự bắt sự kiện
+      // Không cần gọi hành động chuyển trang ở đây, onAuthStateChanged ở App sẽ tự bắt sự kiện
     } catch (error) {
       console.error("Login Failed:", error);
       setErrorMsg(error.message);
@@ -75,9 +74,14 @@ const AuthPage = () => {
     }
   };
 
+  const handleTraditionalSubmit = (e) => {
+    e.preventDefault();
+    alert("Vui lòng sử dụng Đăng nhập bằng Google trong phiên bản Demo này!");
+  };
+
   return (
-    <div className="min-h-screen bg-orange-50 flex items-center justify-center p-4 font-sans">
-      <div className="bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+    <div className="min-h-screen bg-orange-50 flex items-center justify-center p-4 font-sans relative z-50">
+      <div className="bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden flex flex-col">
         
         {/* Form Container */}
         <div className="w-full p-8 md:p-10">
@@ -99,6 +103,7 @@ const AuthPage = () => {
           <div className="space-y-4">
             {/* Google Login Button */}
             <button 
+              type="button"
               onClick={handleGoogleLogin}
               disabled={isLoading}
               className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all shadow-sm group disabled:opacity-50 disabled:cursor-not-allowed"
@@ -119,7 +124,7 @@ const AuthPage = () => {
             </button>
             
             {errorMsg && (
-              <p className="text-red-500 text-xs text-center px-4">{errorMsg}</p>
+              <p className="text-red-500 text-xs text-center px-4 bg-red-50 py-2 rounded-lg">{errorMsg}</p>
             )}
 
             <div className="relative flex py-2 items-center">
@@ -128,8 +133,8 @@ const AuthPage = () => {
                 <div className="flex-grow border-t border-gray-200"></div>
             </div>
 
-            {/* Traditional Inputs (Visual only) */}
-            <div className="space-y-3">
+            {/* Traditional Inputs (Visual only - Wrapped in Form to prevent reload) */}
+            <form onSubmit={handleTraditionalSubmit} className="space-y-3">
               <div className="relative">
                 <Mail className="absolute left-3 top-3.5 text-gray-400" size={18} />
                 <input 
@@ -146,11 +151,11 @@ const AuthPage = () => {
                   className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition-all text-sm"
                 />
               </div>
-              <button className="w-full bg-slate-900 hover:bg-black text-white font-bold py-3 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+              <button type="submit" className="w-full bg-slate-900 hover:bg-black text-white font-bold py-3 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
                 <span>{isLogin ? 'Đăng nhập' : 'Tạo tài khoản'}</span>
                 <ArrowRight size={18} />
               </button>
-            </div>
+            </form>
           </div>
 
           <div className="mt-8 text-center text-sm">
@@ -158,6 +163,7 @@ const AuthPage = () => {
               {isLogin ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'}
             </span>
             <button 
+              type="button"
               onClick={() => setIsLogin(!isLogin)}
               className="ml-2 font-bold text-orange-600 hover:text-orange-700 hover:underline"
             >
@@ -213,7 +219,7 @@ export default function App() {
         setCurrentUser(user);
         setProfile(prev => ({
           ...prev,
-          username: user.email.split('@')[0], // Tạo username tạm từ email
+          username: user.email ? user.email.split('@')[0] : 'user', 
           displayName: user.displayName || 'Mewo Friend',
           avatar: user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
           bio: prev.bio || 'Chuyên gia bắt chuột & Marketing 🐟 | CEO @Mewo'
