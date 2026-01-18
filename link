@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio Link - Phạm Minh Anh</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Font Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs (Compat version for simple HTML usage) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Be Vietnam Pro"', 'sans-serif'] },
+                    colors: { brand: { light: '#fce7f3', DEFAULT: '#db2777', dark: '#831843' } },
+                    animation: { 'fade-in': 'fadeIn 0.3s ease-out' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } } }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        body {
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #ffd1ff);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Loading Spinner */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #db2777; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Admin Tab Styling */
+        .adm-tab { transition: all 0.3s; }
+        .adm-tab:hover { color: #db2777; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased relative">
+
+    <!-- APP CONTAINER -->
+    <main id="app-container" class="w-full max-w-md mx-auto py-8 px-4 pb-24 min-h-screen flex flex-col">
+        
+        <!-- Loading State -->
+        <div id="loading" class="flex justify-center items-center h-64">
+            <div class="loader"></div>
+        </div>
+
+        <!-- CONTENT (Hidden while loading) -->
+        <div id="content" class="hidden animate-fade-in">
+            
+            <!-- PROFILE SECTION -->
+            <div class="text-center mb-6 pt-4">
+                <div class="relative w-28 h-28 mx-auto mb-4 group cursor-pointer" onclick="openAdmin('profile')">
+                    <div class="absolute inset-0 bg-white rounded-full opacity-40 blur-md"></div>
+                    <img id="profile-avatar" src="" class="relative w-full h-full object-cover rounded-full border-4 border-white shadow-xl">
+                    <div class="absolute bottom-1 right-1 bg-blue-500 text-white rounded-full w-7 h-7 flex items-center justify-center border-2 border-white text-xs"><i class="fas fa-check"></i></div>
+                </div>
+                <h1 id="profile-name" class="text-2xl font-bold text-white drop-shadow-md mb-1">...</h1>
+                <p id="profile-bio" class="text-white/90 text-sm font-medium mb-4">...</p>
+                
+                <!-- Socials -->
+                <div class="flex justify-center gap-4 mb-6" id="social-container">
+                    <!-- Icons injected via JS -->
+                </div>
+            </div>
+
+            <!-- TABS NAVIGATION -->
+            <div class="sticky top-2 z-40 flex p-1 bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl mb-6 mx-2 shadow-lg">
+                <button onclick="switchTab('links')" id="btn-links" class="tab-btn flex-1 py-2.5 rounded-xl text-sm font-medium text-white transition-all bg-white !text-brand-DEFAULT shadow-sm font-bold">
+                    <i class="fas fa-link mr-1"></i> Liên kết
+                </button>
+                <button onclick="switchTab('products')" id="btn-products" class="tab-btn flex-1 py-2.5 rounded-xl text-sm font-medium text-white transition-all hover:bg-white/10">
+                    <i class="fas fa-shopping-bag mr-1"></i> Sản phẩm
+                </button>
+            </div>
+
+            <!-- TAB: LINKS -->
+            <div id="view-links" class="space-y-4 px-2">
+                <!-- Links injected via JS -->
+            </div>
+
+            <!-- TAB: PRODUCTS -->
+            <div id="view-products" class="hidden px-1">
+                <!-- Filter Bar -->
+                <div class="flex overflow-x-auto gap-2 mb-4 pb-2 hide-scrollbar sticky top-20 z-40 py-2" id="category-filter">
+                    <!-- Categories injected via JS -->
+                </div>
+                <!-- Grid -->
+                <div id="product-grid" class="grid grid-cols-2 gap-3">
+                    <!-- Products injected via JS -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER & ADMIN TRIGGER -->
+        <footer class="mt-auto text-center pt-10">
+            <p class="text-white text-xs opacity-70">© 2024 Bio Link</p>
+            <button onclick="toggleAdmin()" class="mt-4 w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center mx-auto hover:bg-white/40 transition">
+                <i class="fas fa-cog"></i>
+            </button>
+        </footer>
+
+    </main>
+
+    <!-- ADMIN PANEL OVERLAY -->
+    <div id="admin-panel" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex justify-end transition-opacity duration-300">
+        <div class="bg-white w-full max-w-md h-full shadow-2xl overflow-y-auto p-6 animate-fade-in relative">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Quản lý nội dung</h2>
+                <button onclick="toggleAdmin()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"><i class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Admin Tabs -->
+            <div class="flex border-b mb-6">
+                <button onclick="switchAdminTab('info')" id="adm-tab-info" class="adm-tab pb-2 px-4 border-b-2 border-brand-DEFAULT font-bold text-brand-DEFAULT">Thông tin</button>
+                <button onclick="switchAdminTab('links')" id="adm-tab-links" class="adm-tab pb-2 px-4 text-gray-500">Liên kết</button>
+                <button onclick="switchAdminTab('products')" id="adm-tab-products" class="adm-tab pb-2 px-4 text-gray-500">Sản phẩm</button>
+            </div>
+
+            <!-- Form: Info -->
+            <div id="adm-form-info" class="adm-content space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Tên hiển thị</label>
+                    <input type="text" id="edit-name" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-brand-DEFAULT outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Mô tả ngắn</label>
+                    <textarea id="edit-bio" rows="2" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-brand-DEFAULT outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Link Ảnh đại diện</label>
+                    <input type="text" id="edit-avatar" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-brand-DEFAULT outline-none">
+                </div>
+                <div class="pt-4">
+                    <button onclick="saveData()" class="w-full bg-brand-DEFAULT text-white py-3 rounded-xl font-bold hover:bg-brand-dark transition shadow-lg">Lưu Thay Đổi</button>
+                </div>
+            </div>
+
+            <!-- Form: Links -->
+            <div id="adm-form-links" class="adm-content hidden space-y-4">
+                <div id="link-editor-list" class="space-y-3"></div>
+                <button onclick="addLink()" class="w-full border-2 border-dashed border-gray-300 text-gray-500 py-3 rounded-xl font-bold hover:border-brand-DEFAULT hover:text-brand-DEFAULT transition"><i class="fas fa-plus mr-1"></i> Thêm liên kết mới</button>
+                <div class="pt-4 sticky bottom-0 bg-white border-t mt-4">
+                    <button onclick="saveData()" class="w-full bg-brand-DEFAULT text-white py-3 rounded-xl font-bold hover:bg-brand-dark transition shadow-lg">Lưu Danh Sách</button>
+                </div>
+            </div>
+
+            <!-- Form: Products -->
+            <div id="adm-form-products" class="adm-content hidden space-y-4">
+                <div id="product-editor-list" class="space-y-6"></div>
+                <button onclick="addProduct()" class="w-full border-2 border-dashed border-gray-300 text-gray-500 py-3 rounded-xl font-bold hover:border-brand-DEFAULT hover:text-brand-DEFAULT transition"><i class="fas fa-plus mr-1"></i> Thêm sản phẩm mới</button>
+                <div class="pt-4 sticky bottom-0 bg-white border-t mt-4">
+                    <button onclick="saveData()" class="w-full bg-brand-DEFAULT text-white py-3 rounded-xl font-bold hover:bg-brand-dark transition shadow-lg">Lưu Sản Phẩm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CONFIG & DEFAULT DATA ---
+        const DEFAULT_DATA = {
+            profile: {
+                name: "Phạm Minh Anh",
+                bio: "✨ Chia sẻ tips làm đẹp & Phong cách sống ✨",
+                avatar: "https://scontent.fsgn8-3.fna.fbcdn.net/v/t39.30808-6/616038701_2309848252851279_7191171639530957142_n.jpg",
+                socials: [
+                    { icon: "fab fa-tiktok", url: "#" },
+                    { icon: "fab fa-facebook-f", url: "#" },
+                    { icon: "fab fa-instagram", url: "#" }
+                ]
+            },
+            links: [
+                { id: 1, title: "Săn Sale Shopee Hôm Nay", subtitle: "Mã giảm giá độc quyền", url: "https://shopee.vn", icon: "fas fa-fire", color: "orange", isHighlight: true },
+                { id: 2, title: "Bộ Skincare Trị Mụn", subtitle: "Top sản phẩm mình dùng", url: "#", icon: "fas fa-spray-can", color: "blue", type: "collection", filter: "beauty" },
+                { id: 3, title: "Thời Trang & Phụ Kiện", subtitle: "Quần áo, túi xách hot trend", url: "#", icon: "fas fa-tshirt", color: "pink", type: "collection", filter: "fashion" }
+            ],
+            products: [
+                { id: 1, name: "Son Kem Lì Black Rouge", price: "150k", image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-lm654c6v2d1n90", link: "#", category: "beauty", sale: "-25%" },
+                { id: 2, name: "Máy Rửa Mặt Halio", price: "650k", image: "https://down-vn.img.susercontent.com/file/vn-11134207-7qukw-lkfz4d5y3l4c68", link: "#", category: "beauty", sale: "" },
+                { id: 3, name: "Kính Mát Retro", price: "89k", image: "https://down-vn.img.susercontent.com/file/vn-11134207-7r98o-ll36y0e6z8d98d", link: "#", category: "fashion", sale: "-50%" },
+                { id: 4, name: "Túi Xách Canvas", price: "120k", image: "https://down-vn.img.susercontent.com/file/sg-11134201-22120-1e5f8f8f8f8f", link: "#", category: "fashion", sale: "" }
+            ],
+            categories: [
+                { id: "beauty", name: "Mỹ phẩm" },
+                { id: "fashion", name: "Thời trang" },
+                { id: "home", name: "Gia dụng" }
+            ]
+        };
+
+        let appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+        let db;
+
+        // --- 2. FIREBASE CONFIG (ĐÃ TÍCH HỢP CỦA BẠN) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqndpG932fb8RfOUBDAf_Q4R-9llpUJlI",
+            authDomain: "biolink-6e6ee.firebaseapp.com",
+            projectId: "biolink-6e6ee",
+            storageBucket: "biolink-6e6ee.firebasestorage.app",
+            messagingSenderId: "232844523779",
+            appId: "1:232844523779:web:a0bdf6e804892ca5c41136",
+            measurementId: "G-2DSTF8HF5P"
+        };
+
+        async function initApp() {
+            try {
+                // Khởi tạo Firebase
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                db = firebase.firestore();
+                const auth = firebase.auth();
+                
+                // Đăng nhập ẩn danh (Yêu cầu để đọc/ghi dữ liệu)
+                await auth.signInAnonymously();
+                console.log("Đã kết nối Firebase thành công!");
+                
+                // Tải dữ liệu
+                await loadDataFromFirestore();
+                
+            } catch (e) {
+                console.error("Lỗi kết nối Firebase:", e);
+                // Fallback nếu lỗi: vẫn render data mặc định
+                renderApp(); 
+            }
+        }
+
+        async function loadDataFromFirestore() {
+            if (!db) return;
+            try {
+                // Đọc từ collection 'data', document 'profile'
+                const docRef = db.collection('data').doc('profile');
+                const doc = await docRef.get();
+                if (doc.exists) {
+                    appData = doc.data();
+                    console.log("Đã tải dữ liệu từ Cloud");
+                } else {
+                    console.log("Chưa có dữ liệu, dùng mặc định");
+                }
+            } catch (error) {
+                console.error("Lỗi tải data:", error);
+            }
+            renderApp();
+        }
+
+        async function saveData() {
+            // Cập nhật state nội bộ từ ô nhập liệu
+            updateStateFromInputs();
+
+            // Render lại giao diện ngay lập tức
+            renderApp();
+            toggleAdmin(); // Đóng bảng admin
+
+            if (!db) {
+                alert("Lỗi: Chưa kết nối được Database.");
+                return;
+            }
+
+            try {
+                // Lưu lên Cloud
+                const docRef = db.collection('data').doc('profile');
+                await docRef.set(appData);
+                alert("Đã lưu thành công lên Cloud!");
+            } catch (error) {
+                console.error("Lỗi lưu:", error);
+                alert("Lỗi khi lưu (Hãy kiểm tra tab Rules trong Firestore): " + error.message);
+            }
+        }
+
+        // --- 3. RENDERING LOGIC ---
+        function renderApp() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').classList.remove('hidden');
+
+            // 3.1 Render Profile
+            document.getElementById('profile-name').textContent = appData.profile.name;
+            document.getElementById('profile-bio').textContent = appData.profile.bio;
+            const avatarImg = document.getElementById('profile-avatar');
+            avatarImg.src = appData.profile.avatar;
+            avatarImg.onerror = () => avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(appData.profile.name)}&background=random`;
+
+            const socialHtml = appData.profile.socials.map(s => `
+                <a href="${s.url}" class="w-10 h-10 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white hover:text-black transition transform hover:-translate-y-1">
+                    <i class="${s.icon} text-lg"></i>
+                </a>
+            `).join('');
+            document.getElementById('social-container').innerHTML = socialHtml;
+
+            // 3.2 Render Links
+            const linksHtml = appData.links.map(link => {
+                const borderClass = link.isHighlight ? 'border-l-4 border-yellow-400' : `border-l-4 border-${link.color}-400`;
+                const bgIcon = link.isHighlight ? 'bg-orange-100 text-orange-500' : `bg-${link.color}-100 text-${link.color}-500`;
+                // Nếu type là collection thì gọi hàm openCategory, nếu không thì mở link
+                const action = link.type === 'collection' ? `onclick="openCategory('${link.filter}')"` : `href="${link.url}" target="_blank"`;
+                const iconRight = link.type === 'collection' ? 'fa-chevron-right' : 'fa-external-link-alt';
+                
+                return `
+                <a ${action} class="block group relative transform transition hover:scale-[1.02] cursor-pointer">
+                    ${link.isHighlight ? '<div class="absolute -inset-0.5 bg-yellow-400 rounded-2xl blur opacity-60 animate-pulse"></div>' : ''}
+                    <div class="relative glass-card hover:bg-white rounded-xl p-4 flex items-center justify-between shadow-sm ${borderClass}">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 ${bgIcon} rounded-lg flex items-center justify-center text-xl shadow-inner">
+                                <i class="${link.icon}"></i>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="font-bold text-gray-800">${link.title}</h3>
+                                <p class="text-xs text-gray-600">${link.subtitle || ''}</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 p-2 rounded-full group-hover:bg-brand group-hover:text-white transition">
+                             <i class="fas ${iconRight} text-xs text-gray-400 group-hover:text-white"></i>
+                        </div>
+                    </div>
+                </a>`;
+            }).join('');
+            document.getElementById('view-links').innerHTML = linksHtml;
+
+            // 3.3 Render Categories Filter
+            const catsHtml = `<button onclick="filterProducts('all')" class="filter-btn active px-4 py-1.5 rounded-full text-xs font-semibold bg-white/60 backdrop-blur-md border border-white text-gray-600 transition shadow-sm" data-filter="all">Tất cả</button>` + 
+                appData.categories.map(c => `
+                <button onclick="filterProducts('${c.id}')" class="filter-btn px-4 py-1.5 rounded-full text-xs font-semibold bg-white/60 backdrop-blur-md border border-white text-gray-600 transition shadow-sm" data-filter="${c.id}">${c.name}</button>
+            `).join('');
+            document.getElementById('category-filter').innerHTML = catsHtml;
+
+            // 3.4 Render Products (Initial load)
+            renderProductGrid('all');
+        }
+
+        function renderProductGrid(filter) {
+            const grid = document.getElementById('product-grid');
+            const products = filter === 'all' ? appData.products : appData.products.filter(p => p.category === filter);
+            
+            if (products.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center py-10 opacity-50"><i class="fas fa-box-open text-3xl mb-2"></i><br>Không có sản phẩm</div>`;
+                return;
+            }
+
+            grid.innerHTML = products.map(p => `
+                <div class="glass-card rounded-xl overflow-hidden hover:shadow-lg transition duration-300 flex flex-col">
+                    <div class="relative h-36 bg-white">
+                        <img src="${p.image}" class="w-full h-full object-cover">
+                        ${p.sale ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">${p.sale}</span>` : ''}
+                    </div>
+                    <div class="p-3 flex flex-col flex-grow">
+                        <h3 class="text-sm font-semibold text-gray-800 line-clamp-2 mb-1">${p.name}</h3>
+                        <div class="mt-auto flex items-center justify-between">
+                            <span class="text-brand font-bold text-sm">${p.price}</span>
+                            <a href="${p.link}" target="_blank" class="bg-brand text-white text-xs px-2.5 py-1.5 rounded-full hover:bg-brand-dark transition">Mua</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- 4. INTERACTION LOGIC ---
+        function switchTab(tab) {
+            const btnLinks = document.getElementById('btn-links');
+            const btnProds = document.getElementById('btn-products');
+            const viewLinks = document.getElementById('view-links');
+            const viewProds = document.getElementById('view-products');
+
+            if (tab === 'links') {
+                viewLinks.classList.remove('hidden');
+                viewProds.classList.add('hidden');
+                btnLinks.classList.add('bg-white', '!text-brand-DEFAULT', 'shadow-sm', 'font-bold');
+                btnProds.classList.remove('bg-white', '!text-brand-DEFAULT', 'shadow-sm', 'font-bold');
+            } else {
+                viewLinks.classList.add('hidden');
+                viewProds.classList.remove('hidden');
+                btnProds.classList.add('bg-white', '!text-brand-DEFAULT', 'shadow-sm', 'font-bold');
+                btnLinks.classList.remove('bg-white', '!text-brand-DEFAULT', 'shadow-sm', 'font-bold');
+            }
+        }
+
+        function filterProducts(catId) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === catId) {
+                    btn.classList.add('active', 'bg-brand-DEFAULT', 'text-white', 'border-brand-DEFAULT');
+                    btn.classList.remove('bg-white/60', 'text-gray-600');
+                } else {
+                    btn.classList.remove('active', 'bg-brand-DEFAULT', 'text-white', 'border-brand-DEFAULT');
+                    btn.classList.add('bg-white/60', 'text-gray-600');
+                }
+            });
+            renderProductGrid(catId);
+        }
+
+        function openCategory(catId) {
+            switchTab('products');
+            filterProducts(catId);
+            setTimeout(() => {
+                document.getElementById('view-products').scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        // --- 5. ADMIN LOGIC ---
+        function toggleAdmin() {
+            const panel = document.getElementById('admin-panel');
+            if (panel.classList.contains('hidden')) {
+                const pass = prompt("Nhập mật khẩu quản trị (Demo: 1234):", "1234");
+                if (pass === '1234') {
+                    fillAdminForms();
+                    panel.classList.remove('hidden');
+                } else if (pass !== null) {
+                    alert("Sai mật khẩu!");
+                }
+            } else {
+                panel.classList.add('hidden');
+            }
+        }
+
+        function switchAdminTab(tab) {
+            ['info', 'links', 'products'].forEach(t => {
+                document.getElementById(`adm-form-${t}`).classList.add('hidden');
+                document.getElementById(`adm-tab-${t}`).classList.remove('border-b-2', 'border-brand-DEFAULT', 'font-bold', 'text-brand-DEFAULT');
+                document.getElementById(`adm-tab-${t}`).classList.add('text-gray-500');
+            });
+            document.getElementById(`adm-form-${tab}`).classList.remove('hidden');
+            document.getElementById(`adm-tab-${tab}`).classList.add('border-b-2', 'border-brand-DEFAULT', 'font-bold', 'text-brand-DEFAULT');
+            document.getElementById(`adm-tab-${tab}`).classList.remove('text-gray-500');
+        }
+
+        function fillAdminForms() {
+            // Fill Info
+            document.getElementById('edit-name').value = appData.profile.name;
+            document.getElementById('edit-bio').value = appData.profile.bio;
+            document.getElementById('edit-avatar').value = appData.profile.avatar;
+
+            // Fill Links Editor
+            const linksEditor = document.getElementById('link-editor-list');
+            linksEditor.innerHTML = appData.links.map((l, i) => `
+                <div class="border rounded-lg p-3 bg-gray-50 relative group">
+                    <button onclick="deleteLink(${i})" class="absolute top-2 right-2 text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                    <div class="mb-2"><input type="text" value="${l.title}" onchange="updateLink(${i}, 'title', this.value)" class="w-full text-sm font-bold bg-transparent border-b outline-none" placeholder="Tiêu đề"></div>
+                    <div class="mb-2"><input type="text" value="${l.subtitle || ''}" onchange="updateLink(${i}, 'subtitle', this.value)" class="w-full text-xs text-gray-500 bg-transparent border-b outline-none" placeholder="Mô tả phụ"></div>
+                    <div class="flex gap-2">
+                        <input type="text" value="${l.url}" onchange="updateLink(${i}, 'url', this.value)" class="flex-1 text-xs bg-white border rounded p-1" placeholder="URL">
+                        <select onchange="updateLink(${i}, 'color', this.value)" class="text-xs bg-white border rounded p-1">
+                            <option value="blue" ${l.color=='blue'?'selected':''}>Xanh</option>
+                            <option value="pink" ${l.color=='pink'?'selected':''}>Hồng</option>
+                            <option value="orange" ${l.color=='orange'?'selected':''}>Cam</option>
+                            <option value="green" ${l.color=='green'?'selected':''}>Lá</option>
+                        </select>
+                    </div>
+                </div>
+            `).join('');
+
+            // Fill Products Editor
+            const prodEditor = document.getElementById('product-editor-list');
+            prodEditor.innerHTML = appData.products.map((p, i) => `
+                <div class="border rounded-lg p-3 bg-gray-50 relative flex gap-3">
+                    <button onclick="deleteProduct(${i})" class="absolute top-2 right-2 text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                    <img src="${p.image}" class="w-16 h-16 object-cover rounded bg-white">
+                    <div class="flex-1 space-y-2">
+                        <input type="text" value="${p.name}" onchange="updateProduct(${i}, 'name', this.value)" class="w-full text-sm font-bold bg-transparent border-b outline-none" placeholder="Tên SP">
+                        <div class="flex gap-2">
+                            <input type="text" value="${p.price}" onchange="updateProduct(${i}, 'price', this.value)" class="w-20 text-xs bg-white border rounded p-1" placeholder="Giá">
+                            <select onchange="updateProduct(${i}, 'category', this.value)" class="text-xs bg-white border rounded p-1">
+                                ${appData.categories.map(c => `<option value="${c.id}" ${p.category==c.id?'selected':''}>${c.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <input type="text" value="${p.image}" onchange="updateProduct(${i}, 'image', this.value)" class="w-full text-xs text-gray-400 bg-transparent border-b outline-none" placeholder="Link ảnh">
+                         <input type="text" value="${p.link}" onchange="updateProduct(${i}, 'link', this.value)" class="w-full text-xs text-blue-400 bg-transparent border-b outline-none" placeholder="Link tiếp thị">
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- 6. DATA MANIPULATION ---
+        function updateStateFromInputs() {
+            appData.profile.name = document.getElementById('edit-name').value;
+            appData.profile.bio = document.getElementById('edit-bio').value;
+            appData.profile.avatar = document.getElementById('edit-avatar').value;
+        }
+
+        // Helpers for Global Scope (called by HTML onclick)
+        window.updateLink = (index, field, value) => { appData.links[index][field] = value; };
+        window.deleteLink = (index) => { 
+            if(confirm("Xóa link này?")) { appData.links.splice(index, 1); fillAdminForms(); } 
+        };
+        window.addLink = () => {
+            appData.links.push({ id: Date.now(), title: "Link mới", url: "#", icon: "fas fa-link", color: "blue" });
+            fillAdminForms();
+        };
+
+        window.updateProduct = (index, field, value) => { appData.products[index][field] = value; };
+        window.deleteProduct = (index) => {
+            if(confirm("Xóa sản phẩm này?")) { appData.products.splice(index, 1); fillAdminForms(); }
+        };
+        window.addProduct = () => {
+            appData.products.push({ id: Date.now(), name: "Sản phẩm mới", price: "0k", image: "https://via.placeholder.com/150", link: "#", category: "beauty" });
+            fillAdminForms();
+        };
+
+        // --- START APP ---
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>
