@@ -34,12 +34,6 @@
     <style>
         body { background-color: #f3f3f1; overflow: hidden; height: 100vh; }
         
-        /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
-        
         /* Sidebar Nav Item */
         .nav-item {
             width: 100%; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -49,44 +43,33 @@
         .nav-item.active { background-color: #f0fdf4; color: #16a34a; }
         .nav-icon { font-size: 1.25rem; }
 
-        /* Modern Card */
-        .lt-card { background: white; border-radius: 24px; padding: 20px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; transition: transform 0.2s, box-shadow 0.2s; }
-        .lt-card:hover { transform: translateY(-1px); border-color: #d1d5db; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        /* Cards & Inputs */
+        .lt-card { background: white; border-radius: 24px; padding: 20px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; transition: transform 0.2s; }
+        .lt-card:hover { border-color: #d1d5db; }
         .lt-card.collection-card { background: #FDF4FF; border-color: #E9D5FF; }
-
-        /* Inputs */
-        .lt-input { width: 100%; padding: 10px 14px; background: #f9fafb; border: 1px solid transparent; border-radius: 10px; font-size: 0.95rem; font-weight: 500; color: #111827; outline: none; transition: all 0.2s; }
-        .lt-input:focus { background: white; border-color: #d1d5db; box-shadow: 0 0 0 3px rgba(0,0,0,0.03); }
+        
+        .lt-input { width: 100%; padding: 12px 16px; background: #f9fafb; border: 1px solid transparent; border-radius: 12px; font-size: 0.95rem; font-weight: 500; color: #111827; outline: none; transition: all 0.2s; }
+        .lt-input:focus { background: white; border-color: #111; box-shadow: 0 0 0 2px rgba(0,0,0,0.1); }
         .lt-input::placeholder { color: #9ca3af; }
-        .collection-card .lt-input { background: white; }
 
-        /* Upload Button */
-        .upload-btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            padding: 8px 16px; background-color: #f3f4f6; color: #4b5563;
-            border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-            border: 1px dashed #d1d5db;
-        }
-        .upload-btn:hover { background-color: #e5e7eb; border-color: #9ca3af; color: #1f2937; }
-
-        /* Phone Preview Wrapper */
+        /* Preview Phone */
         .preview-wrapper {
-            width: 320px; height: 650px;
-            background: #fff; border-radius: 40px; border: 10px solid #1f2937;
+            width: 300px; height: 600px;
+            background: #fff; border-radius: 40px; border: 12px solid #111;
             position: relative; overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25);
             transform-origin: top center;
         }
-        .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 100px; height: 25px; background: #000; border-radius: 20px; z-index: 50; }
+        .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 90px; height: 24px; background: #111; border-radius: 20px; z-index: 50; }
 
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        
         .hidden { display: none !important; }
-        
-        /* Toast */
-        #toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 9999; }
-        .toast { background: #1f2937; color: white; padding: 12px 24px; border-radius: 99px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideUpToast 0.3s; font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        #toast-container { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 9999; }
+        .toast { background: #111; color: white; padding: 12px 24px; border-radius: 99px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideUpToast 0.3s; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         @keyframes slideUpToast { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .hero-text-shadow { text-shadow: 0 4px 0 rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -106,18 +89,15 @@
                 <h1 class="text-5xl font-black text-slate-900 leading-tight">Mọi thứ của bạn.<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">Một liên kết.</span></h1>
                 
                 <div class="bg-white p-6 rounded-3xl shadow-xl border border-slate-100">
-                    <!-- Auth Toggle -->
                     <div class="flex p-1 bg-slate-100 rounded-xl mb-6">
                         <button onclick="toggleAuth('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition">Đăng nhập</button>
                         <button onclick="toggleAuth('register')" id="tab-register" class="flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition">Đăng ký</button>
                     </div>
-
                     <form id="form-auth" onsubmit="handleAuth(event)" class="space-y-4">
                         <input id="auth-email" type="email" placeholder="Email" class="lt-input" required>
                         <input id="auth-pass" type="password" placeholder="Mật khẩu" class="lt-input" required>
                         <button type="submit" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-black transition shadow-lg transform active:scale-[0.98]" id="btn-auth">Tiếp tục</button>
                     </form>
-                    
                     <button onclick="handleGoogle()" class="mt-4 w-full py-3 border border-slate-200 rounded-xl font-bold text-sm text-slate-700 hover:bg-slate-50 transition flex items-center justify-center gap-2">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> Google
                     </button>
@@ -125,50 +105,27 @@
             </div>
         </div>
 
-        <!-- 2. EDITOR LAYOUT (LINKTREE STYLE) -->
+        <!-- 2. EDITOR LAYOUT (FIXED PREVIEW) -->
         <div id="view-editor" class="view-section hidden h-full flex bg-[#f3f3f1]">
             
-            <!-- A. SIDEBAR NAV (Left) -->
+            <!-- A. SIDEBAR NAV -->
             <aside class="w-20 md:w-24 bg-white border-r border-gray-200 flex flex-col items-center py-6 z-30 flex-shrink-0">
                 <div class="mb-8 text-2xl text-slate-900 cursor-pointer" onclick="goToDashboard()"><i class="fas fa-shapes"></i></div>
-                
                 <div class="flex-1 w-full space-y-2 px-2">
-                    <button onclick="switchTab('links')" id="nav-links" class="nav-item active">
-                        <i class="fas fa-list nav-icon"></i>
-                        <span>Liên kết</span>
-                    </button>
-                    <button onclick="switchTab('products')" id="nav-products" class="nav-item">
-                        <i class="fas fa-store nav-icon"></i>
-                        <span>Cửa hàng</span>
-                    </button>
-                    <button onclick="switchTab('appearance')" id="nav-appearance" class="nav-item">
-                        <i class="fas fa-palette nav-icon"></i>
-                        <span>Giao diện</span>
-                    </button>
-                    <button onclick="switchTab('settings')" id="nav-settings" class="nav-item">
-                        <i class="fas fa-cog nav-icon"></i>
-                        <span>Cài đặt</span>
-                    </button>
+                    <button onclick="switchTab('links')" id="nav-links" class="nav-item active"><i class="fas fa-list nav-icon"></i><span>Liên kết</span></button>
+                    <button onclick="switchTab('products')" id="nav-products" class="nav-item"><i class="fas fa-store nav-icon"></i><span>Cửa hàng</span></button>
+                    <button onclick="switchTab('appearance')" id="nav-appearance" class="nav-item"><i class="fas fa-palette nav-icon"></i><span>Giao diện</span></button>
+                    <button onclick="switchTab('settings')" id="nav-settings" class="nav-item"><i class="fas fa-cog nav-icon"></i><span>Cài đặt</span></button>
                 </div>
-
                 <div class="mt-auto w-full px-2 space-y-2">
-                    <button onclick="goToDashboard()" class="nav-item" title="Về Dashboard">
-                        <i class="fas fa-th-large nav-icon"></i>
-                    </button>
-                    <!-- LOGOUT BUTTON -->
-                    <button onclick="handleLogout()" class="nav-item text-red-500 hover:text-red-600 hover:bg-red-50" title="Đăng xuất">
-                        <i class="fas fa-sign-out-alt nav-icon"></i>
-                    </button>
-                    <div class="w-full h-px bg-gray-100"></div>
-                    <div class="w-10 h-10 rounded-full bg-gray-200 mx-auto overflow-hidden border border-gray-300">
-                        <img id="nav-avatar" class="w-full h-full object-cover">
-                    </div>
+                    <button onclick="goToDashboard()" class="nav-item" title="Dashboard"><i class="fas fa-th-large nav-icon"></i></button>
+                    <button onclick="handleLogout()" class="nav-item text-red-500 hover:bg-red-50" title="Logout"><i class="fas fa-sign-out-alt nav-icon"></i></button>
+                    <div class="w-10 h-10 rounded-full bg-gray-200 mx-auto overflow-hidden border border-gray-300"><img id="nav-avatar" class="w-full h-full object-cover"></div>
                 </div>
             </aside>
 
-            <!-- B. MAIN CONTENT (Middle) -->
+            <!-- B. MAIN CONTENT -->
             <main class="flex-1 flex flex-col h-full overflow-hidden relative min-w-0">
-                <!-- Header -->
                 <header class="h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 flex justify-between items-center px-6 md:px-10 shrink-0 sticky top-0 z-20">
                     <h2 class="font-bold text-xl text-slate-800" id="header-title">Liên kết</h2>
                     <div class="flex items-center gap-3">
@@ -178,42 +135,35 @@
                             <button onclick="copyLink()"><i class="fas fa-copy hover:text-black"></i></button>
                         </div>
                         <button onclick="saveBio()" class="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-black transition shadow-sm active:scale-95">Lưu thay đổi</button>
-                        <!-- Mobile Preview Toggle -->
-                        <button onclick="toggleMobilePreview()" class="md:hidden w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center"><i class="fas fa-eye"></i></button>
+                        
+                        <!-- Toggle Preview Button (Visible on screens < 1024px) -->
+                        <button onclick="toggleMobilePreview()" class="lg:hidden w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition"><i class="fas fa-eye text-slate-700"></i></button>
                     </div>
                 </header>
 
-                <!-- Scrollable Form Area -->
                 <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10">
                     <div class="max-w-2xl mx-auto space-y-6 pb-20">
                         
                         <!-- TAB: LINKS -->
                         <div id="tab-content-links" class="tab-content">
-                            <!-- Dual Create Buttons -->
                             <div class="flex gap-4 mb-6">
                                 <button onclick="addLink()" class="flex-1 py-4 bg-[#7B2CBF] hover:bg-[#6D23AC] text-white rounded-2xl font-bold shadow-lg shadow-purple-200/50 transition transform active:scale-[0.98] flex items-center justify-center gap-2">
                                     <i class="fas fa-link"></i> Thêm Liên Kết
                                 </button>
-                                <button onclick="addCollection()" class="flex-1 py-4 bg-white border-2 border-[#7B2CBF] text-[#7B2CBF] hover:bg-purple-50 rounded-2xl font-bold transition transform active:scale-[0.98] flex items-center justify-center gap-2">
+                                <button onclick="addCollection()" class="flex-1 py-4 bg-white border-2 border-[#7B2CBF] text-[#7B2CBF] hover:bg-[#F5F0FF] rounded-2xl font-bold transition transform active:scale-[0.98] flex items-center justify-center gap-2">
                                     <i class="fas fa-folder-plus"></i> Thêm Bộ Sưu Tập
                                 </button>
                             </div>
-                            
                             <div id="links-list" class="space-y-4"></div>
                         </div>
 
-                        <!-- TAB: PRODUCTS (SHOP) -->
+                        <!-- TAB: PRODUCTS -->
                         <div id="tab-content-products" class="tab-content hidden">
                             <div class="flex justify-between items-center mb-6">
                                 <h3 class="font-bold text-lg text-slate-800">Quản lý Sản phẩm</h3>
-                                <button onclick="addProd()" class="bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-full font-bold shadow-lg transition active:scale-95 text-sm flex items-center gap-2">
-                                    <i class="fas fa-plus"></i> Thêm SP
-                                </button>
+                                <button onclick="addProd()" class="bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-full font-bold shadow-lg transition active:scale-95 text-sm flex items-center gap-2"><i class="fas fa-plus"></i> Thêm SP</button>
                             </div>
-                            <div class="p-4 bg-blue-50 text-blue-700 text-sm rounded-2xl border border-blue-100 flex gap-3 mb-6">
-                                <i class="fas fa-lightbulb text-xl shrink-0"></i>
-                                <div><b>Mẹo:</b> Tạo "Bộ sưu tập" ở tab Liên kết trước, sau đó thêm sản phẩm vào đây và chọn bộ sưu tập tương ứng.</div>
-                            </div>
+                            <div class="p-4 bg-blue-50 text-blue-700 text-sm rounded-2xl border border-blue-100 flex gap-3 mb-6"><i class="fas fa-lightbulb text-xl shrink-0"></i><div><b>Mẹo:</b> Tạo "Bộ sưu tập" ở tab Liên kết trước, sau đó thêm sản phẩm vào đây và chọn bộ sưu tập tương ứng.</div></div>
                             <div id="products-list" class="space-y-4"></div>
                         </div>
 
@@ -223,12 +173,8 @@
                                 <h3 class="font-bold text-lg mb-6">Hồ sơ</h3>
                                 <div class="flex flex-col sm:flex-row gap-6 items-center">
                                     <div class="relative group cursor-pointer w-24 h-24 shrink-0">
-                                        <div class="w-full h-full rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200 relative">
-                                            <img id="ed-img-preview" class="w-full h-full object-cover">
-                                        </div>
-                                        <label for="avatar-upload" class="absolute bottom-0 right-0 bg-slate-900 text-white p-2 rounded-full text-xs shadow-md cursor-pointer hover:bg-black transition">
-                                            <i class="fas fa-camera"></i>
-                                        </label>
+                                        <div class="w-full h-full rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200 relative"><img id="ed-img-preview" class="w-full h-full object-cover"></div>
+                                        <label for="avatar-upload" class="absolute bottom-0 right-0 bg-slate-900 text-white p-2 rounded-full text-xs shadow-md cursor-pointer hover:bg-black transition"><i class="fas fa-camera"></i></label>
                                         <input type="file" id="avatar-upload" class="hidden" accept="image/*" onchange="uploadImage(event, 'avatar')">
                                     </div>
                                     <div class="flex-1 w-full space-y-3">
@@ -238,7 +184,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="space-y-4">
                                 <h3 class="font-bold text-lg px-1">Chủ đề</h3>
                                 <div class="grid grid-cols-3 gap-4">
@@ -250,7 +195,6 @@
                                     <div onclick="setTheme('sunset')" class="aspect-[9/16] rounded-2xl bg-gradient-to-tr from-orange-400 to-pink-500 cursor-pointer hover:ring-4 ring-orange-200 transition shadow-sm border border-transparent hover:border-white"></div>
                                 </div>
                             </div>
-
                              <div class="space-y-4">
                                 <h3 class="font-bold text-lg px-1">Kiểu nút</h3>
                                 <div class="grid grid-cols-3 gap-3">
@@ -273,19 +217,19 @@
                 </div>
             </main>
 
-            <!-- C. PREVIEW PANEL (Right) - Fixed & Visible on MD+ -->
-            <aside class="hidden md:flex w-[400px] xl:w-[480px] border-l border-gray-200 bg-white items-center justify-center p-4 lg:p-8 relative flex-shrink-0 transition-all duration-300">
-                <div class="absolute top-0 right-0 p-4">
-                    <button onclick="refreshPreview()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition text-gray-500" title="Làm mới"><i class="fas fa-sync-alt"></i></button>
+            <!-- C. PREVIEW PANEL (Right) - ALWAYS VISIBLE ON LG SCREENS -->
+            <aside class="hidden lg:flex w-[400px] xl:w-[480px] border-l border-gray-200 bg-white items-center justify-center p-8 relative flex-shrink-0 z-20">
+                <div class="absolute top-4 right-4">
+                    <button onclick="preview()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition text-gray-500" title="Làm mới"><i class="fas fa-sync-alt"></i></button>
                 </div>
-                <div class="preview-wrapper transform scale-[0.7] lg:scale-[0.85] xl:scale-95 transition-transform origin-center shadow-2xl">
+                <div class="preview-wrapper transform scale-[0.85] xl:scale-95 transition-transform origin-center shadow-2xl">
                     <div class="notch"></div>
                     <iframe id="preview-frame" class="w-full h-full bg-white border-none"></iframe>
                 </div>
             </aside>
         </div>
 
-        <!-- 3. DASHBOARD (PROJECT SELECTOR) -->
+        <!-- 3. DASHBOARD -->
         <div id="view-dashboard" class="view-section hidden h-full overflow-y-auto bg-[#f3f3f1]">
             <nav class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
                 <div class="font-black text-xl flex items-center gap-2"><i class="fas fa-shapes text-green-600"></i> Mewo</div>
@@ -301,9 +245,8 @@
             </div>
         </div>
 
-        <!-- 4. PUBLIC PAGE CONTAINER -->
+        <!-- 4. PUBLIC PAGE -->
         <div id="view-public" class="view-section hidden h-full w-full overflow-y-auto"></div>
-
     </div>
 
     <!-- MODALS -->
@@ -321,18 +264,16 @@
         </div>
     </div>
 
-    <div id="modal-mobile-preview" class="fixed inset-0 bg-white z-[60] hidden flex flex-col">
-        <div class="px-4 py-3 border-b flex justify-between items-center bg-white">
-            <span class="font-bold">Xem trước</span>
-            <button onclick="toggleMobilePreview()" class="w-8 h-8 bg-gray-100 rounded-full"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="flex-1 bg-gray-100 p-4 flex justify-center">
-            <div class="preview-wrapper transform scale-90 border-none shadow-none"><iframe id="mobile-preview-frame" class="w-full h-full bg-white"></iframe></div>
+    <!-- Mobile Preview Modal -->
+    <div id="modal-mobile-preview" class="fixed inset-0 bg-black/90 z-[60] hidden flex flex-col items-center justify-center p-4">
+        <button onclick="toggleMobilePreview()" class="absolute top-4 right-4 w-10 h-10 bg-white/20 rounded-full text-white flex items-center justify-center"><i class="fas fa-times"></i></button>
+        <div class="w-full h-full max-w-[340px] max-h-[650px] bg-white rounded-[30px] overflow-hidden">
+            <iframe id="mobile-preview-frame" class="w-full h-full bg-white border-none"></iframe>
         </div>
     </div>
 
     <script>
-        // --- CONFIG ---
+        // CONFIG
         const firebaseConfig = { apiKey: "AIzaSyAqndpG932fb8RfOUBDAf_Q4R-9llpUJlI", authDomain: "biolink-6e6ee.firebaseapp.com", projectId: "biolink-6e6ee", storageBucket: "biolink-6e6ee.firebasestorage.app", messagingSenderId: "232844523779", appId: "1:232844523779:web:a0bdf6e804892ca5c41136", measurementId: "G-2DSTF8HF5P" };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -452,6 +393,7 @@
             if(!doc.exists) { location.hash='#dashboard'; return; }
             bioData = doc.data();
             
+            // Init Defaults
             bioData.links = bioData.links || [];
             bioData.products = bioData.products || [];
             bioData.socials = bioData.socials || {};
@@ -465,7 +407,7 @@
 
             renderLists();
             switchTab('links');
-            preview(); // Initial preview load
+            setTimeout(preview, 500); // Small delay to ensure iframe is ready
         }
 
         function switchTab(t) {
@@ -580,7 +522,7 @@
         function uploadImage(event, type, index = null) {
             const file = event.target.files[0];
             if (!file) return;
-            if (file.size > 1048576) return showToast("Ảnh phải nhỏ hơn 1MB", "error"); // Limit 1MB for Firestore doc size safety
+            if (file.size > 1048576) return showToast("Ảnh phải nhỏ hơn 1MB", "error"); 
             
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -603,6 +545,11 @@
             bioData.profile.name = document.getElementById('ed-name').value;
             bioData.profile.bio = document.getElementById('ed-bio').value;
             
+            const avtInput = document.getElementById('ed-avatar').value;
+            if (avtInput && !avtInput.startsWith("Ảnh đã") && !avtInput.startsWith("data:")) bioData.profile.avatar = avtInput;
+            document.getElementById('ed-img-preview').src = bioData.profile.avatar;
+            document.getElementById('nav-avatar').src = bioData.profile.avatar;
+
             const html = genHtml(bioData, true);
             const frames = [document.getElementById('preview-frame'), document.getElementById('mobile-preview-frame')];
             frames.forEach(f => { if(f) { const d=f.contentDocument; d.open(); d.write(html); d.close(); } });
@@ -690,10 +637,6 @@
             return isPreview ? `<!DOCTYPE html><html><head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>${css}</style></head><body>${content}</body></html>` : `<style>${css}</style>${content}`;
         }
         
-        // GLOBAL FOR PUBLIC
-        window.showShop = function(col) { document.getElementById('main').style.display='none'; document.getElementById('shop').style.display='block'; document.getElementById('stitle').innerText=col; const g=document.getElementById('grid'); const fl=window.pubProds.filter(p=>p.collection===col); if(!fl.length){g.innerHTML='Empty';return;} g.innerHTML = fl.map(p=>`<div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:10px;display:flex;align-items:center;padding:8px;gap:10px"><img src="${p.image}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;background:#eee"><div style="flex:1"><div style="font-weight:bold;font-size:14px;color:#333;margin-bottom:4px">${p.name}</div><div style="font-size:12px;color:#e11d48;font-weight:bold">${p.price}</div></div><a href="${p.link}" target="_blank" style="background:#000;color:white;text-decoration:none;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:bold">Mua</a></div>`).join(''); };
-        window.closeShop = function() { document.getElementById('shop').style.display='none'; document.getElementById('main').style.display='block'; };
-
         function showToast(m,t){ const d=document.createElement('div');d.className='toast';d.innerText=m;document.getElementById('toast-container').appendChild(d);setTimeout(()=>d.remove(),3000); }
         function copyToClipboard(t){ navigator.clipboard.writeText(t).then(()=>showToast("Đã sao chép","success")); }
         function claimUsername() { openAuthModal('register'); document.getElementById('reg-email').focus(); }
