@@ -32,32 +32,25 @@
     </script>
 
     <style>
-        /* Base Reset */
         body { background-color: #f8fafc; overflow-x: hidden; }
-        
-        /* Modern Scrollbar */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        /* Layout Utils */
         .hidden { display: none !important; }
         
-        /* Components */
         .input-modern { @apply w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-100 transition-all outline-none text-slate-800 text-sm font-medium; }
         .btn-primary { @apply w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold shadow-lg transition active:scale-95 flex items-center justify-center gap-2; }
         .card-modern { @apply bg-white rounded-2xl border border-slate-200 shadow-sm p-5 relative transition-all; }
         
-        /* Tab System */
-        .tab-btn { @apply flex-1 py-2 text-sm font-bold text-slate-500 rounded-lg transition-all cursor-pointer text-center; }
-        .tab-btn.active { @apply bg-white text-slate-900 shadow-sm; }
+        .tab-btn { @apply px-6 py-2.5 text-sm font-bold text-slate-500 rounded-xl transition-all cursor-pointer text-center whitespace-nowrap; }
+        .tab-btn.active { @apply bg-white text-slate-900 shadow-sm text-brand-600; }
         
         /* Phone Mockup */
         .phone-mockup {
-            width: 320px; height: 650px;
+            width: 320px; height: 660px;
             background: #fff;
             border-radius: 45px;
-            border: 10px solid #222;
+            border: 12px solid #1e293b;
             position: relative;
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -65,11 +58,10 @@
         }
         .dynamic-island {
             position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-            width: 100px; height: 28px; background: #000; border-radius: 20px;
+            width: 90px; height: 26px; background: #000; border-radius: 20px;
             z-index: 50;
         }
 
-        /* Toast */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
         .toast { background: white; padding: 12px 20px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-left: 4px solid #e11d48; margin-bottom: 10px; animation: slideIn 0.3s; font-size: 0.9rem; font-weight: 600; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
@@ -79,7 +71,7 @@
 
     <div id="toast-container"></div>
 
-    <!-- MAIN LAYOUT -->
+    <!-- MAIN APP -->
     <div id="app" class="flex-1 relative h-full w-full">
         
         <!-- === VIEW: LANDING === -->
@@ -98,21 +90,15 @@
                     <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto lg:mx-0">
                         <div class="flex-1 bg-white p-3 rounded-xl border-2 border-transparent focus-within:border-brand-200 shadow-xl flex items-center">
                             <span class="font-bold text-slate-400 pl-2">mewo.life/</span>
-                            <input id="landing-slug" type="text" placeholder="username" class="flex-1 bg-transparent outline-none font-bold text-slate-900 ml-1">
+                            <input id="landing-slug" type="text" placeholder="username" class="flex-1 bg-transparent outline-none font-bold text-slate-900 ml-1 lowercase">
                         </div>
                         <button onclick="claimUsername()" class="px-8 py-3 bg-brand-600 text-white rounded-xl font-bold shadow-xl hover:bg-brand-700 transition">Bắt đầu</button>
                     </div>
                 </div>
-                <!-- 3D Phone Image Placeholder -->
-                <div class="lg:w-1/2 flex justify-center">
-                    <div class="phone-mockup bg-white flex flex-col items-center pt-16 border-slate-900">
+                <div class="lg:w-1/2 flex justify-center perspective-1000">
+                    <div class="phone-mockup border-slate-900 shadow-2xl transform rotate-y-12">
                         <div class="dynamic-island"></div>
-                        <div class="w-full h-full bg-slate-50 flex flex-col items-center p-4">
-                            <div class="w-20 h-20 rounded-full bg-brand-200 mb-3 border-4 border-white shadow-md"></div>
-                            <div class="w-32 h-4 bg-slate-200 rounded mb-2"></div>
-                            <div class="w-full h-12 bg-white rounded-xl shadow-sm mb-2"></div>
-                            <div class="w-full h-12 bg-white rounded-xl shadow-sm mb-2"></div>
-                        </div>
+                        <iframe src="about:blank" class="w-full h-full bg-slate-50" style="pointer-events: none;"></iframe>
                     </div>
                 </div>
             </div>
@@ -123,7 +109,7 @@
             <header class="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center z-20">
                 <div class="font-black text-xl text-brand-600 flex items-center gap-2"><i class="fas fa-cat"></i> Mewo</div>
                 <div class="flex items-center gap-4">
-                    <span id="user-email-display" class="text-xs font-bold text-slate-500 hidden sm:block">user@mewo.life</span>
+                    <span id="user-email-display" class="text-xs font-bold text-slate-500 hidden sm:block">...</span>
                     <button onclick="handleLogout()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-500 transition"><i class="fas fa-power-off"></i></button>
                 </div>
             </header>
@@ -136,70 +122,70 @@
                     </div>
                     
                     <div id="dashboard-loader" class="text-center py-10 hidden"><div class="inline-block w-8 h-8 border-4 border-slate-200 border-t-brand-600 rounded-full animate-spin"></div></div>
-                    <div id="bio-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        <!-- Items Injected Here -->
-                    </div>
+                    <div id="bio-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
                 </div>
             </main>
         </div>
 
-        <!-- === VIEW: EDITOR === -->
+        <!-- === VIEW: EDITOR (FIXED LAYOUT) === -->
         <div id="view-editor" class="view-section hidden h-full flex overflow-hidden bg-slate-100">
             
-            <!-- LEFT PANEL: Editor Controls -->
-            <aside class="flex-1 flex flex-col h-full bg-white border-r border-slate-200 z-10 max-w-full md:max-w-[480px]">
+            <!-- LEFT PANEL: Editor (FLEX-1 to grow) -->
+            <aside class="flex-1 flex flex-col h-full bg-[#f9fafb] border-r border-slate-200 z-10 overflow-hidden relative">
                 <!-- Header -->
-                <div class="px-5 py-3 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-20">
-                    <button onclick="goToDashboard()" class="text-slate-500 hover:text-slate-900 font-bold text-xs flex items-center gap-1"><i class="fas fa-arrow-left"></i> Dashboard</button>
+                <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-white sticky top-0 z-30">
+                    <button onclick="goToDashboard()" class="text-slate-500 hover:text-slate-900 font-bold text-sm flex items-center gap-2"><i class="fas fa-arrow-left"></i> Dashboard</button>
                     <div class="flex gap-2">
-                        <button onclick="toggleMobilePreview()" class="md:hidden w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center"><i class="fas fa-eye"></i></button>
-                        <button onclick="saveCurrentBio()" class="bg-slate-900 text-white px-4 py-1.5 rounded-full font-bold text-xs hover:bg-slate-800 flex items-center gap-2"><i class="fas fa-save"></i> Lưu</button>
-                    </div>
-                </div>
-
-                <!-- URL Bar -->
-                <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-                    <a id="editor-url-display" href="#" target="_blank" class="text-xs font-mono font-bold text-brand-600 hover:underline truncate mr-2">...</a>
-                    <div class="flex gap-1">
-                        <button onclick="copyToClipboard(document.getElementById('editor-url-display').innerText)" class="w-7 h-7 bg-white border rounded flex items-center justify-center text-slate-400 hover:text-brand-600 text-xs"><i class="fas fa-copy"></i></button>
-                        <button onclick="showQRCode()" class="w-7 h-7 bg-white border rounded flex items-center justify-center text-slate-400 hover:text-brand-600 text-xs"><i class="fas fa-qrcode"></i></button>
+                        <button onclick="toggleMobilePreview()" class="md:hidden w-9 h-9 bg-slate-100 rounded-full flex items-center justify-center"><i class="fas fa-eye"></i></button>
+                        <button onclick="saveCurrentBio()" class="bg-slate-900 text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-slate-800 shadow-md flex items-center gap-2 transition hover:scale-105 active:scale-95"><i class="fas fa-save"></i> Lưu</button>
                     </div>
                 </div>
 
                 <!-- Tabs -->
-                <div class="px-5 pt-4 pb-0">
-                    <div class="flex p-1 bg-slate-100 rounded-lg">
-                        <div onclick="switchEditorTab('links')" id="tab-links" class="tab-btn active">Liên kết</div>
-                        <div onclick="switchEditorTab('products')" id="tab-products" class="tab-btn">Cửa hàng</div>
-                        <div onclick="switchEditorTab('appearance')" id="tab-appearance" class="tab-btn">Giao diện</div>
+                <div class="px-6 pt-6 pb-2">
+                    <div class="bg-slate-200 p-1.5 rounded-2xl flex gap-1 overflow-x-auto hide-scrollbar">
+                        <div onclick="switchTab('links')" id="tab-links" class="tab-btn active">Liên kết</div>
+                        <div onclick="switchTab('products')" id="tab-products" class="tab-btn">Cửa hàng</div>
+                        <div onclick="switchTab('appearance')" id="tab-appearance" class="tab-btn">Giao diện</div>
+                        <div onclick="switchTab('settings')" id="tab-settings" class="tab-btn">Cài đặt</div>
                     </div>
                 </div>
 
-                <!-- Content Area -->
-                <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
-                    <!-- Tab: Links -->
-                    <div id="editor-links" class="editor-tab">
-                        <button onclick="addLinkItem()" class="w-full py-3 border-2 border-dashed border-brand-200 text-brand-600 rounded-xl font-bold text-sm hover:bg-brand-50 transition">+ Thêm Liên Kết</button>
+                <!-- Scrollable Content -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+                    <!-- URL Info -->
+                    <div class="bg-blue-50 border border-blue-100 p-3 rounded-xl flex justify-between items-center">
+                        <div class="flex items-center gap-2 overflow-hidden px-1">
+                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0"></span>
+                            <a id="editor-url-display" href="#" target="_blank" class="text-xs font-bold text-slate-700 hover:text-blue-600 truncate font-mono">...</a>
+                        </div>
+                        <div class="flex gap-1 shrink-0">
+                            <button onclick="copyLink()" class="w-8 h-8 rounded-lg hover:bg-white/50 flex items-center justify-center text-slate-500"><i class="fas fa-copy"></i></button>
+                            <button onclick="showQRCode()" class="w-8 h-8 rounded-lg hover:bg-white/50 flex items-center justify-center text-slate-500"><i class="fas fa-qrcode"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- TAB CONTENT CONTAINERS -->
+                    <div id="content-links" class="tab-content space-y-4">
+                        <button onclick="addLinkItem()" class="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold shadow-lg shadow-brand-500/20 transition flex items-center justify-center gap-2 transform active:scale-95"><i class="fas fa-plus-circle"></i> Thêm liên kết</button>
                         <div id="links-container" class="space-y-3 mt-4 pb-10"></div>
                     </div>
                     
-                    <!-- Tab: Products -->
-                    <div id="editor-products" class="editor-tab hidden">
-                         <button onclick="addProductItem()" class="w-full py-3 border-2 border-dashed border-slate-300 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition">+ Thêm Sản Phẩm</button>
+                    <div id="content-products" class="tab-content hidden space-y-4">
+                         <button onclick="addProductItem()" class="w-full py-4 bg-slate-800 hover:bg-slate-900 text-white rounded-2xl font-bold shadow-lg transition flex items-center justify-center gap-2 transform active:scale-95"><i class="fas fa-shopping-bag"></i> Thêm sản phẩm</button>
                          <div class="mt-2 text-[10px] text-slate-400 bg-slate-50 p-2 rounded">Mẹo: Tạo Link loại "Bộ sưu tập" bên tab Liên kết để nhóm sản phẩm.</div>
                          <div id="products-container" class="space-y-3 mt-4 pb-10"></div>
                     </div>
 
-                    <!-- Tab: Appearance -->
-                    <div id="editor-appearance" class="editor-tab hidden space-y-6">
+                    <div id="content-appearance" class="tab-content hidden space-y-6">
                         <div class="card-modern space-y-3">
                             <h3 class="text-xs font-bold uppercase text-slate-400">Hồ sơ</h3>
                             <div class="flex items-center gap-3">
                                 <img id="editor-avatar-img" class="w-12 h-12 rounded-full border bg-slate-100 object-cover">
-                                <input id="ed-avatar" oninput="updatePreview()" class="input-modern flex-1" placeholder="Link ảnh avatar...">
+                                <input id="inp-avatar" oninput="updatePreview()" class="input-modern flex-1" placeholder="Link ảnh avatar...">
                             </div>
-                            <input id="ed-name" oninput="updatePreview()" class="input-modern font-bold" placeholder="Tên hiển thị">
-                            <textarea id="ed-bio" oninput="updatePreview()" class="input-modern" rows="2" placeholder="Tiểu sử..."></textarea>
+                            <input id="inp-name" oninput="updatePreview()" class="input-modern font-bold" placeholder="Tên hiển thị">
+                            <textarea id="inp-bio" oninput="updatePreview()" class="input-modern" rows="2" placeholder="Tiểu sử..."></textarea>
                         </div>
 
                         <div class="space-y-2">
@@ -208,30 +194,42 @@
                                 <button onclick="setTheme('default')" class="h-16 rounded-lg bg-gradient-to-br from-pink-300 to-rose-400 border-2 border-transparent hover:border-brand-600"></button>
                                 <button onclick="setTheme('ocean')" class="h-16 rounded-lg bg-gradient-to-b from-blue-500 to-cyan-400 border-2 border-transparent hover:border-brand-600"></button>
                                 <button onclick="setTheme('midnight')" class="h-16 rounded-lg bg-slate-900 border-2 border-transparent hover:border-brand-600"></button>
-                                <button onclick="setTheme('forest')" class="h-16 rounded-lg bg-gradient-to-br from-green-700 to-emerald-400 border-2 border-transparent hover:border-brand-600"></button>
+                                <button onclick="setTheme('forest')" class="h-16 rounded-lg bg-gradient-to-br from-emerald-600 to-teal-400 border-2 border-transparent hover:border-brand-600"></button>
                                 <button onclick="setTheme('minimal')" class="h-16 rounded-lg bg-white border border-slate-200 hover:border-brand-600"></button>
                                 <button onclick="setTheme('sunset')" class="h-16 rounded-lg bg-gradient-to-tr from-orange-400 to-pink-500 border-2 border-transparent hover:border-brand-600"></button>
                             </div>
                         </div>
 
                         <div class="space-y-2">
-                            <h3 class="text-xs font-bold uppercase text-slate-400">Mạng xã hội</h3>
-                            <div id="socials-container" class="space-y-2"></div>
+                            <h3 class="text-xs font-bold uppercase text-slate-400">Kiểu nút</h3>
+                            <div class="grid grid-cols-3 gap-2 bg-slate-200 p-1 rounded-xl">
+                                <button onclick="setButtonStyle('rounded')" class="py-2 bg-white rounded-lg text-xs font-bold shadow-sm hover:text-brand-600 transition">Tròn</button>
+                                <button onclick="setButtonStyle('soft')" class="py-2 bg-slate-200/50 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:shadow-sm transition">Bo góc</button>
+                                <button onclick="setButtonStyle('rect')" class="py-2 bg-slate-200/50 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:shadow-sm transition">Vuông</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="content-settings" class="tab-content hidden space-y-4">
+                        <div class="card-modern space-y-3">
+                            <h3 class="font-bold text-sm text-slate-900">Mạng xã hội</h3>
+                            <div id="list-socials" class="space-y-2"></div>
                         </div>
                     </div>
                 </div>
             </aside>
 
-            <!-- RIGHT PANEL: Phone Preview (Desktop) -->
-            <div class="hidden md:flex flex-1 items-center justify-center p-8 bg-slate-200 relative overflow-hidden">
-                <div class="phone-mockup transform scale-90 xl:scale-100 transition-transform">
+            <!-- RIGHT PANEL: Preview (Fixed Width) -->
+            <div class="hidden md:flex w-[480px] bg-white border-l border-slate-200 flex-col items-center justify-center p-6 relative z-20">
+                <div class="phone-mockup transform scale-[0.85] xl:scale-100 transition-transform">
                     <div class="dynamic-island"></div>
                     <iframe id="preview-frame" class="w-full h-full bg-white border-none"></iframe>
                 </div>
+                <div class="mt-6 text-xs font-bold text-slate-300 uppercase tracking-widest">Live Preview</div>
             </div>
         </div>
 
-        <!-- === VIEW: PUBLIC (REAL PAGE) === -->
+        <!-- === VIEW: PUBLIC === -->
         <div id="view-public" class="view-section hidden h-full w-full overflow-y-auto"></div>
 
     </div>
@@ -243,21 +241,24 @@
             <button onclick="closeModal('modal-auth')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800"><i class="fas fa-times"></i></button>
             <h2 class="text-xl font-bold text-center mb-6" id="auth-title">Đăng nhập</h2>
             
-            <div id="auth-forms">
-                <form id="form-login" onsubmit="handleLogin(event)" class="space-y-3">
-                    <input id="login-email" type="email" placeholder="Email" class="input-modern" required>
-                    <input id="login-password" type="password" placeholder="Mật khẩu" class="input-modern" required>
-                    <button type="submit" class="btn-primary">Đăng nhập</button>
-                    <p class="text-center text-xs text-slate-500 mt-4">Chưa có tài khoản? <a href="#" onclick="toggleAuthMode('register')" class="text-brand-600 font-bold">Đăng ký</a></p>
-                </form>
-
-                <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3 hidden">
-                    <input id="reg-email" type="email" placeholder="Email" class="input-modern" required>
-                    <input id="reg-password" type="password" placeholder="Mật khẩu (min 6)" class="input-modern" minlength="6" required>
-                    <button type="submit" class="btn-primary">Đăng ký</button>
-                    <p class="text-center text-xs text-slate-500 mt-4">Đã có tài khoản? <a href="#" onclick="toggleAuthMode('login')" class="text-brand-600 font-bold">Đăng nhập</a></p>
-                </form>
+            <div class="flex bg-slate-100 p-1 rounded-xl mb-6">
+                <button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded-lg shadow-sm bg-white text-slate-900 transition">Đăng nhập</button>
+                <button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 transition">Đăng ký</button>
             </div>
+
+            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-3">
+                <input id="login-email" type="email" placeholder="Email" class="input-modern" required>
+                <input id="login-password" type="password" placeholder="Mật khẩu" class="input-modern" required>
+                <button type="submit" class="btn-primary">Đăng nhập</button>
+                <p class="text-center text-xs text-slate-500 mt-4">Chưa có tài khoản? <a href="#" onclick="toggleAuthMode('register')" class="text-brand-600 font-bold">Đăng ký</a></p>
+            </form>
+
+            <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3 hidden">
+                <input id="reg-email" type="email" placeholder="Email" class="input-modern" required>
+                <input id="reg-password" type="password" placeholder="Mật khẩu (min 6)" class="input-modern" minlength="6" required>
+                <button type="submit" class="btn-primary">Đăng ký</button>
+                <p class="text-center text-xs text-slate-500 mt-4">Đã có tài khoản? <a href="#" onclick="toggleAuthMode('login')" class="text-brand-600 font-bold">Đăng nhập</a></p>
+            </form>
             
             <div class="relative my-6"><div class="absolute inset-0 flex items-center"><div class="w-full border-t"></div></div><div class="relative flex justify-center text-xs text-slate-400 bg-white px-2">HOẶC</div></div>
             <button onclick="handleGoogleLogin()" class="w-full py-2.5 border rounded-xl flex items-center justify-center gap-2 hover:bg-slate-50 font-bold text-sm text-slate-700 transition"><img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> Google</button>
@@ -274,7 +275,7 @@
             </div>
             <div class="flex justify-end gap-2">
                 <button onclick="closeModal('modal-create')" class="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg">Hủy</button>
-                <button onclick="createNewBio()" class="px-4 py-2 bg-brand-600 text-white text-sm font-bold rounded-lg hover:bg-brand-700">Tạo ngay</button>
+                <button onclick="createNewBio()" class="px-4 py-2 bg-brand-600 text-white text-sm font-bold rounded-lg hover:bg-brand-700" id="btn-create-action">Tạo ngay</button>
             </div>
         </div>
     </div>
@@ -303,12 +304,14 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // STATE
+        window.onerror = function(m) { console.error(m); showToast("Lỗi: "+m, "error"); };
+
         let currentUser = null, currentBioData = null, editingSlug = null;
-        let isDashboardLoading = false;
-        
-        // --- ROUTING ---
+        const socialPlatforms = ['facebook','instagram','tiktok','youtube','twitter','email'];
+
+        // --- ROUTING & AUTH ---
         function handleRoute() {
+            if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', handleRoute); return; }
             const hash = window.location.hash;
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             
@@ -340,13 +343,14 @@
             }
         }
         window.addEventListener('hashchange', handleRoute);
-        window.addEventListener('load', handleRoute); // Ensure runs on load
+        window.addEventListener('load', handleRoute);
 
         // --- AUTH ---
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             currentUser = user;
             if (user) {
-                document.getElementById('user-email-display').textContent = user.email || 'User';
+                const emailEl = document.getElementById('user-email-display');
+                if(emailEl) emailEl.textContent = user.email || 'User';
                 if (!window.location.hash || window.location.hash === '#') window.location.hash = '#dashboard';
                 else if (window.location.hash === '#dashboard') loadDashboard(); // Reload if already on dashboard
             } else {
@@ -381,9 +385,8 @@
 
         // --- DASHBOARD ---
         async function loadDashboard() {
-            if(isDashboardLoading) return; isDashboardLoading = true;
             const list = document.getElementById('bio-list');
-            list.innerHTML = ''; // Clear first
+            list.innerHTML = ''; 
             document.getElementById('dashboard-loader').classList.remove('hidden');
 
             try {
@@ -412,16 +415,16 @@
                 }
                 list.innerHTML = html;
             } catch(e) { showToast(e.message, 'error'); } 
-            finally { 
-                document.getElementById('dashboard-loader').classList.add('hidden'); 
-                isDashboardLoading = false;
-            }
+            finally { document.getElementById('dashboard-loader').classList.add('hidden'); }
         }
 
         function openCreateModal() { document.getElementById('modal-create').classList.remove('hidden'); }
         async function createNewBio() {
+            const btn = document.getElementById('btn-create-action');
+            if(btn.disabled) return;
             const slug = document.getElementById('create-slug').value.trim().toLowerCase();
             if(slug.length < 3) return showToast("Tên quá ngắn", "error");
+            btn.disabled = true; btn.innerText = "...";
             
             try {
                 const ref = db.collection('bios').doc(slug);
@@ -437,56 +440,60 @@
                 loadDashboard();
                 showToast("Tạo thành công!", "success");
             } catch(e) { showToast(e.message, 'error'); }
+            finally { btn.disabled = false; btn.innerText = "Tạo ngay"; }
         }
 
         // --- EDITOR ---
         async function loadEditor(slug) {
             editingSlug = slug;
             document.getElementById('editor-url-display').innerText = `mewo.life/${slug}`;
-            document.getElementById('live-preview-link').href = `#u/${slug}`;
+            document.getElementById('editor-url-display').href = `#u/${slug}`;
             
             const doc = await db.collection('bios').doc(slug).get();
+            if(!doc.exists) { window.location.hash = '#dashboard'; return; }
+            
             currentBioData = doc.data();
-            // Init empty arrays if missing
             currentBioData.links = currentBioData.links || [];
             currentBioData.products = currentBioData.products || [];
             currentBioData.socials = currentBioData.socials || {};
             currentBioData.theme = currentBioData.theme || {id:'default'};
 
-            // Fill Form
-            document.getElementById('ed-name').value = currentBioData.profile.name;
-            document.getElementById('ed-bio').value = currentBioData.profile.bio;
-            document.getElementById('ed-avatar').value = currentBioData.profile.avatar;
-            document.getElementById('editor-avatar-img').src = currentBioData.profile.avatar;
+            // Bind Data
+            document.getElementById('inp-name').value = currentBioData.profile.name;
+            document.getElementById('inp-bio').value = currentBioData.profile.bio;
+            document.getElementById('inp-avatar').value = currentBioData.profile.avatar;
+            document.getElementById('img-avatar-preview').src = currentBioData.profile.avatar;
 
             renderEditorLinks();
             renderEditorProducts();
             renderSocials();
-            switchEditorTab('links');
+            switchTab('links');
             updatePreview();
         }
 
-        function switchEditorTab(t) {
-            document.querySelectorAll('.editor-tab').forEach(e => e.classList.add('hidden'));
-            document.getElementById(`editor-${t}`).classList.remove('hidden');
+        function switchTab(t) {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
+            document.getElementById(`content-${t}`).classList.remove('hidden');
             ['links','products','appearance','settings'].forEach(k => {
                 const btn = document.getElementById(`tab-${k}`);
                 if(btn) btn.className = k===t ? 'tab-btn active' : 'tab-btn';
             });
         }
 
-        // Render Functions
+        // Render Functions (Clean & Robust)
+        const esc = (t) => t ? t.replace(/"/g, '&quot;') : '';
+
         function renderEditorLinks() {
             const c = document.getElementById('links-container'); c.innerHTML='';
             currentBioData.links.forEach((l, i) => {
                 c.innerHTML += `
                 <div class="card-modern group">
                     <div class="absolute top-3 right-3 flex gap-2">
-                        <select onchange="upLink(${i},'type',this.value)" class="text-xs border rounded p-1 bg-slate-50"><option value="link" ${l.type!=='collection'?'selected':''}>Link</option><option value="collection" ${l.type==='collection'?'selected':''}>Bộ sưu tập</option></select>
+                        <select onchange="upLink(${i},'type',this.value)" class="text-xs border border-slate-200 rounded-lg p-1 bg-slate-50 outline-none"><option value="link" ${l.type!=='collection'?'selected':''}>Link</option><option value="collection" ${l.type==='collection'?'selected':''}>Bộ sưu tập</option></select>
                         <button onclick="rmLink(${i})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
                     </div>
-                    <input value="${l.title}" oninput="upLink(${i},'title',this.value)" class="font-bold w-full outline-none mb-2" placeholder="Tiêu đề">
-                    <input value="${l.url}" oninput="upLink(${i},'url',this.value)" class="text-xs w-full text-slate-500 outline-none" placeholder="https://...">
+                    <input value="${esc(l.title)}" oninput="upLink(${i},'title',this.value)" class="font-bold w-full outline-none mb-2" placeholder="Tiêu đề">
+                    <input value="${esc(l.url)}" oninput="upLink(${i},'url',this.value)" class="text-xs w-full text-slate-500 outline-none" placeholder="https://...">
                 </div>`;
             });
         }
@@ -499,13 +506,13 @@
                 <div class="card-modern flex gap-3">
                     <img src="${p.image||'https://placehold.co/100'}" class="w-16 h-16 rounded bg-slate-100 object-cover">
                     <div class="flex-1 space-y-1">
-                        <input value="${p.name}" oninput="upProd(${i},'name',this.value)" class="font-bold w-full text-sm outline-none" placeholder="Tên SP">
+                        <input value="${esc(p.name)}" oninput="upProd(${i},'name',this.value)" class="font-bold w-full text-sm outline-none" placeholder="Tên SP">
                         <div class="flex gap-2">
-                             <input value="${p.price}" oninput="upProd(${i},'price',this.value)" class="w-16 text-xs font-bold text-brand-600 outline-none" placeholder="Giá">
+                             <input value="${esc(p.price)}" oninput="upProd(${i},'price',this.value)" class="w-16 text-xs font-bold text-brand-600 outline-none bg-slate-50 px-1 rounded" placeholder="Giá">
                              <select onchange="upProd(${i},'collection',this.value)" class="text-xs border rounded w-full">${cols}<option value="" ${!p.collection?'selected':''}>Chọn BST...</option></select>
                         </div>
-                        <input value="${p.image}" oninput="upProd(${i},'image',this.value)" class="text-[10px] w-full border-b" placeholder="Link ảnh">
-                        <input value="${p.link}" oninput="upProd(${i},'link',this.value)" class="text-[10px] w-full border-b" placeholder="Link mua">
+                        <input value="${esc(p.image)}" oninput="upProd(${i},'image',this.value)" class="text-[10px] w-full border-b" placeholder="Link ảnh">
+                        <input value="${esc(p.link)}" oninput="upProd(${i},'link',this.value)" class="text-[10px] w-full border-b" placeholder="Link mua">
                     </div>
                     <button onclick="rmProd(${i})" class="text-slate-300 hover:text-red-500 self-start"><i class="fas fa-trash"></i></button>
                 </div>`;
@@ -513,9 +520,8 @@
         }
         
         function renderSocials() {
-            const c = document.getElementById('socials-list'); c.innerHTML='';
-            const platforms = ['facebook','instagram','tiktok','youtube','email'];
-            platforms.forEach(p => {
+            const c = document.getElementById('socials-container'); c.innerHTML='';
+            socialPlatforms.forEach(p => {
                 c.innerHTML += `<div class="flex items-center gap-3 p-2 bg-slate-50 rounded-lg border border-slate-100"><i class="fab fa-${p==='email'?'google':p} text-slate-400 w-5 text-center"></i><input value="${currentBioData.socials[p]||''}" oninput="upSocial('${p}',this.value)" class="bg-transparent text-sm w-full outline-none" placeholder="${p} url..."></div>`
             });
         }
@@ -531,24 +537,21 @@
         
         function upSocial(k,v) { currentBioData.socials[k]=v; updatePreview(); }
         function setTheme(id) { currentBioData.theme.id=id; updatePreview(); }
-        function setButtonStyle(s) { currentBioData.theme.buttonStyle=s; updatePreview(); }
+        function setButtonStyle(s) { if(!currentBioData.theme) currentBioData.theme={}; currentBioData.theme.buttonStyle=s; updatePreview(); }
         function goToDashboard() { window.location.hash = '#dashboard'; }
 
         function updatePreview() {
             // Update Profile State
-            currentBioData.profile.name = document.getElementById('ed-name').value;
-            currentBioData.profile.bio = document.getElementById('ed-bio').value;
-            currentBioData.profile.avatar = document.getElementById('ed-avatar').value;
-            document.getElementById('editor-avatar-img').src = currentBioData.profile.avatar;
+            currentBioData.profile.name = document.getElementById('inp-name').value;
+            currentBioData.profile.bio = document.getElementById('inp-bio').value;
+            currentBioData.profile.avatar = document.getElementById('inp-avatar').value;
+            document.getElementById('img-avatar-preview').src = currentBioData.profile.avatar;
 
             // Render Iframe
             const html = generatePublicHTML(currentBioData, true);
             const frames = [document.getElementById('preview-frame'), document.getElementById('mobile-preview-frame')];
             frames.forEach(f => {
-                if(f) {
-                    const doc = f.contentDocument || f.contentWindow.document;
-                    doc.open(); doc.write(html); doc.close();
-                }
+                if(f) { const doc = f.contentDocument || f.contentWindow.document; doc.open(); doc.write(html); doc.close(); }
             });
         }
         
@@ -559,14 +562,13 @@
         function toggleMobilePreview() { const m=document.getElementById('modal-mobile-preview'); m.classList.toggle('hidden'); if(!m.classList.contains('hidden')) updatePreview(); }
         function showQRCode() { document.getElementById('modal-qr').classList.remove('hidden'); document.getElementById('qr-img').src=`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin+'/#u/'+editingSlug)}`; }
         
-        // --- PUBLIC VIEW ---
+        // --- PUBLIC VIEW & RENDERER ---
         async function loadPublicBio(slug) {
             const container = document.getElementById('view-public');
             try {
                 const doc = await db.collection('bios').doc(slug).get();
                 if(!doc.exists) { container.innerHTML = '<div class="h-screen flex items-center justify-center">Trang không tồn tại</div>'; return; }
-                // Set global for Shop logic
-                window.publicProducts = doc.data().products || [];
+                window.publicProducts = doc.data().products || []; // Global for shop
                 container.innerHTML = generatePublicHTML(doc.data(), false);
                 
                 // Analytics
@@ -577,28 +579,18 @@
         function generatePublicHTML(data, isPreview) {
             const theme = data.theme || {id:'default', buttonStyle:'rounded'};
             const radius = theme.buttonStyle==='rect'?'rounded-md':theme.buttonStyle==='soft'?'rounded-2xl':'rounded-full';
+            const safeProducts = JSON.stringify(data.products || []).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
             
             // Logic for Scripts (Shop & Collections)
             const script = `
             <script>
-                const products = ${JSON.stringify(data.products||[])};
+                const products = JSON.parse("${safeProducts}");
                 function showShop(col) {
                     document.getElementById('main-view').style.display='none';
                     document.getElementById('shop-view').style.display='block';
                     document.getElementById('shop-title').innerText = col;
                     const grid = document.getElementById('prod-grid');
-                    grid.innerHTML = products.filter(p=>p.collection===col).map(p=>\`
-                        <div class="bg-white rounded-lg overflow-hidden shadow-sm">
-                            <img src="\${p.image}" class="w-full h-32 object-cover bg-slate-100">
-                            <div class="p-2">
-                                <div class="font-bold text-xs truncate">\${p.name}</div>
-                                <div class="flex justify-between items-center mt-1">
-                                    <span class="text-xs font-bold text-red-500">\${p.price}</span>
-                                    <a href="\${p.link}" target="_blank" class="bg-black text-white text-[10px] px-2 py-1 rounded">Mua</a>
-                                </div>
-                            </div>
-                        </div>
-                    \`).join('');
+                    grid.innerHTML = products.filter(p=>p.collection===col).map(p=>\`<div class="bg-white rounded-lg overflow-hidden shadow-sm"><img src="\${p.image}" class="w-full h-32 object-cover bg-slate-100"><div class="p-2"><div class="font-bold text-xs truncate text-slate-800">\${p.name}</div><div class="flex justify-between items-center mt-1"><span class="text-xs font-bold text-red-500">\${p.price}</span><a href="\${p.link}" target="_blank" class="bg-black text-white text-[10px] px-2 py-1 rounded">Mua</a></div></div></div>\`).join('');
                     if(!grid.innerHTML) grid.innerHTML='<div class="col-span-2 text-center text-white opacity-50 py-10">Trống</div>';
                 }
                 function closeShop() {
@@ -607,19 +599,17 @@
                 }
             <\/script>`;
 
-            // Generate Links HTML
-            const linksHtml = (data.links||[]).map(l => {
+            // Generate Links HTML - Use Escaped Titles for onclick
+            const links = (data.links||[]).map(l => {
+                const safeTitle = l.title.replace(/"/g, '&quot;').replace(/'/g, "\\'");
                 if(l.type === 'collection') {
-                    // Collection Button triggers showShop()
-                    const clickAction = isPreview ? `showShop('${l.title}')` : `window.showShop('${l.title}')`;
-                    return `<div onclick="${clickAction}" class="cursor-pointer block mb-3 group"><div class="relative w-full p-4 flex items-center justify-between bg-white/90 backdrop-blur-md shadow-sm border border-white/40 ${radius} hover:bg-white transition"><span class="font-bold text-sm text-slate-800 pl-2 border-l-4 border-brand-500">${l.title}</span><i class="fas fa-chevron-right text-slate-400"></i></div></div>`;
-                } else {
-                    return `<a href="${l.url}" target="_blank" class="block mb-3 transition hover:-translate-y-1"><div class="relative w-full p-4 flex items-center justify-center bg-white/90 backdrop-blur-md shadow-sm border border-white/40 ${radius} hover:bg-white transition"><span class="font-bold text-sm text-slate-800">${l.title}</span></div></a>`;
+                    const act = isPreview ? `showShop('${safeTitle}')` : `window.showShop('${safeTitle}')`;
+                    return `<div onclick="${act}" class="cursor-pointer mb-3 p-4 bg-white/90 backdrop-blur rounded-full shadow-sm flex justify-between items-center hover:bg-white transition"><span class="font-bold text-sm pl-2 border-l-4 border-brand-500">${l.title}</span><i class="fas fa-chevron-right text-gray-400"></i></div>`;
                 }
+                return `<a href="${l.url}" target="_blank" class="block mb-3 p-4 bg-white/90 backdrop-blur rounded-full shadow-sm text-center font-bold text-sm hover:bg-white transition hover:-translate-y-1">${l.title}</a>`;
             }).join('');
-
-            // Generate Socials
-            const socialIcons = Object.entries(data.socials||{}).map(([k,v]) => v ? `<a href="${v}" target="_blank" class="text-2xl text-white/90 hover:text-white transition"><i class="fab fa-${k==='email'?'google':k}"></i></a>` : '').join('');
+            
+            const socials = Object.entries(data.socials||{}).map(([k,v]) => v ? `<a href="${v}" target="_blank" class="text-2xl text-white/90 hover:text-white transition"><i class="fab fa-${k==='email'?'google':k}"></i></a>` : '').join('');
 
             const css = `
                 body{margin:0;font-family:sans-serif} ::-webkit-scrollbar{width:0}
@@ -638,8 +628,8 @@
                         <img src="${data.profile.avatar}" class="w-24 h-24 rounded-full border-4 border-white/30 shadow-xl mx-auto mb-4 object-cover" onerror="this.src='https://ui-avatars.com/api/?name=User'">
                         <h1 class="text-xl font-bold mb-1 text-white drop-shadow-md">${data.profile.name}</h1>
                         <p class="text-sm text-white/80 mb-6 font-medium whitespace-pre-line">${data.profile.bio}</p>
-                        <div class="flex justify-center gap-4 mb-8">${socialIcons}</div>
-                        <div class="w-full text-left">${linksHtml}</div>
+                        <div class="flex justify-center gap-4 mb-8">${socials}</div>
+                        <div class="w-full text-left">${links}</div>
                     </div>
 
                     <div id="shop-view" class="w-full max-w-md hidden" style="display:none">
@@ -658,24 +648,14 @@
             if(isPreview) return `<!DOCTYPE html><html><head><script src="https://cdn.tailwindcss.com"><\/script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>${css}</style></head><body>${content}</body></html>`;
             return `<style>${css}</style>${content}`;
         }
-
+        
         // --- GLOBAL HELPERS (SPA MODE) ---
-        // These need to be attached to window for the injected HTML fragment to access them in SPA mode
         window.showShop = function(col) {
             document.getElementById('main-view').style.display='none';
             document.getElementById('shop-view').style.display='block';
             document.getElementById('shop-title').innerText = col;
-            
-            // Filter global products
             const grid = document.getElementById('prod-grid');
-            const filtered = window.publicProducts.filter(p => p.collection === col);
-            
-            if(filtered.length === 0) {
-                 grid.innerHTML = '<div class="col-span-2 text-center text-white opacity-50 py-10">Trống</div>';
-                 return;
-            }
-
-            grid.innerHTML = filtered.map(p => `
+            grid.innerHTML = window.publicProducts.filter(p => p.collection === col).map(p => `
                 <div class="bg-white rounded-lg overflow-hidden shadow-sm">
                     <img src="${p.image}" class="w-full h-32 object-cover bg-slate-100">
                     <div class="p-2">
@@ -687,6 +667,7 @@
                     </div>
                 </div>
             `).join('');
+            if(!grid.innerHTML) grid.innerHTML='<div class="col-span-2 text-center text-white opacity-50 py-10">Trống</div>';
         };
         window.closeShop = function() {
             document.getElementById('shop-view').style.display='none';
