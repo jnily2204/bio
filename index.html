@@ -181,8 +181,8 @@
                             <button onclick="copyLink()"><i class="fas fa-copy hover:text-black"></i></button>
                         </div>
                         <button onclick="saveBio()" class="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-black transition shadow-sm active:scale-95">Lưu thay đổi</button>
-                        <!-- Mobile Preview Toggle -->
-                        <button onclick="toggleMobilePreview()" class="lg:hidden w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center"><i class="fas fa-eye"></i></button>
+                        <!-- Mobile Preview Toggle (Hidden on medium screens and up) -->
+                        <button onclick="toggleMobilePreview()" class="md:hidden w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center"><i class="fas fa-eye"></i></button>
                     </div>
                 </header>
 
@@ -276,7 +276,7 @@
                 </div>
             </main>
 
-            <!-- C. PREVIEW PANEL (Right) -->
+            <!-- C. PREVIEW PANEL (Right) - Visible on MD+ -->
             <aside class="hidden md:flex w-[350px] lg:w-[480px] border-l border-gray-200 bg-white items-center justify-center p-4 lg:p-8 relative flex-shrink-0 transition-all duration-300">
                 <div class="absolute top-0 right-0 p-4">
                     <button onclick="refreshPreview()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition text-gray-500" title="Làm mới"><i class="fas fa-sync-alt"></i></button>
@@ -691,7 +691,7 @@
                         </div>
                         <div id="grid"></div>
                     </div>
-                    ${!isPreview ? '<div style="margin-top:auto;padding-top:40px;font-size:10px;font-weight:bold;opacity:0.5;color:white;text-transform:uppercase">Powered by Mewo</div>' : ''}
+                    ${!isPreview ? '<div style="margin-top:auto;padding-top:40px;font-size:10px;font-weight:bold;opacity:0.5;text-transform:uppercase">Powered by Mewo</div>' : ''}
                 </div>
                 ${script}
             `;
