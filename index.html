@@ -20,14 +20,12 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Karla', 'sans-serif'] },
-                    colors: { brand: { 50: '#fff1f2', 100: '#ffe4e6', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 900: '#881337' } },
-                    animation: { 'fade-in': 'fadeIn 0.3s ease-out', 'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)', 'float': 'float 6s infinite', 'blob': 'blob 7s infinite' },
-                    keyframes: { 
-                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }, 
-                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }, 
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-20px)' } },
-                        blob: { "0%": { transform: "translate(0px, 0px) scale(1)" }, "33%": { transform: "translate(30px, -50px) scale(1.1)" }, "66%": { transform: "translate(-20px, 20px) scale(0.9)" }, "100%": { transform: "translate(0px, 0px) scale(1)" } }
-                    }
+                    colors: { 
+                        brand: { 500: '#7B2CBF', 600: '#6D23AC' }, 
+                        bg: '#f3f3f1' 
+                    },
+                    animation: { 'fade-in': 'fadeIn 0.3s ease-out' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } } }
                 }
             }
         }
@@ -36,16 +34,19 @@
     <style>
         body { background-color: #f3f3f1; overflow: hidden; height: 100vh; }
         
-        /* Sidebar Nav Item */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+        
         .nav-item {
             width: 100%; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
             color: #575757; transition: all 0.2s; border-radius: 12px; font-size: 0.7rem; gap: 6px; font-weight: 600; cursor: pointer;
         }
         .nav-item:hover { background-color: #f3f4f6; color: #111; }
-        .nav-item.active { background-color: #f0fdf4; color: #16a34a; } /* Linktree Green-ish active state */
+        .nav-item.active { background-color: #f0fdf4; color: #16a34a; }
         .nav-icon { font-size: 1.25rem; }
 
-        /* Modern Card & Inputs */
         .lt-card { background: white; border-radius: 24px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; transition: transform 0.2s; }
         .lt-card:hover { border-color: #d1d5db; }
         
@@ -53,7 +54,6 @@
         .lt-input:focus { background: white; border-color: #111; box-shadow: 0 0 0 2px rgba(0,0,0,0.1); }
         .lt-input::placeholder { color: #9ca3af; }
 
-        /* Phone Preview */
         .preview-container {
             width: 320px; height: 650px;
             background: #fff; border-radius: 48px; border: 12px solid #111;
@@ -63,17 +63,11 @@
         }
         .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 96px; height: 26px; background: #000; border-radius: 20px; z-index: 50; }
 
-        /* Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-        
         .hidden { display: none !important; }
         #toast-container { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 9999; }
         .toast { background: #111; color: white; padding: 12px 24px; border-radius: 99px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideUpToast 0.3s; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         @keyframes slideUpToast { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        /* Landing specific */
         .hero-text-shadow { text-shadow: 0 4px 0 rgba(0,0,0,0.05); }
     </style>
 </head>
@@ -83,9 +77,8 @@
 
     <div id="app" class="h-full w-full">
         
-        <!-- 1. LANDING & AUTH (Giữ nguyên giao diện bạn thích) -->
+        <!-- 1. LANDING & AUTH -->
         <div id="view-landing" class="view-section hidden h-full overflow-y-auto bg-[#fff1f2] flex flex-col relative">
-            <!-- Blobs -->
             <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#fecdd3] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob"></div>
             <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#e9d5ff] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob animation-delay-2000"></div>
 
@@ -187,16 +180,27 @@
                             <div id="links-list" class="space-y-4 mt-6"></div>
                         </div>
 
-                        <!-- TAB: PRODUCTS -->
+                        <!-- TAB: PRODUCTS (SHOP) -->
                         <div id="tab-content-products" class="tab-content hidden">
-                            <button onclick="addProd()" class="w-full py-4 bg-slate-900 hover:bg-black text-white rounded-3xl font-bold shadow-lg transition transform active:scale-[0.99] flex items-center justify-center gap-2 text-base">
-                                <i class="fas fa-shopping-bag"></i> Thêm sản phẩm
-                            </button>
-                            <div class="mt-4 p-4 bg-blue-50 text-blue-700 text-sm rounded-2xl border border-blue-100 flex gap-3">
-                                <i class="fas fa-lightbulb text-xl"></i>
-                                <div>Mẹo: Để hiển thị sản phẩm, hãy tạo một liên kết loại <b>"Bộ sưu tập"</b> ở tab Liên kết.</div>
+                            <!-- Collections Section -->
+                            <div class="mb-8">
+                                <h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fas fa-layer-group text-slate-400"></i> Danh mục / Bộ sưu tập</h3>
+                                <button onclick="addCollection()" class="w-full py-3 bg-white border-2 border-dashed border-slate-300 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition mb-4">
+                                    + Thêm Danh mục mới
+                                </button>
+                                <div id="collections-list" class="space-y-3"></div>
                             </div>
-                            <div id="products-list" class="space-y-4 mt-6"></div>
+                            
+                            <hr class="border-gray-200 mb-8">
+
+                            <!-- Products Section -->
+                            <div>
+                                <h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fas fa-box-open text-slate-400"></i> Sản phẩm</h3>
+                                <button onclick="addProd()" class="w-full py-4 bg-slate-900 hover:bg-black text-white rounded-3xl font-bold shadow-lg transition transform active:scale-[0.99] flex items-center justify-center gap-2 text-base mb-4">
+                                    <i class="fas fa-shopping-bag"></i> Thêm sản phẩm mới
+                                </button>
+                                <div id="products-list" class="space-y-4"></div>
+                            </div>
                         </div>
 
                         <!-- TAB: APPEARANCE -->
@@ -337,13 +341,13 @@
             isAuthLogin = type === 'login';
             document.getElementById('tab-login').className = isAuthLogin ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition' : 'flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition';
             document.getElementById('tab-register').className = !isAuthLogin ? 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow-sm transition' : 'flex-1 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 transition';
-            document.getElementById('btn-auth').innerText = isAuthLogin ? 'Đăng nhập' : 'Tạo tài khoản';
+            document.getElementById('btn-auth-submit').innerText = isAuthLogin ? 'Tiếp tục' : 'Tiếp tục';
         }
 
         async function handleAuth(e) {
             e.preventDefault();
             const em = document.getElementById('auth-email').value, pw = document.getElementById('auth-pass').value;
-            const btn = document.getElementById('btn-auth');
+            const btn = document.getElementById('btn-auth-submit');
             btn.innerText = '...'; btn.disabled = true;
             try {
                 if (isAuthLogin) await auth.signInWithEmailAndPassword(em, pw);
@@ -351,7 +355,7 @@
                 showToast("Thành công!", "success");
                 closeModal('modal-auth');
             } catch (err) { showToast(err.code, "error"); }
-            finally { btn.innerText = isAuthLogin?'Đăng nhập':'Tạo tài khoản'; btn.disabled=false; }
+            finally { btn.innerText = 'Tiếp tục'; btn.disabled=false; }
         }
         
         async function handleGoogle() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); closeModal('modal-auth'); } catch(e){ showToast(e.message,'error'); } }
@@ -441,6 +445,7 @@
             document.getElementById('ed-name').value = bioData.profile.name;
             document.getElementById('ed-bio').value = bioData.profile.bio;
             document.getElementById('ed-avatar').value = bioData.profile.avatar;
+            document.getElementById('ed-img-preview').src = bioData.profile.avatar;
             document.getElementById('nav-avatar').src = bioData.profile.avatar;
 
             renderLists();
@@ -460,25 +465,44 @@
         const esc = t => t ? t.replace(/"/g, '&quot;') : '';
 
         function renderLists() {
+            // LINKS (Filtered: Only real links)
             const lList = document.getElementById('links-list'); lList.innerHTML = '';
             bioData.links.forEach((l, i) => {
-                lList.innerHTML += `
-                <div class="lt-card group relative">
-                    <div class="absolute top-4 right-4 flex gap-2">
-                         <div class="flex flex-col gap-1 mr-2">
-                             <button onclick="moveLink(${i},-1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-up"></i></button>
-                             <button onclick="moveLink(${i},1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-down"></i></button>
-                         </div>
-                        <select onchange="updateLink(${i},'type',this.value)" class="text-xs bg-gray-50 border rounded p-1 h-8"><option value="link" ${l.type!=='collection'?'selected':''}>Link</option><option value="collection" ${l.type==='collection'?'selected':''}>Bộ sưu tập</option></select>
-                        <button onclick="remLink(${i})" class="text-gray-300 hover:text-red-500 h-8 w-8"><i class="fas fa-trash"></i></button>
-                    </div>
-                    <div class="space-y-3 pr-24">
-                        <input value="${esc(l.title)}" oninput="updateLink(${i},'title',this.value)" class="lt-input font-bold" placeholder="Tiêu đề">
-                        <input value="${esc(l.url)}" oninput="updateLink(${i},'url',this.value)" class="lt-input text-sm text-gray-500" placeholder="URL">
-                    </div>
-                </div>`;
+                if(l.type !== 'collection') {
+                    lList.innerHTML += `
+                    <div class="lt-card group relative">
+                        <div class="absolute top-4 right-4 flex gap-2">
+                             <div class="flex flex-col gap-1 mr-2">
+                                 <button onclick="moveLink(${i},-1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-up"></i></button>
+                                 <button onclick="moveLink(${i},1)" class="text-gray-300 hover:text-black"><i class="fas fa-chevron-down"></i></button>
+                             </div>
+                            <button onclick="remLink(${i})" class="text-gray-300 hover:text-red-500 h-8 w-8"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="space-y-3 pr-24">
+                            <input value="${esc(l.title)}" oninput="updateLink(${i},'title',this.value)" class="lt-input font-bold" placeholder="Tiêu đề">
+                            <input value="${esc(l.url)}" oninput="updateLink(${i},'url',this.value)" class="lt-input text-sm text-gray-500" placeholder="URL">
+                        </div>
+                    </div>`;
+                }
             });
 
+            // COLLECTIONS & PRODUCTS (Shop Tab)
+            const cList = document.getElementById('collections-list'); cList.innerHTML = '';
+            // Collections
+            bioData.links.forEach((l, i) => {
+                if(l.type === 'collection') {
+                    cList.innerHTML += `
+                    <div class="lt-card relative !p-4 !mb-4 border-l-4 border-l-brand-500">
+                        <div class="absolute top-3 right-3">
+                            <button onclick="remLink(${i})" class="text-gray-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block">Tên danh mục</label>
+                        <input value="${esc(l.title)}" oninput="updateLink(${i},'title',this.value)" class="lt-input font-bold" placeholder="Tên danh mục (Ví dụ: Skincare)">
+                    </div>`;
+                }
+            });
+
+            // Products
             const pList = document.getElementById('products-list'); pList.innerHTML = '';
             const cols = bioData.links.filter(k=>k.type==='collection').map(k=>`<option value="${k.title}">${k.title}</option>`).join('');
             bioData.products.forEach((p, i) => {
@@ -489,7 +513,7 @@
                         <input value="${esc(p.name)}" oninput="updateProd(${i},'name',this.value)" class="lt-input font-bold" placeholder="Tên SP">
                         <div class="flex gap-2">
                             <input value="${esc(p.price)}" oninput="updateProd(${i},'price',this.value)" class="lt-input w-24 font-bold text-green-600" placeholder="Giá">
-                            <select onchange="updateProd(${i},'collection',this.value)" class="lt-input text-xs">${cols}<option value="" ${!p.collection?'selected':''}>Chọn BST...</option></select>
+                            <select onchange="updateProd(${i},'collection',this.value)" class="lt-input text-xs">${cols}<option value="" ${!p.collection?'selected':''}>Chọn danh mục...</option></select>
                         </div>
                         <input value="${esc(p.image)}" oninput="updateProd(${i},'image',this.value)" class="lt-input text-xs" placeholder="Link ảnh">
                         <input value="${esc(p.link)}" oninput="updateProd(${i},'link',this.value)" class="lt-input text-xs" placeholder="Link mua">
@@ -511,8 +535,9 @@
 
         // Data Helpers
         function addLink() { bioData.links.push({title:'Link mới', url:'#', type:'link'}); renderLists(); preview(); }
+        function addCollection() { bioData.links.push({title:'Danh mục mới', url:'#', type:'collection'}); renderLists(); preview(); }
         function remLink(i) { if(confirm('Xóa?')) { bioData.links.splice(i,1); renderLists(); preview(); } }
-        function updateLink(i,k,v) { bioData.links[i][k]=v; preview(); }
+        function updateLink(i,k,v) { bioData.links[i][k]=v; preview(); if(k==='title' && bioData.links[i].type==='collection') renderLists(); } // Re-render if collection title changes
         function moveLink(i,d) { if(i+d>=0 && i+d<bioData.links.length) { [bioData.links[i], bioData.links[i+d]] = [bioData.links[i+d], bioData.links[i]]; renderLists(); preview(); } }
         
         function addProd() { bioData.products.push({name:'SP Mới', price:'0đ', image:'', link:'#', collection:''}); renderLists(); preview(); }
@@ -593,6 +618,7 @@
                 .avatar{width:96px;height:96px;border-radius:50%;object-fit:cover;border:4px solid rgba(255,255,255,0.3);margin-bottom:16px;box-shadow:0 10px 20px rgba(0,0,0,0.1)}
                 .name{font-size:20px;font-weight:800;margin-bottom:4px;color:inherit;text-shadow:0 2px 4px rgba(0,0,0,0.1)}
                 .bio{font-size:14px;color:inherit;opacity:0.9;margin-bottom:32px;text-align:center;white-space:pre-line;line-height:1.5;max-width:300px}
+                .theme-minimal .name {color:#111;text-shadow:none} .theme-minimal .bio {color:#555} .theme-minimal .socials a {color:#555 !important}
             `;
 
             const content = `
@@ -611,7 +637,7 @@
                         </div>
                         <div id="grid"></div>
                     </div>
-                    ${!isPreview ? '<div style="margin-top:auto;padding-top:40px;font-size:10px;font-weight:bold;opacity:0.5;text-transform:uppercase">Powered by Mewo</div>' : ''}
+                    ${!isPreview ? '<div style="margin-top:auto;padding-top:40px;font-size:10px;font-weight:bold;opacity:0.5;color:white;text-transform:uppercase">Powered by Mewo</div>' : ''}
                 </div>
                 ${script}
             `;
