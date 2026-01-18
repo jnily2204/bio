@@ -37,7 +37,6 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-// Kiểm tra xem app đã được init chưa để tránh lỗi duplicate khi hot-reload
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
@@ -45,16 +44,19 @@ const provider = new GoogleAuthProvider();
 // --- 1. CÁC COMPONENT PHỤ TRỢ (ĐỊNH NGHĨA TRƯỚC KHI DÙNG) ---
 
 // Nút chuyển đổi (Toggle Switch)
+// FIX: Dùng span thay vì div bên trong button để tránh lỗi HTML nesting
 const Toggle = ({ checked, onChange }) => (
   <button 
     onClick={() => onChange(!checked)}
     className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${checked ? 'bg-orange-500' : 'bg-gray-300'}`}
+    type="button"
   >
-    <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${checked ? 'translate-x-5' : ''}`} />
+    <span className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 block ${checked ? 'translate-x-5' : ''}`} />
   </button>
 );
 
 // Component Menu Item trong Sidebar
+// FIX: Dùng span bọc icon thay vì div
 const NavItem = ({ icon, label, active, onClick }) => {
   return (
     <button 
@@ -63,17 +65,19 @@ const NavItem = ({ icon, label, active, onClick }) => {
         flex flex-col md:flex-row items-center md:space-x-3 p-3 rounded-xl transition-all w-full
         ${active ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'}
       `}
+      type="button"
     >
-      <div className={`${active ? 'text-orange-500' : ''}`}>{icon}</div>
+      <span className={`${active ? 'text-orange-500' : ''}`}>{icon}</span>
       <span className={`text-xs md:text-sm font-medium ${active ? 'font-bold' : ''}`}>{label}</span>
     </button>
   );
 };
 
 // Component lựa chọn Theme
+// FIX: Chuyển từ button sang div để chứa được các div con phức tạp bên trong
 const ThemeOption = ({ label, bg, btn, textColor, active, onClick }) => {
     return (
-        <button onClick={onClick} className="text-left group">
+        <div onClick={onClick} className="text-left group cursor-pointer" role="button" tabIndex={0}>
             <div className={`
                h-32 rounded-xl border-2 transition-all overflow-hidden relative shadow-sm
                ${active ? 'border-orange-500 ring-2 ring-orange-200' : 'border-gray-200 group-hover:border-gray-300'}
@@ -90,7 +94,7 @@ const ThemeOption = ({ label, bg, btn, textColor, active, onClick }) => {
                 )}
             </div>
             <p className="mt-2 text-sm font-medium text-gray-700 text-center">{label}</p>
-        </button>
+        </div>
     )
 };
 
@@ -104,6 +108,7 @@ const ButtonStyleOption = ({ label, shape, active, onClick }) => {
             ${shape}
             ${active ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-gray-200 bg-white hover:border-gray-300'}
           `}
+          type="button"
         >
             {label}
         </button>
@@ -189,7 +194,7 @@ const AuthPage = () => {
                 <div className="flex-grow border-t border-gray-200"></div>
             </div>
 
-            {/* Traditional Inputs (Visual only - Wrapped in Form to prevent reload) */}
+            {/* Traditional Inputs */}
             <form onSubmit={handleTraditionalSubmit} className="space-y-3">
               <div className="relative">
                 <Mail className="absolute left-3 top-3.5 text-gray-400" size={18} />
@@ -388,6 +393,7 @@ const App = () => {
           <button 
             onClick={handleLogout}
             className="w-full flex items-center space-x-2 text-sm text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
+            type="button"
           >
             <LogOut size={16} />
             <span>Đăng xuất</span>
