@@ -141,40 +141,12 @@
                         </div>
 
                         <!-- Social Buttons -->
-                        <div class="grid grid-cols-2 gap-3">
-                            <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                        <div class="w-full">
+                            <button onclick="handleGoogleLogin()" class="w-full flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
                                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> <span class="text-sm font-medium">Google</span>
                             </button>
-                            <button onclick="switchAuthView('phone')" class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
-                                <i class="fas fa-phone text-slate-600"></i> <span class="text-sm font-medium">Số điện thoại</span>
-                            </button>
                         </div>
                     </div>
-
-                    <!-- Phone Auth Container (Hidden by default) -->
-                    <div id="auth-phone-container" class="hidden">
-                        <button onclick="switchAuthView('main')" class="text-sm text-slate-500 hover:text-slate-900 mb-4 flex items-center gap-1"><i class="fas fa-arrow-left"></i> Quay lại</button>
-                        <h2 class="text-xl font-bold mb-4">Đăng nhập bằng SĐT</h2>
-                        
-                        <!-- Step 1: Input Phone -->
-                        <div id="phone-step-1">
-                            <div class="flex gap-2 mb-4">
-                                <div class="w-20 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-center text-sm font-bold flex items-center justify-center gap-1">🇻🇳 +84</div>
-                                <input type="tel" id="phone-input" placeholder="912345678" class="flex-1 input-modern" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                            </div>
-                            <div id="recaptcha-container" class="mb-4"></div>
-                            <button onclick="sendOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition mt-2" id="btn-send-otp">Gửi mã xác thực</button>
-                        </div>
-
-                        <!-- Step 2: Input OTP -->
-                        <div id="phone-step-2" class="hidden">
-                            <p class="text-sm text-slate-500 mb-4">Nhập mã OTP (6 số) đã gửi đến số điện thoại của bạn.</p>
-                            <input type="text" id="otp-input" placeholder="123456" class="input-modern text-center tracking-widest text-lg font-bold mb-4" maxlength="6">
-                            <button onclick="verifyOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition">Xác nhận</button>
-                            <button onclick="switchAuthView('phone')" class="w-full text-slate-500 py-2 text-sm mt-2 hover:text-slate-700">Gửi lại / Đổi số</button>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -287,7 +259,7 @@
         <div class="bg-white rounded-2xl p-6 w-full max-w-xs animate-slide-up">
             <h3 class="font-bold text-lg mb-4">Tạo Mewo mới</h3>
             <div class="flex bg-slate-50 border rounded-lg overflow-hidden mb-4"><span class="px-3 py-2 text-slate-500 text-sm border-r">/u/</span><input id="new-slug" placeholder="username" class="flex-1 p-2 bg-transparent outline-none text-sm font-bold lowercase"></div>
-            <div class="flex justify-end gap-2"><button onclick="closeModal('modal-create')" class="px-4 py-2 text-sm text-slate-500 font-bold">Hủy</button><button onclick="createNewBio()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold">Tạo ngay</button></div>
+            <div class="flex justify-end gap-2"><button onclick="closeModal('modal-create')" class="px-4 py-2 text-sm text-slate-500 font-bold">Hủy</button><button onclick="createNewBio()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold" id="btn-create-bio">Tạo ngay</button></div>
         </div>
     </div>
 
@@ -315,7 +287,6 @@
 
         // STATE & GLOBALS
         let currentUser = null, currentBioData = null, editingSlug = null;
-        let confirmationResult = null;
         let isDashboardLoading = false; // Fix: Prevent race condition
         const socialPlatforms = [
             { id: 'facebook', icon: 'fab fa-facebook', label: 'Facebook' },
@@ -441,15 +412,6 @@
             document.getElementById('tab-login').className = m==='login'?'flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900':'flex-1 py-2 text-sm font-medium text-slate-500';
             document.getElementById('tab-register').className = m==='register'?'flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900':'flex-1 py-2 text-sm font-medium text-slate-500';
         }
-        function switchAuthView(v) {
-            document.getElementById('auth-main-container').classList.toggle('hidden', v==='phone');
-            document.getElementById('auth-phone-container').classList.toggle('hidden', v!=='phone');
-            if(v==='phone') { 
-                setupRecaptcha(); 
-                document.getElementById('phone-step-1').classList.remove('hidden'); 
-                document.getElementById('phone-step-2').classList.add('hidden');
-            }
-        }
 
         async function handleLogin(e) { e.preventDefault(); authAction(auth.signInWithEmailAndPassword, 'login'); }
         async function handleRegister(e) { e.preventDefault(); authAction(auth.createUserWithEmailAndPassword, 'register'); }
@@ -461,23 +423,6 @@
         }
         async function handleGoogleLogin() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e) { showToast(getErrorMessage(e.code), "error"); } }
         
-        function setupRecaptcha() {
-            if(window.recaptchaVerifier) window.recaptchaVerifier.clear();
-            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('btn-send-otp', { 'size': 'invisible', 'callback': ()=>{} });
-        }
-        async function sendOTP() {
-            const ph = document.getElementById('phone-input').value.replace(/[^0-9]/g, '');
-            if(ph.length<9) return showToast("SĐT không hợp lệ","error");
-            try {
-                confirmationResult = await auth.signInWithPhoneNumber('+84'+ph.replace(/^0+/,''), window.recaptchaVerifier);
-                showToast("Đã gửi OTP","success");
-                document.getElementById('phone-step-1').classList.add('hidden'); document.getElementById('phone-step-2').classList.remove('hidden');
-            } catch(e) { showToast(getErrorMessage(e.code),"error"); if(window.recaptchaVerifier) window.recaptchaVerifier.clear(); setupRecaptcha(); }
-        }
-        async function verifyOTP() {
-            try { await confirmationResult.confirm(document.getElementById('otp-input').value); showToast("Thành công!","success"); } 
-            catch(e) { showToast("Mã sai","error"); }
-        }
         function handleLogout() { auth.signOut(); showToast("Đã đăng xuất"); }
         function getErrorMessage(code) {
             switch (code) {
@@ -497,20 +442,42 @@
             isDashboardLoading = true;
 
             const list = document.getElementById('bio-list'), loader = document.getElementById('dashboard-loader');
+            
+            // Clear current list immediately to avoid visual duplication if logic fails later
             list.innerHTML = ''; 
             loader.classList.remove('hidden');
             
             try {
                 const snap = await db.collection('bios').where('ownerId','==',currentUser.uid).get();
+                let html = ''; // Build string first
+
                 if (snap.empty) { 
-                    list.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400">Bạn chưa có trang Bio nào.</div>'; 
+                    html = '<div class="col-span-full text-center py-10 text-slate-400">Bạn chưa có trang Bio nào.</div>'; 
                 } else {
                     snap.forEach(d => {
                         const data = d.data();
-                        list.innerHTML += `<div class="bg-white p-5 rounded-xl shadow-sm border"><div class="flex gap-3 mb-3"><img src="${data.profile.avatar}" class="w-12 h-12 rounded-full border"><div class="overflow-hidden"><h3 class="font-bold truncate">${data.profile.name}</h3><span class="text-xs bg-slate-100 px-2 rounded text-slate-500">/${d.id}</span></div></div><div class="flex gap-2"><a href="#edit/${d.id}" class="flex-1 bg-slate-900 text-white text-center py-2 rounded-lg text-sm font-bold">Sửa</a><a href="#u/${d.id}" target="_blank" class="px-3 bg-slate-100 rounded-lg flex items-center"><i class="fas fa-external-link-alt"></i></a></div></div>`;
+                        html += `
+                        <div class="bg-white p-5 rounded-xl shadow-sm border hover:shadow-md transition">
+                            <div class="flex items-center gap-3 mb-3">
+                                <img src="${data.profile.avatar || 'https://ui-avatars.com/api/?background=random'}" class="w-12 h-12 rounded-full border">
+                                <div class="overflow-hidden"><h3 class="font-bold truncate">${data.profile.name}</h3><span class="text-xs bg-slate-100 px-2 rounded text-slate-500">/${d.id}</span></div>
+                            </div>
+                            <div class="flex justify-between items-center text-xs text-slate-400 mb-4 border-t pt-2">
+                                <span><i class="fas fa-eye"></i> ${d.views || 0} views</span>
+                                <span>${d.links?.length || 0} links</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="#edit/${d.id}" class="flex-1 bg-slate-900 text-white text-center py-2 rounded-lg text-sm font-bold hover:bg-slate-800">Sửa</a>
+                                <button onclick="copyToClipboard('${window.location.origin}${window.location.pathname}#u/${d.id}')" class="px-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fas fa-copy text-slate-600"></i></button>
+                                <a href="#u/${d.id}" target="_blank" class="px-3 bg-slate-100 rounded-lg hover:bg-slate-200 flex items-center"><i class="fas fa-external-link-alt text-slate-600"></i></a>
+                            </div>
+                        </div>`;
                     });
                 }
-            } catch(e) { showToast(e.message,'error'); }
+                list.innerHTML = html; // Set once
+            } catch(e) { 
+                showToast(e.message,'error'); 
+            }
             finally { 
                 loader.classList.add('hidden'); 
                 isDashboardLoading = false;
@@ -519,14 +486,31 @@
         function openCreateModal() { document.getElementById('modal-create').classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         async function createNewBio() {
+            const btn = document.getElementById('btn-create-bio');
+            if(btn.disabled) return;
+            
             const slug = document.getElementById('new-slug').value.trim().toLowerCase();
             if(slug.length<3) return showToast("Slug ngắn","error");
+            
+            btn.disabled = true;
+            btn.innerText = "Đang tạo...";
+
             try {
                 const ref = db.collection('bios').doc(slug);
-                if((await ref.get()).exists) return showToast("Đã tồn tại","error");
-                await ref.set({ ownerId:currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(), profile:{name:"New User",bio:"Welcome",avatar:`https://ui-avatars.com/api/?name=${slug}`}, links:[], products:[], theme:{id:'default'}, socials:{} });
-                closeModal('modal-create'); loadDashboard();
-            } catch(e) { showToast(e.message,'error'); }
+                if((await ref.get()).exists) {
+                    showToast("Đã tồn tại","error");
+                } else {
+                    await ref.set({ ownerId:currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(), profile:{name:"New User",bio:"Welcome",avatar:`https://ui-avatars.com/api/?name=${slug}`}, links:[], products:[], theme:{id:'default'}, socials:{} });
+                    closeModal('modal-create'); 
+                    loadDashboard();
+                    showToast("Tạo thành công!", "success");
+                }
+            } catch(e) { 
+                showToast(e.message,'error'); 
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Tạo ngay";
+            }
         }
 
         async function loadEditor(slug) {
