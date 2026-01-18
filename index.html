@@ -8,7 +8,7 @@
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -36,24 +36,20 @@
     <style>
         body { background-color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
         
-        /* Themes Definitions */
-        .theme-default { background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #ffd1ff); background-size: 400% 400%; animation: meshMove 15s ease infinite; color: #1e293b; }
-        .theme-ocean { background: linear-gradient(180deg, #2E3192 0%, #1BFFFF 100%); color: white; }
-        .theme-midnight { background-color: #0f172a; background-image: radial-gradient(#334155 1px, transparent 1px); background-size: 20px 20px; color: white; }
-        .theme-forest { background: linear-gradient(135deg, #134E5E 0%, #71B280 100%); color: white; }
-        .theme-minimal { background-color: #ffffff; color: #1e293b; }
-        .theme-sunset { background: linear-gradient(45deg, #FA8BFF 0%, #2BD2FF 52%, #2BFF88 90%); color: #1e293b; }
+        /* Themes Definitions (Used in Editor Preview Swatches only) */
+        .theme-default { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: meshMove 15s ease infinite; color: white; }
+        .theme-ocean { background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); color: white; }
+        .theme-midnight { background-color: #000000; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 30px 30px; color: white; }
+        .theme-forest { background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); color: white; }
+        .theme-minimal { background-color: #f3f4f6; color: #1f2937; }
+        .theme-sunset { background: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%); color: #1e293b; }
 
         @keyframes meshMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         /* Button Styles */
         .btn-style-rounded { border-radius: 9999px; }
         .btn-style-rect { border-radius: 4px; }
-        .btn-style-soft { border-radius: 12px; }
-        
-        .btn-fill { background-color: rgba(255,255,255,0.9); backdrop-filter: blur(4px); border: none; }
-        .theme-minimal .btn-fill { background-color: #f1f5f9; border: 1px solid #e2e8f0; }
-        .btn-outline { background: transparent; border: 2px solid currentColor; }
+        .btn-style-soft { border-radius: 16px; }
         
         /* UI Utils */
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(0,0,0,0.05); }
@@ -651,14 +647,23 @@
 
         function generatePublicHTML(data, isPreview) {
             const theme = data.theme || { id: 'default', buttonStyle: 'rounded' };
-            const btnClass = `btn-style-${theme.buttonStyle || 'rounded'}`;
+            const btnStyleMap = {
+                'rounded': 'rounded-full',
+                'rect': 'rounded-md',
+                'soft': 'rounded-2xl'
+            };
+            const radiusClass = btnStyleMap[theme.buttonStyle] || 'rounded-full';
             
-            // Generate Links
-            const linksHtml = (data.links || []).map(l => `
-                <a href="${l.url}" target="_blank" class="block group relative transition-transform hover:-translate-y-1 active:scale-95">
-                    ${l.highlight ? '<div class="absolute -inset-0.5 bg-gradient-to-r from-pink-500 to-yellow-500 blur opacity-70 group-hover:opacity-100 transition rounded-xl"></div>' : ''}
-                    <div class="relative ${l.highlight ? 'bg-white text-slate-900 border-none' : 'btn-fill'} ${btnClass} p-4 flex items-center justify-between shadow-sm border border-white/20">
-                        <span class="font-bold text-sm text-center w-full">${l.title}</span>
+            // Generate Links with Staggered Animation
+            const linksHtml = (data.links || []).map((l, i) => `
+                <a href="${l.url}" target="_blank" class="block group relative transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] active:scale-95 mb-4" style="animation-delay: ${i * 100}ms">
+                    ${l.highlight ? '<div class="absolute -inset-0.5 bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 blur opacity-75 group-hover:opacity-100 transition duration-1000 ' + radiusClass + '"></div>' : ''}
+                    <div class="relative w-full p-4 flex items-center justify-between transition-all duration-300 ${l.highlight ? 'bg-white text-slate-900' : 'bg-white/90 hover:bg-white text-slate-800'} backdrop-blur-md shadow-sm border border-white/40 hover:shadow-md ${radiusClass}">
+                        ${l.thumbnail ? `<img src="${l.thumbnail}" class="w-10 h-10 object-cover ${radiusClass} absolute left-3">` : ''} 
+                        <div class="w-full text-center px-8">
+                            <span class="font-bold text-sm sm:text-base tracking-wide">${l.title}</span>
+                        </div>
+                        <div class="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity text-sm"><i class="fas fa-external-link-alt"></i></div>
                     </div>
                 </a>
             `).join('');
@@ -667,7 +672,10 @@
             let socialsHtml = '';
             if (data.socials) {
                 socialsHtml = socialPlatforms.map(p => {
-                    if (data.socials[p.id]) return `<a href="${data.socials[p.id]}" target="_blank" class="text-2xl hover:scale-110 transition opacity-80 hover:opacity-100"><i class="${p.icon}"></i></a>`;
+                    if (data.socials[p.id]) return `
+                        <a href="${data.socials[p.id]}" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm transition-all transform hover:scale-110 border border-white/20 text-white shadow-sm">
+                            <i class="${p.icon} text-lg"></i>
+                        </a>`;
                     return '';
                 }).join('');
             }
@@ -675,26 +683,72 @@
             // Return full HTML string
             return `
                 <!DOCTYPE html>
-                <html><head><script src="https://cdn.tailwindcss.com"><\/script>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-                <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
-                <style>
-                    body { font-family: 'Be Vietnam Pro', sans-serif; margin:0; min-height:100vh; }
-                    /* Theme Styles from Parent */
-                    ${document.querySelector('style').innerHTML}
-                    /* Overrides for preview */
-                    ${isPreview ? 'body{min-height:100%; padding-bottom: 20px; overflow-y:auto;}' : ''}
-                </style></head>
-                <body class="theme-${theme.id || 'default'} flex flex-col items-center py-12 px-4">
-                    <div class="w-full max-w-md text-center animate-slide-up">
-                        <img src="${data.profile.avatar}" class="w-24 h-24 rounded-full object-cover border-4 border-white/40 shadow-xl mx-auto mb-4">
-                        <h1 class="text-xl font-bold mb-2 drop-shadow-sm">${data.profile.name}</h1>
-                        <p class="text-sm opacity-90 mb-6 font-medium max-w-xs mx-auto leading-relaxed whitespace-pre-wrap">${data.profile.bio}</p>
-                        <div class="flex justify-center gap-4 mb-8 flex-wrap">${socialsHtml}</div>
-                        <div class="space-y-3 w-full px-2">${linksHtml}</div>
+                <html lang="vi">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+                    <style>
+                        body { font-family: 'Be Vietnam Pro', sans-serif; margin:0; min-height:100vh; overflow-x: hidden; }
+                        
+                        /* Scrollbar for preview */
+                        ::-webkit-scrollbar { width: 0px; background: transparent; }
+                        
+                        /* Animations */
+                        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                        .animate-enter { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+                        
+                        /* Theme Backgrounds */
+                        .theme-bg-default { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: white; }
+                        .theme-bg-ocean { background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); color: white; }
+                        .theme-bg-midnight { background-color: #000000; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 30px 30px; color: white; }
+                        .theme-bg-forest { background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); color: white; }
+                        .theme-bg-minimal { background-color: #f3f4f6; color: #1f2937; }
+                        .theme-bg-sunset { background: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%); color: #1e293b; }
+                        
+                        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+                        
+                        /* Glass overrides */
+                        .glass-btn { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
+                        .theme-bg-midnight .glass-btn { background: rgba(30, 41, 59, 0.8); color: white; border: 1px solid rgba(255, 255, 255, 0.1); }
+                        .theme-bg-midnight .glass-btn:hover { background: rgba(30, 41, 59, 1); }
+                    </style>
+                </head>
+                <body class="theme-bg-${theme.id} w-full flex flex-col items-center">
+                    <div class="w-full max-w-lg px-6 py-12 flex flex-col items-center min-h-screen">
+                        
+                        <!-- Profile -->
+                        <div class="text-center mb-8 animate-enter" style="animation-delay: 0ms">
+                            <div class="relative w-28 h-28 mx-auto mb-4 group">
+                                <div class="absolute inset-0 bg-white/30 rounded-full blur-md group-hover:blur-lg transition-all duration-500"></div>
+                                <img src="${data.profile.avatar}" class="relative w-full h-full rounded-full object-cover border-4 border-white/50 shadow-2xl" 
+                                     onerror="this.src='https://ui-avatars.com/api/?name=Mewo&background=random'">
+                            </div>
+                            <h1 class="text-2xl font-extrabold mb-2 drop-shadow-md tracking-tight">${data.profile.name}</h1>
+                            <p class="text-sm font-medium opacity-90 max-w-xs mx-auto leading-relaxed whitespace-pre-line">${data.profile.bio}</p>
+                        </div>
+
+                        <!-- Socials -->
+                        <div class="flex gap-4 mb-10 flex-wrap justify-center animate-enter" style="animation-delay: 100ms">
+                            ${socialsHtml}
+                        </div>
+
+                        <!-- Links -->
+                        <div class="w-full space-y-4">
+                            ${linksHtml}
+                        </div>
+
+                        ${!isPreview ? `
+                        <footer class="mt-auto pt-16 pb-4 text-center animate-enter" style="animation-delay: 500ms">
+                            <a href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors text-xs font-bold opacity-80 hover:opacity-100">
+                                <i class="fas fa-cat"></i> Created with Mewo
+                            </a>
+                        </footer>` : ''}
                     </div>
-                    ${!isPreview ? '<footer class="mt-auto pt-12 text-xs opacity-60 font-bold">Powered by Mewo</footer>' : ''}
-                </body></html>
+                </body>
+                </html>
             `;
         }
 
