@@ -162,15 +162,16 @@
                                 <div class="w-20 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-center text-sm font-bold flex items-center justify-center gap-1">🇻🇳 +84</div>
                                 <input type="tel" id="phone-input" placeholder="912345678" class="flex-1 input-modern" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                             </div>
-                            <div id="recaptcha-container"></div>
-                            <button onclick="sendOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition mt-4" id="btn-send-otp">Gửi mã xác thực</button>
+                            <div id="recaptcha-container" class="mb-4"></div>
+                            <button onclick="sendOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition mt-2" id="btn-send-otp">Gửi mã xác thực</button>
                         </div>
 
                         <!-- Step 2: Input OTP -->
                         <div id="phone-step-2" class="hidden">
-                            <p class="text-sm text-slate-500 mb-4">Nhập mã OTP đã gửi đến số điện thoại của bạn.</p>
+                            <p class="text-sm text-slate-500 mb-4">Nhập mã OTP (6 số) đã gửi đến số điện thoại của bạn.</p>
                             <input type="text" id="otp-input" placeholder="123456" class="input-modern text-center tracking-widest text-lg font-bold mb-4" maxlength="6">
                             <button onclick="verifyOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition">Xác nhận</button>
+                            <button onclick="switchAuthView('phone')" class="w-full text-slate-500 py-2 text-sm mt-2 hover:text-slate-700">Gửi lại / Đổi số</button>
                         </div>
                     </div>
 
@@ -396,6 +397,13 @@
             if(view === 'phone') {
                 document.getElementById('auth-main-container').classList.add('hidden');
                 document.getElementById('auth-phone-container').classList.remove('hidden');
+                // Reset UI
+                document.getElementById('phone-step-1').classList.remove('hidden');
+                document.getElementById('phone-step-2').classList.add('hidden');
+                document.getElementById('otp-input').value = '';
+                document.getElementById('btn-send-otp').innerText = 'Gửi mã xác thực';
+                document.getElementById('btn-send-otp').disabled = false;
+                confirmationResult = null;
                 setupRecaptcha(); // Init Recaptcha when phone view opens
             } else {
                 document.getElementById('auth-phone-container').classList.add('hidden');
@@ -430,20 +438,30 @@
 
         // Phone Login Logic
         function setupRecaptcha() {
-            if (!window.recaptchaVerifier) {
-                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-                    'size': 'normal',
-                    'callback': (response) => {
-                        // reCAPTCHA solved, allow signInWithPhoneNumber.
-                        console.log("Recaptcha Verified");
-                    }
-                });
-                window.recaptchaVerifier.render();
+            // Clean up existing verifier if any, to avoid "already rendered" issues when switching views
+            if (window.recaptchaVerifier) {
+                window.recaptchaVerifier.clear();
+                window.recaptchaVerifier = null;
             }
+            
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                'size': 'normal',
+                'callback': (response) => {
+                    // reCAPTCHA solved, allow signInWithPhoneNumber.
+                    console.log("Recaptcha Verified");
+                }
+            });
+            window.recaptchaVerifier.render();
         }
 
         async function sendOTP() {
-            const phoneNumber = '+84' + document.getElementById('phone-input').value.replace(/^0+/, ''); // Format to +84...
+            const rawPhone = document.getElementById('phone-input').value.replace(/[^0-9]/g, '');
+            
+            if (rawPhone.length < 9) {
+                return showToast("Số điện thoại không hợp lệ", "error");
+            }
+
+            const phoneNumber = '+84' + rawPhone.replace(/^0+/, ''); // Format to +84...
             const appVerifier = window.recaptchaVerifier;
             
             const btn = document.getElementById('btn-send-otp');
@@ -459,18 +477,23 @@
                 showToast(getErrorMessage(error.code), "error");
                 btn.innerText = "Gửi mã xác thực";
                 btn.disabled = false;
-                window.recaptchaVerifier.reset(); // Reset on error
+                if(window.recaptchaVerifier) window.recaptchaVerifier.reset(); // Reset on error
             }
         }
 
         async function verifyOTP() {
             const code = document.getElementById('otp-input').value;
+            
+            if(!code) return showToast("Vui lòng nhập mã OTP", "error");
+            if(!confirmationResult) return showToast("Vui lòng gửi mã xác thực trước", "error");
+
             try {
                 await confirmationResult.confirm(code);
                 showToast("Đăng nhập thành công!", "success");
                 // Auth listener will handle redirect
             } catch (error) {
-                showToast("Mã xác thực không đúng", "error");
+                console.error("OTP Error:", error);
+                showToast("Mã xác thực không đúng (" + error.code + ")", "error");
             }
         }
 
@@ -487,6 +510,10 @@
                 case 'auth/too-many-requests': return "Quá nhiều yêu cầu. Vui lòng thử lại sau.";
                 case 'auth/invalid-verification-code': return "Mã OTP không đúng.";
                 case 'auth/popup-closed-by-user': return "Đã hủy đăng nhập.";
+                case 'auth/captcha-check-failed': return "Lỗi xác thực Captcha. Vui lòng thử lại.";
+                case 'auth/invalid-phone-number': return "Số điện thoại không hợp lệ.";
+                case 'auth/missing-phone-number': return "Vui lòng nhập số điện thoại.";
+                case 'auth/quota-exceeded': return "Hết hạn ngạch SMS. Vui lòng thử lại sau.";
                 default: return "Lỗi: " + code;
             }
         }
