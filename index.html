@@ -85,12 +85,15 @@
         
         <!-- AUTH VIEW -->
         <div id="view-auth" class="view-section hidden flex-grow min-h-screen flex flex-col lg:flex-row bg-white">
+            <!-- Left Side Branding -->
             <div class="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden flex-col justify-between p-12 text-white">
                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 24px 24px;"></div>
                 <div class="relative z-10 flex items-center gap-3"><i class="fas fa-cat text-brand-500 text-2xl"></i> <span class="font-bold text-2xl">Mewo</span></div>
                 <div class="relative z-10 max-w-md"><h2 class="text-5xl font-bold mb-6">Liên kết mọi thứ.<br>Một nơi duy nhất.</h2><p class="text-slate-400 text-lg">Nền tảng Bio Link miễn phí, mạnh mẽ và cute nhất vũ trụ.</p></div>
                 <div class="relative z-10 text-sm text-slate-500">© 2024 Mewo Inc.</div>
             </div>
+
+            <!-- Right Side Auth Forms -->
             <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 bg-white relative">
                 <div class="w-full max-w-sm">
                     <!-- Cat SVG -->
@@ -115,19 +118,66 @@
                             <g><ellipse class="cat-paws cat-paws-left" cx="25" cy="95" rx="10" ry="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/><ellipse class="cat-paws cat-paws-right" cx="95" cy="95" rx="10" ry="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/></g>
                         </svg>
                     </div>
-                    <div class="text-center mb-6"><h1 class="text-2xl font-bold text-slate-900">Xin chào 👋</h1><p class="text-slate-500 text-sm">Đăng nhập để quản lý Mewo của bạn.</p></div>
-                    <div class="flex bg-slate-100 p-1 rounded-lg mb-6"><button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900">Đăng nhập</button><button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500">Đăng ký</button></div>
                     
-                    <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-                        <input type="email" id="login-email" placeholder="Email" class="input-modern track-input" required>
-                        <input type="password" id="login-password" placeholder="Mật khẩu" class="input-modern pass-input" required>
-                        <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng nhập</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="login-loader"></div></button>
-                    </form>
-                    <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
-                        <input type="email" id="reg-email" placeholder="Email" class="input-modern track-input" required>
-                        <input type="password" id="reg-password" placeholder="Mật khẩu (min 6 ký tự)" class="input-modern pass-input" minlength="6" required>
-                        <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng ký</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="reg-loader"></div></button>
-                    </form>
+                    <!-- Main Auth Container -->
+                    <div id="auth-main-container">
+                        <div class="text-center mb-6"><h1 class="text-2xl font-bold text-slate-900">Xin chào 👋</h1><p class="text-slate-500 text-sm">Đăng nhập để quản lý Mewo của bạn.</p></div>
+                        <div class="flex bg-slate-100 p-1 rounded-lg mb-6"><button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900">Đăng nhập</button><button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500">Đăng ký</button></div>
+                        
+                        <!-- Login Form -->
+                        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                            <input type="email" id="login-email" placeholder="Email" class="input-modern track-input" required>
+                            <input type="password" id="login-password" placeholder="Mật khẩu" class="input-modern pass-input" required>
+                            <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng nhập</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="login-loader"></div></button>
+                        </form>
+                        
+                        <!-- Register Form -->
+                        <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                            <input type="email" id="reg-email" placeholder="Email" class="input-modern track-input" required>
+                            <input type="password" id="reg-password" placeholder="Mật khẩu (min 6 ký tự)" class="input-modern pass-input" minlength="6" required>
+                            <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng ký</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="reg-loader"></div></button>
+                        </form>
+
+                        <!-- Social Login Divider -->
+                        <div class="relative my-6">
+                            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+                            <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-slate-500">Hoặc tiếp tục với</span></div>
+                        </div>
+
+                        <!-- Social Buttons -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> <span class="text-sm font-medium">Google</span>
+                            </button>
+                            <button onclick="switchAuthView('phone')" class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                                <i class="fas fa-phone text-slate-600"></i> <span class="text-sm font-medium">Số điện thoại</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Phone Auth Container (Hidden by default) -->
+                    <div id="auth-phone-container" class="hidden">
+                        <button onclick="switchAuthView('main')" class="text-sm text-slate-500 hover:text-slate-900 mb-4 flex items-center gap-1"><i class="fas fa-arrow-left"></i> Quay lại</button>
+                        <h2 class="text-xl font-bold mb-4">Đăng nhập bằng SĐT</h2>
+                        
+                        <!-- Step 1: Input Phone -->
+                        <div id="phone-step-1">
+                            <div class="flex gap-2 mb-4">
+                                <div class="w-20 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-center text-sm font-bold flex items-center justify-center gap-1">🇻🇳 +84</div>
+                                <input type="tel" id="phone-input" placeholder="912345678" class="flex-1 input-modern" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            </div>
+                            <div id="recaptcha-container"></div>
+                            <button onclick="sendOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition mt-4" id="btn-send-otp">Gửi mã xác thực</button>
+                        </div>
+
+                        <!-- Step 2: Input OTP -->
+                        <div id="phone-step-2" class="hidden">
+                            <p class="text-sm text-slate-500 mb-4">Nhập mã OTP đã gửi đến số điện thoại của bạn.</p>
+                            <input type="text" id="otp-input" placeholder="123456" class="input-modern text-center tracking-widest text-lg font-bold mb-4" maxlength="6">
+                            <button onclick="verifyOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition">Xác nhận</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -287,6 +337,7 @@
 
         // STATE
         let currentUser = null, currentBioData = null, editingSlug = null;
+        let confirmationResult = null; // For Phone Auth
         const socialPlatforms = [
             { id: 'facebook', icon: 'fab fa-facebook', label: 'Facebook' },
             { id: 'instagram', icon: 'fab fa-instagram', label: 'Instagram' },
@@ -317,7 +368,7 @@
         window.addEventListener('hashchange', handleRoute);
         auth.onAuthStateChanged(user => {
             currentUser = user;
-            if (user) { document.getElementById('user-email-display').textContent = user.email; if(!window.location.hash) window.location.hash = '#dashboard'; }
+            if (user) { document.getElementById('user-email-display').textContent = user.email || user.phoneNumber || 'User'; if(!window.location.hash) window.location.hash = '#dashboard'; }
             handleRoute();
         });
 
@@ -343,15 +394,106 @@
             document.getElementById('tab-register').classList.toggle('bg-white', m === 'register');
             document.getElementById('tab-register').classList.toggle('text-slate-900', m === 'register');
         }
+
+        // Switch between Main Login and Phone Login Views
+        function switchAuthView(view) {
+            if(view === 'phone') {
+                document.getElementById('auth-main-container').classList.add('hidden');
+                document.getElementById('auth-phone-container').classList.remove('hidden');
+                setupRecaptcha(); // Init Recaptcha when phone view opens
+            } else {
+                document.getElementById('auth-phone-container').classList.add('hidden');
+                document.getElementById('auth-main-container').classList.remove('hidden');
+            }
+        }
+
         async function handleLogin(e) { e.preventDefault(); authAction(auth.signInWithEmailAndPassword, 'login'); }
         async function handleRegister(e) { e.preventDefault(); authAction(auth.createUserWithEmailAndPassword, 'register'); }
         async function authAction(method, type) {
             const email = document.getElementById(type+'-email').value, pass = document.getElementById(type+'-password').value;
             document.getElementById(type+'-loader').classList.remove('hidden');
-            try { await method(email, pass); showToast("Thành công!", "success"); } catch(e) { showToast(e.message, "error"); }
+            try { 
+                await method(email, pass); 
+                showToast("Thành công!", "success"); 
+            } catch(e) { 
+                showToast(getErrorMessage(e.code), "error"); 
+            }
             finally { document.getElementById(type+'-loader').classList.add('hidden'); }
         }
+
+        // Google Login
+        async function handleGoogleLogin() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithPopup(provider);
+                showToast("Đăng nhập Google thành công!", "success");
+            } catch (error) {
+                showToast(getErrorMessage(error.code), "error");
+            }
+        }
+
+        // Phone Login Logic
+        function setupRecaptcha() {
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'normal',
+                    'callback': (response) => {
+                        // reCAPTCHA solved, allow signInWithPhoneNumber.
+                        console.log("Recaptcha Verified");
+                    }
+                });
+                window.recaptchaVerifier.render();
+            }
+        }
+
+        async function sendOTP() {
+            const phoneNumber = '+84' + document.getElementById('phone-input').value.replace(/^0+/, ''); // Format to +84...
+            const appVerifier = window.recaptchaVerifier;
+            
+            const btn = document.getElementById('btn-send-otp');
+            btn.innerText = "Đang gửi...";
+            btn.disabled = true;
+
+            try {
+                confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, appVerifier);
+                showToast("Đã gửi mã OTP!", "success");
+                document.getElementById('phone-step-1').classList.add('hidden');
+                document.getElementById('phone-step-2').classList.remove('hidden');
+            } catch (error) {
+                showToast(getErrorMessage(error.code), "error");
+                btn.innerText = "Gửi mã xác thực";
+                btn.disabled = false;
+                window.recaptchaVerifier.reset(); // Reset on error
+            }
+        }
+
+        async function verifyOTP() {
+            const code = document.getElementById('otp-input').value;
+            try {
+                await confirmationResult.confirm(code);
+                showToast("Đăng nhập thành công!", "success");
+                // Auth listener will handle redirect
+            } catch (error) {
+                showToast("Mã xác thực không đúng", "error");
+            }
+        }
+
         function handleLogout() { auth.signOut(); showToast("Đã đăng xuất"); }
+
+        // Vietnamese Error Mapping
+        function getErrorMessage(code) {
+            switch (code) {
+                case 'auth/email-already-in-use': return "Email này đã được sử dụng.";
+                case 'auth/invalid-email': return "Email không hợp lệ.";
+                case 'auth/user-not-found': return "Tài khoản không tồn tại.";
+                case 'auth/wrong-password': return "Mật khẩu không đúng.";
+                case 'auth/weak-password': return "Mật khẩu quá yếu (tối thiểu 6 ký tự).";
+                case 'auth/too-many-requests': return "Quá nhiều yêu cầu. Vui lòng thử lại sau.";
+                case 'auth/invalid-verification-code': return "Mã OTP không đúng.";
+                case 'auth/popup-closed-by-user': return "Đã hủy đăng nhập.";
+                default: return "Lỗi: " + code;
+            }
+        }
 
         // DASHBOARD
         async function loadDashboard() {
