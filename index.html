@@ -21,12 +21,13 @@
                 extend: {
                     fontFamily: { sans: ['"Inter"', '"Be Vietnam Pro"', 'sans-serif'], display: ['"Be Vietnam Pro"', 'sans-serif'], serif: ['"Playfair Display"', 'serif'] },
                     colors: { brand: { 50: '#fff1f2', 100: '#ffe4e6', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 900: '#881337' } },
-                    animation: { 'fade-in': 'fadeIn 0.5s ease-out', 'slide-up': 'slideUp 0.5s ease-out', 'float': 'float 6s infinite', 'heart-beat': 'heartBeat 1s infinite' },
+                    animation: { 'fade-in': 'fadeIn 0.5s ease-out', 'slide-up': 'slideUp 0.5s ease-out', 'float': 'float 6s infinite', 'heart-beat': 'heartBeat 1s infinite', 'blob': 'blob 7s infinite' },
                     keyframes: { 
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }, 
                         slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }, 
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }, 
-                        heartBeat: { '0%, 100%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.2)' } } 
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-20px)' } }, 
+                        heartBeat: { '0%, 100%': { transform: 'scale(1)' }, '50%': { transform: 'scale(1.2)' } },
+                        blob: { "0%": { transform: "translate(0px, 0px) scale(1)" }, "33%": { transform: "translate(30px, -50px) scale(1.1)" }, "66%": { transform: "translate(-20px, 20px) scale(0.9)" }, "100%": { transform: "translate(0px, 0px) scale(1)" } }
                     }
                 }
             }
@@ -36,149 +37,155 @@
     <style>
         body { background-color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
         
-        /* Themes Definitions */
-        .theme-default { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: meshMove 15s ease infinite; color: white; }
-        .theme-ocean { background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); color: white; }
-        .theme-midnight { background-color: #000000; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 30px 30px; color: white; }
-        .theme-forest { background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); color: white; }
-        .theme-minimal { background-color: #f3f4f6; color: #1f2937; }
-        .theme-sunset { background: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%); color: #1e293b; }
+        /* Modern Admin UI Styles */
+        .modern-input { width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid transparent; border-radius: 12px; font-size: 0.9rem; transition: all 0.2s; outline: none; font-weight: 500; color: #334155; }
+        .modern-input:focus { background: #fff; border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .modern-input::placeholder { color: #94a3b8; font-weight: 400; }
+        
+        .modern-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; transition: all 0.2s; position: relative; }
+        .modern-card:hover { box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08); transform: translateY(-2px); border-color: #e2e8f0; }
 
+        .modern-tab-container { background: #f1f5f9; padding: 4px; border-radius: 14px; display: flex; gap: 4px; }
+        .modern-tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; color: #64748b; transition: all 0.2s; cursor: pointer; }
+        .modern-tab:hover { color: #334155; }
+        .modern-tab.active { background: white; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* Landing & Themes */
+        .landing-bg { background-color: #fff1f2; color: #1e293b; }
+        .perspective-1000 { perspective: 1000px; }
+        .rotate-y-12 { transform: rotateY(-12deg) rotateX(5deg); }
+        .hero-text-shadow { text-shadow: 0 4px 0 rgba(0,0,0,0.05); }
+        .theme-default { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); animation: meshMove 15s ease infinite; color: white; }
         @keyframes meshMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* Button Styles */
-        .btn-style-rounded { border-radius: 9999px; }
-        .btn-style-rect { border-radius: 8px; }
-        .btn-style-soft { border-radius: 16px; }
-        
-        /* UI Utils */
-        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(0,0,0,0.05); }
+        /* Utils */
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .hidden { display: none !important; }
         
-        /* Modern Admin UI Styles */
-        .modern-input { width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid transparent; border-radius: 10px; font-size: 0.9rem; transition: all 0.2s; outline: none; font-weight: 500; color: #334155; }
-        .modern-input:focus { background: #fff; border-color: #cbd5e1; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .modern-input::placeholder { color: #94a3b8; font-weight: 400; }
-        
-        .modern-card { background: white; border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; transition: all 0.2s; position: relative; }
-        .modern-card:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); border-color: #e2e8f0; }
-
-        .modern-tab-container { background: #f1f5f9; padding: 4px; border-radius: 12px; display: flex; gap: 4px; }
-        .modern-tab { flex: 1; text-align: center; padding: 8px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #64748b; transition: all 0.2s; cursor: pointer; }
-        .modern-tab:hover { color: #334155; }
-        .modern-tab.active { background: white; color: #0f172a; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-
-        /* Cat SVG */
+        /* Cat SVG & Animations */
         .cat-paws { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); transform-box: fill-box; transform-origin: center top; }
         .cat-heart { opacity: 0; transform: scale(0) translateY(10px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: center; transform-box: fill-box; }
-        .loving-it .cat-paws-left { transform: translate(10px, -25px) rotate(30deg); }
-        .loving-it .cat-paws-right { transform: translate(-10px, -25px) rotate(-30deg); }
-        .loving-it .cat-heart { opacity: 1; transform: scale(1.2) translateY(-5px); animation: heartBeat 1s infinite; }
-        .covering-eyes .cat-paws-left { transform: translate(12px, -45px) rotate(10deg); }
-        .covering-eyes .cat-paws-right { transform: translate(-12px, -45px) rotate(-10deg); }
+        .loving-it .cat-paws-left { transform: translate(10px, -25px) rotate(30deg); } .loving-it .cat-paws-right { transform: translate(-10px, -25px) rotate(-30deg); } .loving-it .cat-heart { opacity: 1; transform: scale(1.2) translateY(-5px); animation: heartBeat 1s infinite; }
+        .covering-eyes .cat-paws-left { transform: translate(12px, -45px) rotate(10deg); } .covering-eyes .cat-paws-right { transform: translate(-12px, -45px) rotate(-10deg); }
 
-        /* Toast */
-        .toast { background: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); margin-bottom: 12px; border-left: 4px solid #e11d48; animation: slideInRight 0.4s; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 0.9rem; position: fixed; top: 24px; right: 24px; z-index: 9999; }
+        .toast { background: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.15); margin-bottom: 12px; border-left: 4px solid #e11d48; animation: slideInRight 0.4s; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.9rem; position: fixed; top: 24px; right: 24px; z-index: 9999; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
-<body class="text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900">
+<body class="text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900 font-sans">
 
     <div id="toast-container"></div>
 
     <div id="app" class="min-h-screen flex flex-col relative">
         
-        <!-- AUTH VIEW -->
-        <div id="view-auth" class="view-section hidden flex-grow min-h-screen flex flex-col lg:flex-row bg-white">
-            <!-- Left Side Branding -->
-            <div class="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden flex-col justify-between p-12 text-white">
-                <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 24px 24px;"></div>
-                <div class="relative z-10 flex items-center gap-3"><i class="fas fa-cat text-brand-500 text-2xl"></i> <span class="font-bold text-2xl">Mewo</span></div>
-                <div class="relative z-10 max-w-md"><h2 class="text-5xl font-bold mb-6">Liên kết mọi thứ.<br>Một nơi duy nhất.</h2><p class="text-slate-400 text-lg">Nền tảng Bio Link miễn phí, mạnh mẽ và cute nhất vũ trụ.</p></div>
-                <div class="relative z-10 text-sm text-slate-500">© 2024 Mewo Inc.</div>
-            </div>
+        <!-- LANDING PAGE -->
+        <div id="view-landing" class="view-section hidden flex-grow min-h-screen flex-col bg-[#fff1f2] text-slate-800 overflow-hidden relative">
+            <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#fecdd3] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#e9d5ff] rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob animation-delay-2000"></div>
 
-            <!-- Right Side Auth Forms -->
-            <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 bg-white relative">
-                <div class="w-full max-w-sm">
-                    <!-- Cat SVG -->
-                    <div class="flex justify-center mb-4 h-28 relative" id="cat-container">
-                        <svg viewBox="0 0 120 110" class="w-36 h-36">
+            <nav class="flex justify-between items-center py-6 px-6 max-w-7xl mx-auto w-full z-10">
+                <div class="flex items-center gap-2 text-3xl font-extrabold font-display tracking-tighter text-brand-600"><i class="fas fa-cat"></i> Mewo</div>
+                <div class="flex gap-3 items-center">
+                    <button onclick="openAuthModal('login')" class="px-5 py-2.5 rounded-xl bg-white/80 hover:bg-white text-slate-800 font-bold transition shadow-sm backdrop-blur-md">Đăng nhập</button>
+                    <button onclick="openAuthModal('register')" class="hidden sm:block px-6 py-2.5 rounded-full bg-brand-600 text-white hover:bg-brand-700 font-extrabold transition shadow-lg shadow-brand-200 transform hover:scale-105">Đăng ký ngay</button>
+                </div>
+            </nav>
+
+            <header class="flex-grow flex flex-col lg:flex-row items-center justify-center px-6 max-w-7xl mx-auto w-full gap-16 py-12 z-10">
+                <div class="lg:w-1/2 space-y-8 text-center lg:text-left animate-slide-up">
+                    <h1 class="text-6xl lg:text-8xl font-black tracking-tighter leading-[0.95] font-display hero-text-shadow text-slate-900">Mọi kết nối.<br><span class="text-brand-600">Một link duy nhất.</span></h1>
+                    <p class="text-xl text-slate-600 max-w-lg font-medium mx-auto lg:mx-0 leading-relaxed">Nền tảng Bio Link chuyên nghiệp, miễn phí và cute nhất hệ mặt trời.</p>
+                    <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto lg:mx-0">
+                        <div class="flex-grow bg-white p-1 pl-5 rounded-2xl flex items-center border-2 border-transparent focus-within:border-brand-200 transition shadow-xl ring-4 ring-slate-50/50">
+                            <span class="text-slate-400 font-bold select-none text-lg">mewo.life/</span>
+                            <input type="text" id="landing-username" placeholder="username" class="outline-none bg-transparent font-bold w-full ml-1 py-4 text-slate-900 placeholder-slate-300 text-lg">
+                        </div>
+                        <button onclick="claimUsername()" class="px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-extrabold text-lg whitespace-nowrap transition shadow-xl shadow-brand-200 transform active:scale-95">Bắt đầu</button>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 relative justify-center perspective-1000 animate-float hidden md:flex">
+                     <div class="w-[340px] h-[680px] bg-slate-900 rounded-[50px] border-[12px] border-slate-900 shadow-2xl overflow-hidden relative rotate-y-12 hover:rotate-0 transition duration-700 ease-out transform-gpu ring-8 ring-white/30">
+                        <div class="w-full h-full bg-[#f8fafc] flex flex-col items-center pt-20 px-5 space-y-5 overflow-hidden relative">
+                            <div class="absolute top-[-60px] left-[-60px] w-48 h-48 bg-brand-200 rounded-full blur-2xl opacity-60"></div>
+                            <img src="https://ui-avatars.com/api/?name=Mewo&background=random&color=fff&size=128" class="w-28 h-28 rounded-full border-4 border-white shadow-xl z-10">
+                            <div class="font-extrabold text-slate-900 text-2xl z-10 font-display">@mewo.official</div>
+                            <div class="w-full space-y-3 z-10 mt-2">
+                                <div class="w-full bg-white p-5 rounded-2xl shadow-sm border border-slate-100 font-bold text-center text-slate-800 transform hover:scale-[1.02] transition cursor-pointer hover:shadow-md">🎵 Bài hát mới nhất</div>
+                                <div class="w-full bg-white p-5 rounded-2xl shadow-sm border border-slate-100 font-bold text-center text-slate-800 transform hover:scale-[1.02] transition cursor-pointer hover:shadow-md">🛒 Cửa hàng Merch</div>
+                                <div class="w-full bg-white p-5 rounded-2xl shadow-sm border border-slate-100 font-bold text-center text-slate-800 transform hover:scale-[1.02] transition cursor-pointer hover:shadow-md">📺 Kênh YouTube</div>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+            </header>
+        </div>
+
+        <!-- AUTH MODAL -->
+        <div id="modal-auth" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative animate-slide-up">
+                <button onclick="closeModal('modal-auth')" class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-slate-50 text-slate-400 rounded-full hover:bg-slate-100 transition z-10"><i class="fas fa-times"></i></button>
+                <div class="p-8 pt-10">
+                    <div class="flex justify-center mb-4 h-24 relative" id="cat-container">
+                        <svg viewBox="0 0 120 110" class="w-32 h-32">
                             <path d="M30 35 L15 5 Q35 10 45 30 Z" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2" stroke-linejoin="round"/>
                             <path d="M90 35 L105 5 Q85 10 75 30 Z" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2" stroke-linejoin="round"/>
                             <ellipse cx="60" cy="60" rx="45" ry="38" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2.5"/>
                             <ellipse cx="35" cy="70" rx="6" ry="4" fill="#fda4af" opacity="0.6"/>
                             <ellipse cx="85" cy="70" rx="6" ry="4" fill="#fda4af" opacity="0.6"/>
-                            <g class="cat-eyes">
-                                <circle cx="40" cy="55" r="10" fill="white" stroke="#334155" stroke-width="2"/>
-                                <circle id="pupil-left" class="cat-pupil" cx="40" cy="55" r="6" fill="#1e293b"/>
-                                <circle cx="43" cy="52" r="2" fill="white"/>
-                                <circle cx="80" cy="55" r="10" fill="white" stroke="#334155" stroke-width="2"/>
-                                <circle id="pupil-right" class="cat-pupil" cx="80" cy="55" r="6" fill="#1e293b"/>
-                                <circle cx="83" cy="52" r="2" fill="white"/>
-                            </g>
+                            <g class="cat-eyes"><circle cx="40" cy="55" r="10" fill="white" stroke="#334155" stroke-width="2"/><circle id="pupil-left" class="cat-pupil" cx="40" cy="55" r="6" fill="#1e293b"/><circle cx="43" cy="52" r="2" fill="white"/><circle cx="80" cy="55" r="10" fill="white" stroke="#334155" stroke-width="2"/><circle id="pupil-right" class="cat-pupil" cx="80" cy="55" r="6" fill="#1e293b"/><circle cx="83" cy="52" r="2" fill="white"/></g>
                             <path d="M57 65 L63 65 L60 68 Z" fill="#fda4af"/>
                             <path d="M60 68 Q50 77 45 70 M60 68 Q70 77 75 70" fill="none" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/>
                             <path class="cat-heart" d="M60 70 C60 60 52 60 52 67 C52 75 60 80 60 80 C60 80 68 75 68 67 C68 60 60 60 60 70" fill="#f43f5e" stroke="#be123c" stroke-width="1"/>
                             <g><ellipse class="cat-paws cat-paws-left" cx="25" cy="95" rx="10" ry="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/><ellipse class="cat-paws cat-paws-right" cx="95" cy="95" rx="10" ry="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/></g>
                         </svg>
                     </div>
+                    <div class="text-center mb-6"><h2 class="text-2xl font-bold text-slate-900" id="auth-title">Chào mừng trở lại!</h2><p class="text-slate-500 text-sm mt-1">Đăng nhập để quản lý bio.</p></div>
+                    <div class="flex bg-slate-100 p-1 rounded-xl mb-6"><button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2.5 text-sm font-bold rounded-lg shadow-sm bg-white text-slate-900 transition-all">Đăng nhập</button><button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-700 transition-all">Đăng ký</button></div>
                     
-                    <!-- Main Auth Container -->
-                    <div id="auth-main-container">
-                        <div class="text-center mb-6"><h1 class="text-2xl font-bold text-slate-900">Xin chào 👋</h1><p class="text-slate-500 text-sm">Đăng nhập để quản lý Mewo của bạn.</p></div>
-                        <div class="flex bg-slate-100 p-1 rounded-lg mb-6"><button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900">Đăng nhập</button><button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500">Đăng ký</button></div>
-                        
-                        <!-- Login Form -->
-                        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-                            <input type="email" id="login-email" placeholder="Email" class="input-modern track-input" style="padding: 14px; border: 1px solid #e2e8f0;" required>
-                            <input type="password" id="login-password" placeholder="Mật khẩu" class="input-modern pass-input" style="padding: 14px; border: 1px solid #e2e8f0;" required>
-                            <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng nhập</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="login-loader"></div></button>
-                        </form>
-                        
-                        <!-- Register Form -->
-                        <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
-                            <input type="email" id="reg-email" placeholder="Email" class="input-modern track-input" style="padding: 14px; border: 1px solid #e2e8f0;" required>
-                            <input type="password" id="reg-password" placeholder="Mật khẩu (min 6 ký tự)" class="input-modern pass-input" style="padding: 14px; border: 1px solid #e2e8f0;" minlength="6" required>
-                            <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng ký</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="reg-loader"></div></button>
-                        </form>
+                    <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                        <input type="email" id="login-email" placeholder="Email" class="modern-input track-input" required>
+                        <input type="password" id="login-password" placeholder="Mật khẩu" class="modern-input pass-input" required>
+                        <button type="submit" class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold hover:bg-slate-800 transition flex justify-center items-center gap-2 shadow-lg shadow-slate-200"><span>Đăng nhập</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="login-loader"></div></button>
+                    </form>
+                    <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                        <input type="email" id="reg-email" placeholder="Email" class="modern-input track-input" required>
+                        <input type="password" id="reg-password" placeholder="Mật khẩu (min 6 ký tự)" class="modern-input pass-input" minlength="6" required>
+                        <button type="submit" class="w-full bg-brand-600 text-white py-3.5 rounded-xl font-bold hover:bg-brand-700 transition flex justify-center items-center gap-2 shadow-lg shadow-brand-200"><span>Tạo tài khoản</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="reg-loader"></div></button>
+                    </form>
 
-                        <!-- Social Login Divider -->
-                        <div class="relative my-6">
-                            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
-                            <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-slate-500">Hoặc tiếp tục với</span></div>
-                        </div>
-
-                        <!-- Social Buttons -->
-                        <div class="w-full">
-                            <button onclick="handleGoogleLogin()" class="w-full flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
-                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> <span class="text-sm font-medium">Google</span>
-                            </button>
-                        </div>
-                    </div>
+                    <div class="relative my-8"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div><div class="relative flex justify-center text-xs uppercase font-bold tracking-wider"><span class="px-2 bg-white text-slate-400">Hoặc</span></div></div>
+                    <button onclick="handleGoogleLogin()" class="w-full flex items-center justify-center gap-3 py-3 border-2 border-slate-100 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition font-bold text-slate-700"><img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> Tiếp tục với Google</button>
                 </div>
             </div>
         </div>
 
-        <!-- DASHBOARD VIEW -->
+        <!-- DASHBOARD VIEW - MODERNIZED -->
         <div id="view-dashboard" class="view-section hidden flex-grow bg-slate-50">
-            <nav class="bg-white border-b border-slate-200 sticky top-0 z-30 px-6 py-3 flex justify-between items-center">
-                <div class="flex items-center gap-2 text-brand-600 font-bold text-xl"><i class="fas fa-cat"></i> Mewo</div>
-                <div class="flex items-center gap-4"><span id="user-email-display" class="text-sm font-medium text-slate-600 hidden sm:block"></span><button onclick="handleLogout()" class="text-slate-400 hover:text-red-500"><i class="fas fa-sign-out-alt"></i></button></div>
-            </nav>
-            <div class="max-w-5xl mx-auto p-6 animate-fade-in">
-                <div class="flex justify-between items-center mb-8">
-                    <div><h2 class="text-2xl font-bold text-slate-900">Trang Bio của bạn</h2><p class="text-slate-500 text-sm">Quản lý và theo dõi hiệu quả hoạt động.</p></div>
-                    <button onclick="openCreateModal()" class="bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 transition font-bold text-sm shadow flex items-center gap-2"><i class="fas fa-plus"></i> Tạo mới</button>
+            <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30">
+                <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="flex items-center gap-2 text-brand-600 font-bold text-xl font-display tracking-tight"><i class="fas fa-cat"></i> Mewo</div>
+                    <div class="flex items-center gap-4"><span id="user-email-display" class="text-sm font-medium text-slate-600 hidden sm:block"></span><button onclick="handleLogout()" class="text-slate-400 hover:text-red-500 transition"><i class="fas fa-sign-out-alt text-lg"></i></button></div>
                 </div>
-                <div id="bio-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
-                <div id="dashboard-loader" class="flex justify-center mt-10 hidden"><div class="w-8 h-8 border-2 border-slate-200 border-t-brand-600 rounded-full animate-spin"></div></div>
+            </nav>
+
+            <div class="max-w-6xl mx-auto p-6 md:p-10 animate-fade-in">
+                <div class="flex flex-col sm:flex-row justify-between items-end mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-900 font-display">Trang Bio Của Bạn</h2>
+                        <p class="text-slate-500 mt-1">Quản lý và theo dõi hiệu quả hoạt động.</p>
+                    </div>
+                    <button onclick="openCreateModal()" class="bg-slate-900 text-white px-6 py-3 rounded-2xl hover:bg-slate-800 transition font-bold text-sm shadow-lg hover:shadow-xl transform active:scale-95 flex items-center gap-2"><i class="fas fa-plus"></i> Tạo Trang Mới</button>
+                </div>
+                
+                <div id="bio-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <!-- Injected JS Content Here -->
+                </div>
+                <div id="dashboard-loader" class="flex justify-center mt-20 hidden"><div class="w-10 h-10 border-4 border-slate-200 border-t-brand-600 rounded-full animate-spin"></div></div>
             </div>
         </div>
 
-        <!-- EDITOR VIEW - MODERN UI UPDATE -->
+        <!-- EDITOR VIEW -->
         <div id="view-editor" class="view-section hidden flex-grow bg-slate-100 flex flex-col md:flex-row h-screen overflow-hidden">
             <!-- Left Panel -->
             <div class="w-full md:w-[450px] bg-[#f9fafb] border-r border-slate-200 flex flex-col h-full z-20 shadow-xl animate-slide-up md:animate-none">
@@ -186,105 +193,39 @@
                     <button onclick="goToDashboard()" class="text-slate-500 hover:text-slate-900 font-bold text-sm flex items-center gap-2 transition"><i class="fas fa-arrow-left"></i> Dashboard</button>
                     <button onclick="saveCurrentBio()" class="bg-slate-900 text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-slate-800 shadow-md flex items-center gap-2 transition hover:scale-105 active:scale-95"><i class="fas fa-save"></i> Lưu</button>
                 </div>
-                
-                <!-- Modern Tabs -->
                 <div class="p-4 bg-white border-b border-slate-200">
-                    <div class="modern-tab-container">
-                        <div onclick="switchEditorTab('links')" id="tab-editor-links" class="modern-tab active">Liên kết</div>
-                        <div onclick="switchEditorTab('products')" id="tab-editor-products" class="modern-tab">Sản phẩm</div>
-                        <div onclick="switchEditorTab('appearance')" id="tab-editor-appearance" class="modern-tab">Giao diện</div>
-                    </div>
+                    <div class="modern-tab-container"><div onclick="switchEditorTab('links')" id="tab-editor-links" class="modern-tab active">Liên kết</div><div onclick="switchEditorTab('products')" id="tab-editor-products" class="modern-tab">Sản phẩm</div><div onclick="switchEditorTab('appearance')" id="tab-editor-appearance" class="modern-tab">Giao diện</div></div>
                 </div>
-
                 <div class="overflow-y-auto flex-1 p-5 space-y-6 custom-scrollbar">
-                    <!-- URL Info Card -->
                     <div class="modern-card flex justify-between items-center !py-3">
-                        <div class="flex items-center gap-2 overflow-hidden">
-                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                            <a id="live-preview-link" href="#" target="_blank" class="text-xs font-bold text-slate-600 hover:text-brand-600 truncate transition font-mono" id="editor-url-display">...</a>
-                        </div>
-                        <div class="flex gap-1">
-                            <button onclick="copyToClipboard(document.getElementById('editor-url-display').innerText)" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition" title="Sao chép"><i class="fas fa-copy"></i></button>
-                            <button onclick="showQRCode()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition" title="QR Code"><i class="fas fa-qrcode"></i></button>
-                        </div>
+                        <div class="flex items-center gap-2 overflow-hidden"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span><a id="live-preview-link" href="#" target="_blank" class="text-xs font-bold text-slate-600 hover:text-brand-600 truncate transition font-mono" id="editor-url-display">...</a></div>
+                        <div class="flex gap-1"><button onclick="copyToClipboard(document.getElementById('editor-url-display').innerText)" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition"><i class="fas fa-copy"></i></button><button onclick="showQRCode()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition"><i class="fas fa-qrcode"></i></button></div>
                     </div>
-
-                    <!-- TAB 1: LINKS -->
                     <div id="editor-tab-links" class="editor-tab-content space-y-4">
-                        <button onclick="addLinkItem()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2 transform active:scale-95">
-                            <i class="fas fa-plus-circle"></i> Thêm liên kết mới
-                        </button>
-                        
+                        <button onclick="addLinkItem()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2 transform active:scale-95"><i class="fas fa-plus-circle"></i> Thêm liên kết mới</button>
                         <div id="ed-links-list" class="space-y-3 pb-10"></div>
                     </div>
-
-                    <!-- TAB 2: PRODUCTS -->
                     <div id="editor-tab-products" class="editor-tab-content hidden space-y-4">
-                        <button onclick="addProductItem()" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold shadow-lg transition flex items-center justify-center gap-2 transform active:scale-95">
-                            <i class="fas fa-shopping-bag"></i> Thêm sản phẩm
-                        </button>
-                        <div class="p-3 bg-blue-50 text-blue-700 text-xs rounded-xl font-medium border border-blue-100 flex items-start gap-2">
-                            <i class="fas fa-info-circle mt-0.5"></i>
-                            <div>Tạo một liên kết loại <b>"Bộ sưu tập"</b> ở tab Liên kết để hiển thị nhóm sản phẩm này.</div>
-                        </div>
+                        <button onclick="addProductItem()" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold shadow-lg transition flex items-center justify-center gap-2 transform active:scale-95"><i class="fas fa-shopping-bag"></i> Thêm sản phẩm</button>
+                        <div class="p-3 bg-blue-50 text-blue-700 text-xs rounded-xl font-medium border border-blue-100 flex items-start gap-2"><i class="fas fa-info-circle mt-0.5"></i><div>Tạo một liên kết loại <b>"Bộ sưu tập"</b> ở tab Liên kết để hiển thị nhóm sản phẩm này.</div></div>
                         <div id="ed-products-list" class="space-y-3 pb-10"></div>
                     </div>
-
-                    <!-- TAB 3: APPEARANCE -->
                     <div id="editor-tab-appearance" class="editor-tab-content hidden space-y-6">
-                        <!-- Profile -->
                         <div class="modern-card space-y-4">
                             <h3 class="font-bold text-sm text-slate-900">Hồ sơ</h3>
-                            <div class="flex gap-4 items-center">
-                                <div class="w-16 h-16 rounded-full bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
-                                    <img id="editor-avatar-preview" class="w-full h-full object-cover">
-                                </div>
-                                <input type="text" id="ed-avatar" oninput="updatePreview()" placeholder="Dán link ảnh avatar..." class="modern-input">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500 uppercase ml-1">Tên hiển thị</label>
-                                <input type="text" id="ed-name" oninput="updatePreview()" placeholder="Ví dụ: Mewo Official" class="modern-input mt-1">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-slate-500 uppercase ml-1">Tiểu sử (Bio)</label>
-                                <textarea id="ed-bio" oninput="updatePreview()" placeholder="Giới thiệu ngắn về bạn..." rows="3" class="modern-input mt-1 resize-none"></textarea>
-                            </div>
+                            <div class="flex gap-4 items-center"><div class="w-16 h-16 rounded-full bg-slate-100 overflow-hidden border border-slate-200 shrink-0"><img id="editor-avatar-preview" class="w-full h-full object-cover"></div><input type="text" id="ed-avatar" oninput="updatePreview()" placeholder="Dán link ảnh avatar..." class="modern-input"></div>
+                            <div><label class="text-xs font-bold text-slate-500 uppercase ml-1">Tên hiển thị</label><input type="text" id="ed-name" oninput="updatePreview()" placeholder="Ví dụ: Mewo Official" class="modern-input mt-1"></div>
+                            <div><label class="text-xs font-bold text-slate-500 uppercase ml-1">Tiểu sử (Bio)</label><textarea id="ed-bio" oninput="updatePreview()" placeholder="Giới thiệu ngắn về bạn..." rows="3" class="modern-input mt-1 resize-none"></textarea></div>
                         </div>
-
-                        <!-- Themes -->
                         <div class="space-y-2">
                             <h3 class="font-bold text-sm text-slate-900 ml-1">Chủ đề</h3>
-                            <div class="grid grid-cols-3 gap-3">
-                                <button onclick="setTheme('default')" class="h-24 rounded-xl bg-gradient-to-br from-pink-200 to-pink-400 shadow-sm hover:ring-4 ring-brand-200 transition transform hover:scale-105"></button>
-                                <button onclick="setTheme('ocean')" class="h-24 rounded-xl bg-gradient-to-b from-blue-600 to-cyan-400 shadow-sm hover:ring-4 ring-blue-200 transition transform hover:scale-105"></button>
-                                <button onclick="setTheme('midnight')" class="h-24 rounded-xl bg-slate-800 shadow-sm hover:ring-4 ring-slate-400 transition transform hover:scale-105"></button>
-                                <button onclick="setTheme('forest')" class="h-24 rounded-xl bg-gradient-to-br from-green-700 to-green-400 shadow-sm hover:ring-4 ring-green-200 transition transform hover:scale-105"></button>
-                                <button onclick="setTheme('minimal')" class="h-24 rounded-xl bg-white border border-slate-200 shadow-sm hover:ring-4 ring-slate-200 transition transform hover:scale-105"></button>
-                                <button onclick="setTheme('sunset')" class="h-24 rounded-xl bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-400 shadow-sm hover:ring-4 ring-purple-200 transition transform hover:scale-105"></button>
-                            </div>
+                            <div class="grid grid-cols-3 gap-3"><button onclick="setTheme('default')" class="h-24 rounded-xl bg-gradient-to-br from-pink-200 to-pink-400 shadow-sm hover:ring-4 ring-brand-200 transition transform hover:scale-105"></button><button onclick="setTheme('ocean')" class="h-24 rounded-xl bg-gradient-to-b from-blue-600 to-cyan-400 shadow-sm hover:ring-4 ring-blue-200 transition transform hover:scale-105"></button><button onclick="setTheme('midnight')" class="h-24 rounded-xl bg-slate-800 shadow-sm hover:ring-4 ring-slate-400 transition transform hover:scale-105"></button><button onclick="setTheme('forest')" class="h-24 rounded-xl bg-gradient-to-br from-green-700 to-green-400 shadow-sm hover:ring-4 ring-green-200 transition transform hover:scale-105"></button><button onclick="setTheme('minimal')" class="h-24 rounded-xl bg-white border border-slate-200 shadow-sm hover:ring-4 ring-slate-200 transition transform hover:scale-105"></button><button onclick="setTheme('sunset')" class="h-24 rounded-xl bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-400 shadow-sm hover:ring-4 ring-purple-200 transition transform hover:scale-105"></button></div>
                         </div>
-
-                        <!-- Button Style -->
-                        <div class="space-y-2">
-                            <h3 class="font-bold text-sm text-slate-900 ml-1">Kiểu nút</h3>
-                            <div class="grid grid-cols-3 gap-2 bg-slate-200 p-1 rounded-xl">
-                                <button onclick="setButtonStyle('rounded')" class="py-2 bg-white rounded-lg text-xs font-bold shadow-sm hover:text-brand-600 transition">Tròn</button>
-                                <button onclick="setButtonStyle('soft')" class="py-2 bg-slate-200/50 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:shadow-sm transition">Bo góc</button>
-                                <button onclick="setButtonStyle('rect')" class="py-2 bg-slate-200/50 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:shadow-sm transition">Vuông</button>
-                            </div>
-                        </div>
-
-                        <!-- Socials -->
-                        <div class="modern-card space-y-3">
-                            <h3 class="font-bold text-sm text-slate-900">Mạng xã hội</h3>
-                            <div class="space-y-2" id="socials-list">
-                                <!-- Injected JS -->
-                            </div>
-                        </div>
+                        <div class="space-y-2"><h3 class="font-bold text-sm text-slate-900 ml-1">Kiểu nút</h3><div class="grid grid-cols-3 gap-2 bg-slate-200 p-1 rounded-xl"><button onclick="setButtonStyle('rounded')" class="py-2 bg-white rounded-lg text-xs font-bold shadow-sm hover:text-brand-600 transition">Tròn</button><button onclick="setButtonStyle('soft')" class="py-2 bg-slate-200/50 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:shadow-sm transition">Bo góc</button><button onclick="setButtonStyle('rect')" class="py-2 bg-slate-200/50 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:shadow-sm transition">Vuông</button></div></div>
+                        <div class="modern-card space-y-3"><h3 class="font-bold text-sm text-slate-900">Mạng xã hội</h3><div class="space-y-2" id="socials-list"></div></div>
                     </div>
                 </div>
             </div>
-
             <!-- Right Preview -->
             <div class="flex-1 bg-slate-100 flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
                 <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
@@ -303,9 +244,9 @@
     <!-- MODALS -->
     <div id="modal-create" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-6 w-full max-w-xs animate-slide-up">
-            <h3 class="font-bold text-lg mb-4">Tạo Mewo mới</h3>
-            <div class="flex bg-slate-50 border rounded-lg overflow-hidden mb-4"><span class="px-3 py-2 text-slate-500 text-sm border-r">/u/</span><input id="new-slug" placeholder="username" class="flex-1 p-2 bg-transparent outline-none text-sm font-bold lowercase"></div>
-            <div class="flex justify-end gap-2"><button onclick="closeModal('modal-create')" class="px-4 py-2 text-sm text-slate-500 font-bold">Hủy</button><button onclick="createNewBio()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold" id="btn-create-bio">Tạo ngay</button></div>
+            <h3 class="font-bold text-lg mb-4 text-slate-900">Tạo Mewo mới</h3>
+            <div class="flex bg-slate-50 border border-slate-200 rounded-xl overflow-hidden mb-4"><span class="px-3 py-3 text-slate-500 text-sm border-r font-medium bg-slate-100">mewo.life/</span><input id="new-slug" placeholder="username" class="flex-1 p-3 bg-transparent outline-none text-sm font-bold text-slate-900 lowercase"></div>
+            <div class="flex justify-end gap-2"><button onclick="closeModal('modal-create')" class="px-5 py-2 text-sm text-slate-500 font-bold hover:bg-slate-100 rounded-lg">Hủy</button><button onclick="createNewBio()" class="px-5 py-2 bg-slate-900 text-white rounded-lg text-sm font-bold hover:bg-slate-800" id="btn-create-bio">Tạo ngay</button></div>
         </div>
     </div>
 
@@ -314,7 +255,7 @@
             <h3 class="font-bold text-xl mb-4 text-slate-900">Mã QR của bạn</h3>
             <img id="qr-image" class="w-48 h-48 mx-auto mb-4 border-2 border-slate-100 rounded-lg">
             <p class="text-sm text-slate-500 mb-6">Quét để truy cập trang Bio</p>
-            <button onclick="closeModal('modal-qr')" class="w-full py-2 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200">Đóng</button>
+            <button onclick="closeModal('modal-qr')" class="w-full py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition">Đóng</button>
         </div>
     </div>
 
@@ -325,312 +266,130 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // STATE & GLOBALS
+        window.onerror = function(m) { console.error(m); showToast("Lỗi: "+m, "error"); };
+
         let currentUser = null, currentBioData = null, editingSlug = null;
-        let isDashboardLoading = false; // Fix: Prevent race condition
-        const socialPlatforms = [
-            { id: 'facebook', icon: 'fab fa-facebook', label: 'Facebook', color: 'text-blue-600' },
-            { id: 'instagram', icon: 'fab fa-instagram', label: 'Instagram', color: 'text-pink-500' },
-            { id: 'tiktok', icon: 'fab fa-tiktok', label: 'TikTok', color: 'text-black' },
-            { id: 'youtube', icon: 'fab fa-youtube', label: 'YouTube', color: 'text-red-600' },
-            { id: 'email', icon: 'fas fa-envelope', label: 'Email', color: 'text-slate-500' }
-        ];
+        let isDashboardLoading = false;
+        const socialPlatforms = [{ id: 'facebook', icon: 'fab fa-facebook', label: 'Facebook', color: 'text-blue-600' }, { id: 'instagram', icon: 'fab fa-instagram', label: 'Instagram', color: 'text-pink-500' }, { id: 'tiktok', icon: 'fab fa-tiktok', label: 'TikTok', color: 'text-black' }, { id: 'youtube', icon: 'fab fa-youtube', label: 'YouTube', color: 'text-red-600' }, { id: 'twitter', icon: 'fab fa-twitter', label: 'Twitter', color: 'text-blue-400' }, { id: 'email', icon: 'fas fa-envelope', label: 'Email', color: 'text-slate-500' }];
         
-        // --- GLOBAL PUBLIC FUNCTIONS (FOR SHOP LOGIC) ---
-        window.publicProducts = []; // Store products for current view
-        window.openCollection = function(filter) {
-            const mainTab = document.getElementById('main-tab');
-            const shopTab = document.getElementById('shop-tab');
-            if (mainTab && shopTab) {
-                mainTab.classList.add('hidden');
-                shopTab.classList.remove('hidden');
-                window.renderProducts(filter);
-            }
-        };
-        window.closeShop = function() {
-            const mainTab = document.getElementById('main-tab');
-            const shopTab = document.getElementById('shop-tab');
-            if (mainTab && shopTab) {
-                shopTab.classList.add('hidden');
-                mainTab.classList.remove('hidden');
-            }
-        };
+        // GLOBAL SHOP
+        window.publicProducts = [];
+        window.openCollection = function(filter) { document.getElementById('main-tab').classList.add('hidden'); document.getElementById('shop-tab').classList.remove('hidden'); window.renderProducts(filter); };
+        window.closeShop = function() { document.getElementById('shop-tab').classList.add('hidden'); document.getElementById('main-tab').classList.remove('hidden'); };
         window.renderProducts = function(filter) {
-            const grid = document.getElementById('product-grid');
-            if (!grid) return;
-            
-            const titleEl = document.getElementById('shop-title');
-            if (titleEl) titleEl.innerText = filter;
-            
+            const grid = document.getElementById('product-grid'); if (!grid) return;
+            document.getElementById('shop-title').innerText = filter;
             const filtered = window.publicProducts.filter(p => p.collection === filter);
-            if(filtered.length === 0) {
-                grid.innerHTML = '<div class="col-span-2 text-center py-10 opacity-60 text-white/80">Chưa có sản phẩm trong bộ sưu tập này</div>';
-                return;
-            }
-            
-            grid.innerHTML = filtered.map(p => `
-                <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
-                    <div class="aspect-square bg-slate-100 relative">
-                        <img src="${p.image || 'https://placehold.co/200'}" class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-3">
-                        <h3 class="font-bold text-sm text-slate-800 line-clamp-2 mb-1">${p.name}</h3>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-brand-600 font-bold text-sm">${p.price}</span>
-                            <a href="${p.link}" target="_blank" class="bg-slate-900 text-white text-xs px-3 py-1.5 rounded-full hover:bg-slate-800">Mua</a>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            // Sub-tabs (Safe Filter)
+            if(filtered.length === 0) { grid.innerHTML = '<div class="col-span-2 text-center py-10 opacity-60 text-white/80">Chưa có sản phẩm</div>'; return; }
+            grid.innerHTML = filtered.map(p => `<div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"><div class="aspect-square bg-slate-100 relative"><img src="${p.image||'https://placehold.co/200'}" class="w-full h-full object-cover"></div><div class="p-3"><h3 class="font-bold text-sm text-slate-800 line-clamp-2 mb-1">${p.name}</h3><div class="flex justify-between items-center mt-2"><span class="text-brand-600 font-bold text-sm">${p.price}</span><a href="${p.link}" target="_blank" class="bg-slate-900 text-white text-xs px-3 py-1.5 rounded-full hover:bg-slate-800">Mua</a></div></div></div>`).join('');
             const cats = [...new Set(window.publicProducts.map(p=>p.collection))].filter(c=>c);
-            const subTabs = document.getElementById('sub-tabs');
-            if (subTabs) {
-                subTabs.innerHTML = cats.map(c => 
-                    `<button onclick="window.renderProducts('${c.replace(/'/g, "\\'")}')" class="px-4 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap ${c===filter ? 'bg-white text-slate-900' : 'bg-white/20 text-white hover:bg-white/40'}">${c}</button>`
-                ).join('');
-            }
+            document.getElementById('sub-tabs').innerHTML = cats.map(c => `<button onclick="window.renderProducts('${c.replace(/'/g, "\\'")}')" class="px-4 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap ${c===filter ? 'bg-white text-slate-900' : 'bg-white/20 text-white hover:bg-white/40'}">${c}</button>`).join('');
         };
 
         // ROUTER
         function handleRoute() {
-            // Safety check for DOM readiness
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', handleRoute);
-                return;
-            }
-
+            if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', handleRoute); return; }
             const hash = window.location.hash;
-            const sections = document.querySelectorAll('.view-section');
-            if(!sections.length) return; 
-
-            sections.forEach(el => el.classList.add('hidden'));
-            
-            const show = (id) => {
-                const el = document.getElementById(id);
-                if(el) el.classList.remove('hidden');
-                return el;
-            };
-
-            const authModal = document.getElementById('modal-auth'); // In case mixed versions
-            if (authModal && hash !== '' && hash !== '#') authModal.classList.add('hidden');
-
-            if (hash.startsWith('#u/')) {
-                if(show('view-public')) loadPublicBio(hash.split('/')[1]);
-            } else if (hash === '#dashboard') {
-                if (currentUser) { 
-                    if(show('view-dashboard')) loadDashboard(); 
-                } 
-                else window.location.hash = ''; 
-            } else if (hash.startsWith('#edit/')) {
-                if (currentUser) { 
-                    if(show('view-editor')) loadEditor(hash.split('/')[1]); 
-                }
-                else window.location.hash = '';
-            } else {
-                if (currentUser) window.location.hash = '#dashboard';
-                else {
-                    if(!show('view-auth')) show('view-landing'); // Check view-auth first as per current file structure
-                }
-            }
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            if (hash !== '' && hash !== '#') closeModal('modal-auth');
+            if (hash.startsWith('#u/')) { document.getElementById('view-public').classList.remove('hidden'); loadPublicBio(hash.split('/')[1]); }
+            else if (hash === '#dashboard') { if (currentUser) { document.getElementById('view-dashboard').classList.remove('hidden'); loadDashboard(); } else window.location.hash = ''; }
+            else if (hash.startsWith('#edit/')) { if (currentUser) { document.getElementById('view-editor').classList.remove('hidden'); loadEditor(hash.split('/')[1]); } else window.location.hash = ''; }
+            else { if (currentUser) window.location.hash = '#dashboard'; else document.getElementById('view-landing').classList.remove('hidden'); }
         }
         window.addEventListener('hashchange', handleRoute);
         auth.onAuthStateChanged(async user => {
             currentUser = user;
-            if (user) { 
-                const emailDisplay = document.getElementById('user-email-display');
-                if(emailDisplay) emailDisplay.textContent = user.email || 'User'; 
-                await syncUserToDB(user);
-                
-                // Fix: Prevent double route triggering
-                if(!window.location.hash) {
-                    window.location.hash = '#dashboard'; 
-                } else {
-                    handleRoute(); 
-                }
-            } else {
-                handleRoute();
-            }
+            if (user) { document.getElementById('user-email-display').textContent = user.email||'User'; await syncUserToDB(user); if(!window.location.hash) window.location.hash = '#dashboard'; else handleRoute(); } else { handleRoute(); }
         });
 
-        async function syncUserToDB(user) {
-            try { await db.collection('users').doc(user.uid).set({ email: user.email||'Anon', lastLogin: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }); } catch(e){}
-        }
-
-        // CAT & AUTH UI
+        async function syncUserToDB(user) { try { await db.collection('users').doc(user.uid).set({ email: user.email||'Anon', lastLogin: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }); } catch(e){} }
+        
+        // UI
         const catContainer = document.getElementById('cat-container');
-        document.addEventListener('mousemove', (e) => {
-            if(!catContainer) return;
-            // Check if modal is visible to save performance
-            if(document.getElementById('modal-auth') && document.getElementById('modal-auth').classList.contains('hidden')) return;
-            
-            const rect = catContainer.getBoundingClientRect();
-            const dx = (e.clientX - (rect.left+rect.width/2))/25, dy = (e.clientY - (rect.top+rect.height/2))/25;
-            const lx = Math.min(Math.max(dx,-5),5), ly = Math.min(Math.max(dy,-5),5);
-            document.querySelectorAll('.cat-pupil').forEach(p => p.style.transform = `translate(${lx}px, ${ly}px)`);
-        });
+        document.addEventListener('mousemove', (e) => { if(!catContainer || document.getElementById('modal-auth').classList.contains('hidden')) return; const rect = catContainer.getBoundingClientRect(); const dx = (e.clientX-(rect.left+rect.width/2))/25, dy = (e.clientY-(rect.top+rect.height/2))/25; const lx=Math.min(Math.max(dx,-5),5), ly=Math.min(Math.max(dy,-5),5); document.querySelectorAll('.cat-pupil').forEach(p => p.style.transform = `translate(${lx}px, ${ly}px)`); });
         document.querySelectorAll('.track-input').forEach(i => { i.onfocus=()=>catContainer.classList.add('loving-it'); i.onblur=()=>catContainer.classList.remove('loving-it'); });
         document.querySelectorAll('.pass-input').forEach(i => { i.onfocus=()=>catContainer.classList.add('covering-eyes'); i.onblur=()=>catContainer.classList.remove('covering-eyes'); });
 
-        function toggleAuthMode(m) {
-            document.getElementById('form-login').classList.toggle('hidden', m!=='login');
-            document.getElementById('form-register').classList.toggle('hidden', m!=='register');
-            document.getElementById('tab-login').className = m==='login'?'flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900':'flex-1 py-2 text-sm font-medium text-slate-500';
-            document.getElementById('tab-register').className = m==='register'?'flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900':'flex-1 py-2 text-sm font-medium text-slate-500';
-        }
+        function openAuthModal(m) { document.getElementById('modal-auth').classList.remove('hidden'); toggleAuthMode(m); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function claimUsername() { openAuthModal('register'); document.getElementById('reg-email').focus(); }
+        function toggleAuthMode(m) { document.getElementById('form-login').classList.toggle('hidden', m!=='login'); document.getElementById('form-register').classList.toggle('hidden', m!=='register'); const l=document.getElementById('tab-login'), r=document.getElementById('tab-register'); if(m==='login'){l.className='flex-1 py-2.5 text-sm font-bold rounded-lg shadow-sm bg-white text-slate-900 transition'; r.className='flex-1 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-700 transition'; document.getElementById('auth-title').innerText='Chào mừng trở lại!';} else {r.className='flex-1 py-2.5 text-sm font-bold rounded-lg shadow-sm bg-white text-slate-900 transition'; l.className='flex-1 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-700 transition'; document.getElementById('auth-title').innerText='Tạo tài khoản mới';} }
 
         async function handleLogin(e) { e.preventDefault(); authAction(auth.signInWithEmailAndPassword, 'login'); }
         async function handleRegister(e) { e.preventDefault(); authAction(auth.createUserWithEmailAndPassword, 'register'); }
         async function authAction(method, type) {
             const email = document.getElementById(type+'-email').value, pass = document.getElementById(type+'-password').value;
             document.getElementById(type+'-loader').classList.remove('hidden');
-            try { await method(email, pass); showToast("Thành công!", "success"); } catch(e) { showToast(getErrorMessage(e.code), "error"); }
-            finally { document.getElementById(type+'-loader').classList.add('hidden'); }
+            try { await method(email, pass); showToast("Thành công!", "success"); closeModal('modal-auth'); } catch(e) { showToast(getErrorMessage(e.code), "error"); } finally { document.getElementById(type+'-loader').classList.add('hidden'); }
         }
-        async function handleGoogleLogin() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e) { showToast(getErrorMessage(e.code), "error"); } }
-        
+        async function handleGoogleLogin() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); closeModal('modal-auth'); } catch(e) { showToast(getErrorMessage(e.code), "error"); } }
         function handleLogout() { auth.signOut(); showToast("Đã đăng xuất"); }
-        function getErrorMessage(code) {
-            switch (code) {
-                case 'auth/email-already-in-use': return "Email này đã được sử dụng.";
-                case 'auth/invalid-email': return "Email không hợp lệ.";
-                case 'auth/user-not-found': return "Tài khoản không tồn tại.";
-                case 'auth/wrong-password': return "Mật khẩu không đúng.";
-                case 'auth/operation-not-allowed': return "Lỗi: Chưa bật phương thức đăng nhập này trong Firebase.";
-                default: return "Lỗi: " + code;
-            }
-        }
+        function getErrorMessage(c) { return c; }
 
-        // DASHBOARD & EDITOR
         async function loadDashboard() {
-            // Fix: Prevent double loading
-            if(isDashboardLoading) return;
-            isDashboardLoading = true;
-
+            if(isDashboardLoading) return; isDashboardLoading = true;
             const list = document.getElementById('bio-list'), loader = document.getElementById('dashboard-loader');
-            
-            // Clear current list immediately to avoid visual duplication if logic fails later
-            list.innerHTML = ''; 
-            loader.classList.remove('hidden');
-            
+            list.innerHTML = ''; loader.classList.remove('hidden');
             try {
                 const snap = await db.collection('bios').where('ownerId','==',currentUser.uid).get();
-                let html = ''; // Build string first
-
-                if (snap.empty) { 
-                    html = '<div class="col-span-full text-center py-10 text-slate-400">Bạn chưa có trang Bio nào.</div>'; 
-                } else {
-                    snap.forEach(d => {
-                        const data = d.data();
-                        html += `
-                        <div class="bg-white p-5 rounded-xl shadow-sm border hover:shadow-md transition">
-                            <div class="flex items-center gap-3 mb-3">
-                                <img src="${data.profile.avatar || 'https://ui-avatars.com/api/?background=random'}" class="w-12 h-12 rounded-full border">
-                                <div class="overflow-hidden"><h3 class="font-bold truncate">${data.profile.name}</h3><span class="text-xs bg-slate-100 px-2 rounded text-slate-500">/${d.id}</span></div>
+                let html = '';
+                if (snap.empty) html = `<div class="col-span-full text-center py-16 bg-white rounded-3xl border-2 border-dashed border-slate-200"><div class="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-300 text-3xl"><i class="fas fa-plus"></i></div><p class="text-slate-500 font-medium mb-4">Bạn chưa có trang Bio nào.</p><button onclick="openCreateModal()" class="bg-slate-900 text-white px-6 py-2 rounded-xl font-bold text-sm">Tạo ngay</button></div>`;
+                else snap.forEach(d => {
+                    const data = d.data();
+                    html += `
+                    <div class="modern-card hover:border-brand-300 transition-all cursor-pointer group" onclick="location.hash='#edit/${d.id}'">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-4">
+                                 <div class="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-brand-300 to-blue-300"><img src="${data.profile.avatar}" class="w-full h-full rounded-full object-cover border-2 border-white"></div>
+                                 <div><h3 class="font-bold text-lg text-slate-800">${data.profile.name}</h3><div class="text-xs font-medium text-slate-400 bg-slate-50 px-2 py-0.5 rounded-md inline-block">mewo.life/${d.id}</div></div>
                             </div>
-                            <div class="flex justify-between items-center text-xs text-slate-400 mb-4 border-t pt-2">
-                                <span><i class="fas fa-eye"></i> ${d.views || 0} views</span>
-                                <span>${d.links?.length || 0} links</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <a href="#edit/${d.id}" class="flex-1 bg-slate-900 text-white text-center py-2 rounded-lg text-sm font-bold hover:bg-slate-800">Sửa</a>
-                                <button onclick="copyToClipboard('${window.location.origin}${window.location.pathname}#u/${d.id}')" class="px-3 bg-slate-100 rounded-lg hover:bg-slate-200"><i class="fas fa-copy text-slate-600"></i></button>
-                                <a href="#u/${d.id}" target="_blank" class="px-3 bg-slate-100 rounded-lg hover:bg-slate-200 flex items-center"><i class="fas fa-external-link-alt text-slate-600"></i></a>
-                            </div>
-                        </div>`;
-                    });
-                }
-                list.innerHTML = html; // Set once
-            } catch(e) { 
-                showToast(e.message,'error'); 
-            }
-            finally { 
-                loader.classList.add('hidden'); 
-                isDashboardLoading = false;
-            }
+                            <div class="text-right"><div class="text-xs text-slate-400 font-bold uppercase tracking-wider">Lượt xem</div><div class="text-xl font-black text-slate-800">${data.views||0}</div></div>
+                        </div>
+                        <div class="flex gap-2 mt-2" onclick="event.stopPropagation()">
+                            <a href="#edit/${d.id}" class="flex-1 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition shadow-lg shadow-slate-200"><i class="fas fa-pen"></i> Chỉnh sửa</a>
+                            <button onclick="copyToClipboard('${window.location.origin}/#u/${d.id}')" class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 hover:bg-white hover:text-brand-600 hover:shadow-md border border-transparent hover:border-slate-200 transition flex items-center justify-center"><i class="fas fa-copy"></i></button>
+                            <a href="#u/${d.id}" target="_blank" class="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 hover:bg-white hover:text-brand-600 hover:shadow-md border border-transparent hover:border-slate-200 transition flex items-center justify-center"><i class="fas fa-external-link-alt"></i></a>
+                        </div>
+                    </div>`;
+                });
+                list.innerHTML = html;
+            } catch(e) { showToast(e.message,'error'); } finally { loader.classList.add('hidden'); isDashboardLoading = false; }
         }
         function openCreateModal() { document.getElementById('modal-create').classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         async function createNewBio() {
-            const btn = document.getElementById('btn-create-bio');
-            if(btn.disabled) return;
-            
-            const slug = document.getElementById('new-slug').value.trim().toLowerCase();
-            if(slug.length<3) return showToast("Slug ngắn","error");
-            
-            btn.disabled = true;
-            btn.innerText = "Đang tạo...";
-
+            const btn=document.getElementById('btn-create-bio'), slug=document.getElementById('new-slug').value.trim().toLowerCase();
+            if(btn.disabled || slug.length<3) return showToast("Tên ngắn","error");
+            btn.disabled=true; btn.innerText="...";
             try {
-                const ref = db.collection('bios').doc(slug);
-                if((await ref.get()).exists) {
-                    showToast("Đã tồn tại","error");
-                } else {
-                    await ref.set({ ownerId:currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(), profile:{name:"New User",bio:"Welcome",avatar:`https://ui-avatars.com/api/?name=${slug}`}, links:[], products:[], theme:{id:'default'}, socials:{} });
-                    closeModal('modal-create'); 
-                    loadDashboard();
-                    showToast("Tạo thành công!", "success");
-                }
-            } catch(e) { 
-                showToast(e.message,'error'); 
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Tạo ngay";
-            }
+                if((await db.collection('bios').doc(slug).get()).exists) return showToast("Đã tồn tại","error");
+                await db.collection('bios').doc(slug).set({ ownerId:currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp(), profile:{name:"New User",bio:"Welcome",avatar:`https://ui-avatars.com/api/?name=${slug}`}, links:[], products:[], theme:{id:'default',buttonStyle:'rounded'}, socials:{}, views:0 });
+                closeModal('modal-create'); loadDashboard(); showToast("Xong!","success");
+            } catch(e) { showToast(e.message,'error'); } finally { btn.disabled=false; btn.innerText="Tạo ngay"; }
         }
 
         async function loadEditor(slug) {
             editingSlug = slug;
-            document.getElementById('editor-url-display').innerText = `${window.location.origin}/#u/${slug}`;
+            document.getElementById('editor-url-display').innerText = `mewo.life/${slug}`;
             document.getElementById('live-preview-link').href = `#u/${slug}`;
             const doc = await db.collection('bios').doc(slug).get();
             currentBioData = doc.data();
             if(!currentBioData.products) currentBioData.products=[];
             if(!currentBioData.socials) currentBioData.socials={};
-            
             document.getElementById('ed-name').value = currentBioData.profile.name;
             document.getElementById('ed-bio').value = currentBioData.profile.bio;
             document.getElementById('ed-avatar').value = currentBioData.profile.avatar;
-            
-            renderEditorLinks(); renderEditorProducts(); renderSocialsInput();
-            switchEditorTab('links'); updatePreview();
+            renderEditorLinks(); renderEditorProducts(); renderSocialsInput(); switchEditorTab('links'); updatePreview();
         }
-        
         function switchEditorTab(t) {
-            // Update Active Tab UI
-            const tabs = ['links', 'products', 'appearance'];
-            tabs.forEach(tab => {
-                const el = document.getElementById(`tab-editor-${tab}`);
-                if (t === tab) {
-                    el.classList.add('active');
-                } else {
-                    el.classList.remove('active');
-                }
-            });
-
-            // Show Content
             document.querySelectorAll('.editor-tab-content').forEach(e=>e.classList.add('hidden'));
             document.getElementById(`editor-tab-${t}`).classList.remove('hidden');
+            ['links','products','appearance'].forEach(tab => { document.getElementById(`tab-editor-${tab}`).className = t===tab ? 'modern-tab active' : 'modern-tab'; });
         }
-
         function renderEditorLinks() {
             const l = document.getElementById('ed-links-list'); l.innerHTML='';
             currentBioData.links.forEach((link,i) => {
-                l.innerHTML += `
-                <div class="modern-card group">
-                    <div class="absolute top-3 right-3 flex gap-2">
-                        <select onchange="updateLink(${i},'type',this.value)" class="text-xs border border-slate-200 rounded-lg p-1 bg-slate-50 outline-none">
-                            <option value="link" ${link.type!=='collection'?'selected':''}>Link</option>
-                            <option value="collection" ${link.type==='collection'?'selected':''}>Bộ sưu tập</option>
-                        </select>
-                        <button onclick="removeLink(${i})" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash"></i></button>
-                    </div>
-                    <div class="space-y-2">
-                         <input value="${link.title}" oninput="updateLink(${i},'title',this.value)" class="font-bold w-full bg-transparent outline-none text-slate-800 placeholder-slate-300" placeholder="Tiêu đề">
-                         <input value="${link.url}" oninput="updateLink(${i},'url',this.value)" class="text-xs w-full bg-transparent outline-none text-brand-600 placeholder-slate-300" placeholder="https://...">
-                    </div>
-                </div>`;
+                l.innerHTML += `<div class="modern-card group"><div class="absolute top-3 right-3 flex gap-2"><select onchange="updateLink(${i},'type',this.value)" class="text-xs border border-slate-200 rounded-lg p-1 bg-slate-50 outline-none"><option value="link" ${link.type!=='collection'?'selected':''}>Link</option><option value="collection" ${link.type==='collection'?'selected':''}>Bộ sưu tập</option></select><button onclick="removeLink(${i})" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash"></i></button></div><div class="space-y-2"><input value="${link.title}" oninput="updateLink(${i},'title',this.value)" class="font-bold w-full bg-transparent outline-none text-slate-800 placeholder-slate-300" placeholder="Tiêu đề"><input value="${link.url}" oninput="updateLink(${i},'url',this.value)" class="text-xs w-full bg-transparent outline-none text-brand-600 placeholder-slate-300" placeholder="https://..."></div></div>`;
             });
         }
         function renderEditorProducts() {
@@ -638,35 +397,15 @@
             const cols = currentBioData.links.filter(k=>k.type==='collection');
             currentBioData.products.forEach((p,i) => {
                 const opts = cols.map(c=>`<option value="${c.title}" ${p.collection===c.title?'selected':''}>${c.title}</option>`).join('');
-                l.innerHTML += `
-                <div class="modern-card flex gap-3">
-                    <div class="w-16 h-16 bg-slate-100 rounded-lg overflow-hidden shrink-0">
-                         <img src="${p.image || 'https://placehold.co/100'}" class="w-full h-full object-cover">
-                    </div>
-                    <div class="flex-1 space-y-1">
-                        <input value="${p.name}" oninput="updateProduct(${i},'name',this.value)" class="font-bold w-full text-sm outline-none bg-transparent placeholder-slate-300" placeholder="Tên sản phẩm">
-                        <div class="flex gap-2">
-                             <input value="${p.price}" oninput="updateProduct(${i},'price',this.value)" class="text-xs w-20 text-brand-600 font-bold outline-none bg-slate-50 px-1 rounded" placeholder="Giá">
-                             <select onchange="updateProduct(${i},'collection',this.value)" class="text-xs border rounded px-1 bg-white outline-none">${opts}</select>
-                        </div>
-                        <input value="${p.image}" oninput="updateProduct(${i},'image',this.value)" class="text-[10px] w-full border-none bg-transparent outline-none text-slate-400" placeholder="Link ảnh (URL)">
-                        <input value="${p.link}" oninput="updateProduct(${i},'link',this.value)" class="text-[10px] w-full border-none bg-transparent outline-none text-blue-400" placeholder="Link tiếp thị (Affiliate)">
-                    </div>
-                    <button onclick="removeProduct(${i})" class="text-slate-300 hover:text-red-500 self-start"><i class="fas fa-trash"></i></button>
-                </div>`;
+                l.innerHTML += `<div class="modern-card flex gap-3"><div class="w-16 h-16 bg-slate-100 rounded-lg overflow-hidden shrink-0"><img src="${p.image||'https://placehold.co/100'}" class="w-full h-full object-cover"></div><div class="flex-1 space-y-1"><input value="${p.name}" oninput="updateProduct(${i},'name',this.value)" class="font-bold w-full text-sm outline-none bg-transparent" placeholder="Tên SP"><div class="flex gap-2"><input value="${p.price}" oninput="updateProduct(${i},'price',this.value)" class="text-xs w-20 text-brand-600 font-bold outline-none bg-slate-50 px-1 rounded"><select onchange="updateProduct(${i},'collection',this.value)" class="text-xs border rounded px-1 bg-white outline-none">${opts}</select></div><input value="${p.image}" oninput="updateProduct(${i},'image',this.value)" class="text-[10px] w-full bg-transparent outline-none text-slate-400" placeholder="Img"><input value="${p.link}" oninput="updateProduct(${i},'link',this.value)" class="text-[10px] w-full bg-transparent outline-none text-blue-400" placeholder="Link"></div><button onclick="removeProduct(${i})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash"></i></button></div>`;
             });
         }
         function renderSocialsInput() {
             const l = document.getElementById('socials-list'); l.innerHTML='';
             socialPlatforms.forEach(p => {
-                l.innerHTML += `
-                <div class="flex items-center gap-3 p-2 border border-slate-100 rounded-xl bg-slate-50 focus-within:bg-white focus-within:border-brand-200 transition">
-                    <i class="${p.icon} ${p.color} text-lg w-6 text-center"></i>
-                    <input value="${currentBioData.socials[p.id]||''}" oninput="updateSocial('${p.id}',this.value)" class="text-sm w-full bg-transparent outline-none text-slate-700 placeholder-slate-400" placeholder="Dán link ${p.label}...">
-                </div>`;
+                l.innerHTML += `<div class="flex items-center gap-3 p-2 border border-slate-100 rounded-xl bg-slate-50 focus-within:bg-white focus-within:border-brand-200 transition"><i class="${p.icon} ${p.color} text-lg w-6 text-center"></i><input value="${currentBioData.socials[p.id]||''}" oninput="updateSocial('${p.id}',this.value)" class="text-sm w-full bg-transparent outline-none text-slate-700 placeholder-slate-400" placeholder="${p.label}..."></div>`;
             });
         }
-
         function addLinkItem(){ currentBioData.links.push({title:"Mới",url:"#",type:'link'}); renderEditorLinks(); updatePreview(); }
         function removeLink(i){ currentBioData.links.splice(i,1); renderEditorLinks(); updatePreview(); }
         function updateLink(i,k,v){ currentBioData.links[i][k]=v; renderEditorLinks(); renderEditorProducts(); updatePreview(); }
@@ -676,141 +415,42 @@
         function updateSocial(k,v){ currentBioData.socials[k]=v; updatePreview(); }
         function setTheme(id){ currentBioData.theme.id=id; updatePreview(); }
         function setButtonStyle(s){ if(!currentBioData.theme) currentBioData.theme={}; currentBioData.theme.buttonStyle=s; updatePreview(); }
-
         function updatePreview() {
             currentBioData.profile.name = document.getElementById('ed-name').value;
             currentBioData.profile.bio = document.getElementById('ed-bio').value;
             currentBioData.profile.avatar = document.getElementById('ed-avatar').value;
             document.getElementById('editor-avatar-preview').src = currentBioData.profile.avatar;
-            document.getElementById('editor-url-display').innerText = `${window.location.origin}/#u/${editingSlug}`;
-            
-            const frame = document.getElementById('preview-frame');
-            const doc = frame.contentDocument || frame.contentWindow.document;
-            doc.open();
-            doc.write(generatePublicHTML(currentBioData, true));
-            doc.close();
+            document.getElementById('editor-url-display').innerText = `mewo.life/${editingSlug}`;
+            const frame = document.getElementById('preview-frame'); const doc = frame.contentDocument || frame.contentWindow.document; doc.open(); doc.write(generatePublicHTML(currentBioData, true)); doc.close();
         }
-        function goToDashboard() { window.location.hash = '#dashboard'; } 
+        function goToDashboard() { window.location.hash = '#dashboard'; }
         async function saveCurrentBio() { try { await db.collection('bios').doc(editingSlug).update(currentBioData); showToast("Lưu thành công","success"); } catch(e){ showToast(e.message,'error'); } }
         function showQRCode() { document.getElementById('modal-qr').classList.remove('hidden'); document.getElementById('qr-image').src=`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin+'/#u/'+editingSlug)}`; }
-
-        // PUBLIC VIEW RENDERER
         async function loadPublicBio(slug) {
-            const container = document.getElementById('view-public');
-            container.innerHTML = '<div class="flex justify-center items-center h-screen"><div class="w-10 h-10 border-4 border-slate-200 border-t-brand-600 rounded-full animate-spin"></div></div>';
+            const container = document.getElementById('view-public'); container.innerHTML = '<div class="flex justify-center items-center h-screen"><div class="w-10 h-10 border-4 border-slate-200 border-t-brand-600 rounded-full animate-spin"></div></div>';
             try {
-                const docRef = db.collection('bios').doc(slug);
-                const doc = await docRef.get();
+                const docRef = db.collection('bios').doc(slug); const doc = await docRef.get();
                 if(!doc.exists) { container.innerHTML = '<div class="text-center py-20">Trang không tồn tại</div>'; return; }
-                
-                // Set global data for SPA mode scripts
                 window.publicProducts = doc.data().products || [];
-                
                 container.innerHTML = generatePublicHTML(doc.data(), false);
-            } catch(e) { container.innerHTML = 'Lỗi tải trang: ' + e.message; }
+            } catch(e) { container.innerHTML = 'Lỗi: ' + e.message; }
         }
-
         function generatePublicHTML(data, isPreview) {
             const theme = data.theme || { id: 'default', buttonStyle: 'rounded' };
             const btnStyleMap = { 'rounded': 'rounded-full', 'rect': 'rounded-md', 'soft': 'rounded-2xl' };
             const radiusClass = btnStyleMap[theme.buttonStyle] || 'rounded-full';
-            
-            // Fix 1: Robust escaping for HTML attributes
-            const getClickAttr = (title) => {
-                const safeTitle = title.replace(/"/g, '&quot;').replace(/'/g, "\\'");
-                return isPreview ? `onclick="openCollection('${safeTitle}')"` : `onclick="window.openCollection('${safeTitle}')"`;
-            };
-
+            const getClickAttr = (title) => { const safeTitle = title.replace(/"/g, '&quot;').replace(/'/g, "\\'"); return isPreview ? `onclick="openCollection('${safeTitle}')"` : `onclick="window.openCollection('${safeTitle}')"`; };
             const linksHtml = (data.links||[]).map(l => {
-                if(l.type === 'collection') {
-                    return `<div ${getClickAttr(l.title)} class="cursor-pointer block mb-4 group"><div class="relative w-full p-4 flex items-center justify-between bg-white/90 backdrop-blur-md shadow-sm border border-white/40 rounded-2xl hover:bg-white transition"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-brand-100 rounded-lg flex items-center justify-center text-brand-600"><i class="fas fa-layer-group"></i></div><span class="font-bold text-sm text-slate-800">${l.title}</span></div><i class="fas fa-chevron-right text-slate-400"></i></div></div>`;
-                } else {
-                    return `<a href="${l.url}" target="_blank" class="block mb-4 group transition hover:-translate-y-1"><div class="relative w-full p-4 flex items-center justify-center bg-white/90 backdrop-blur-md shadow-sm border border-white/40 rounded-2xl hover:bg-white transition"><span class="font-bold text-sm text-slate-800">${l.title}</span></div></a>`;
-                }
+                if(l.type === 'collection') return `<div ${getClickAttr(l.title)} class="cursor-pointer block mb-4 group"><div class="relative w-full p-4 flex items-center justify-between bg-white/90 backdrop-blur-md shadow-sm border border-white/40 rounded-2xl hover:bg-white transition"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-brand-100 rounded-lg flex items-center justify-center text-brand-600"><i class="fas fa-layer-group"></i></div><span class="font-bold text-sm text-slate-800">${l.title}</span></div><i class="fas fa-chevron-right text-slate-400"></i></div></div>`;
+                return `<a href="${l.url}" target="_blank" class="block mb-4 group transition hover:-translate-y-1"><div class="relative w-full p-4 flex items-center justify-center bg-white/90 backdrop-blur-md shadow-sm border border-white/40 rounded-2xl hover:bg-white transition"><span class="font-bold text-sm text-slate-800">${l.title}</span></div></a>`;
             }).join('');
-
-            let socialsHtml = '';
-            if(data.socials) {
-                socialsHtml = socialPlatforms.map(p => data.socials[p.id] ? `<a href="${data.socials[p.id]}" target="_blank" class="text-2xl text-white/90 hover:text-white transition"><i class="${p.icon}"></i></a>` : '').join('');
-            }
-
-            // Script for Iframe Preview only (Local functions)
-            // Fix 2: Double escape for JSON inside script tag inside string
+            let socialsHtml = ''; if(data.socials) socialsHtml = socialPlatforms.map(p => data.socials[p.id] ? `<a href="${data.socials[p.id]}" target="_blank" class="text-2xl text-white/90 hover:text-white transition"><i class="${p.icon}"></i></a>` : '').join('');
             const safeProducts = JSON.stringify(data.products || []).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-            const iframeScript = isPreview ? `
-                <script>
-                    const products = JSON.parse("${safeProducts}");
-                    function openCollection(filter) {
-                        document.getElementById('main-tab').classList.add('hidden');
-                        document.getElementById('shop-tab').classList.remove('hidden');
-                        const grid = document.getElementById('product-grid');
-                        const filtered = products.filter(p => p.collection === filter);
-                        document.getElementById('shop-title').innerText = filter;
-                        if(filtered.length === 0) { grid.innerHTML = '<div class="col-span-2 text-center py-10 opacity-60">Chưa có sản phẩm</div>'; return; }
-                        grid.innerHTML = filtered.map(p => \`
-                            <div class="bg-white rounded-xl overflow-hidden shadow-sm">
-                                <div class="aspect-square bg-slate-100 relative"><img src="\${p.image||'https://placehold.co/200'}" class="w-full h-full object-cover"></div>
-                                <div class="p-3"><h3 class="font-bold text-xs line-clamp-2">\${p.name}</h3><div class="flex justify-between items-center mt-2"><span class="text-red-500 font-bold text-xs">\${p.price}</span><a href="\${p.link}" target="_blank" class="bg-black text-white text-[10px] px-2 py-1 rounded">Mua</a></div></div>
-                            </div>\`).join('');
-                        
-                        const cats = [...new Set(products.map(p=>p.collection))].filter(c=>c);
-                        document.getElementById('sub-tabs').innerHTML = cats.map(c => 
-                            \`<button onclick="openCollection('\${c}')" class="px-3 py-1 rounded-full text-[10px] font-bold transition whitespace-nowrap \${c===filter ? 'bg-white text-slate-900' : 'bg-white/20 text-white'}">\${c}</button>\`
-                        ).join('');
-                    }
-                    function closeShop() { document.getElementById('shop-tab').classList.add('hidden'); document.getElementById('main-tab').classList.remove('hidden'); }
-                <\/script>` : '';
-
-            // Common Styles (Shared)
-            const stylesCss = `
-                ::-webkit-scrollbar { width: 0px; background: transparent; }
-                .animate-enter { animation: fadeIn 0.6s forwards; opacity: 0; }
-                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .theme-bg-default { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: white; }
-                .theme-bg-ocean { background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); color: white; }
-                .theme-bg-midnight { background-color: #000000; color: white; }
-                .theme-bg-forest { background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); color: white; }
-                .theme-bg-minimal { background-color: #f3f4f6; color: #1f2937; }
-                .theme-bg-sunset { background: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%); color: #1e293b; }
-                @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-                .bio-wrapper { min-height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; }
-            `;
-
-            const bodyContent = `
-                <div class="bio-wrapper theme-bg-${theme.id}">
-                    <div class="w-full max-w-lg px-6 py-12 flex flex-col items-center min-h-screen relative">
-                        <div class="text-center mb-8 animate-enter" style="animation-delay: 0ms">
-                            <div class="relative w-28 h-28 mx-auto mb-4 group">
-                                <img src="${data.profile.avatar}" class="relative w-full h-full rounded-full object-cover border-4 border-white/50 shadow-2xl" onerror="this.src='https://ui-avatars.com/api/?name=Mewo&background=random'">
-                            </div>
-                            <h1 class="text-2xl font-extrabold mb-2 drop-shadow-md tracking-tight">${data.profile.name}</h1>
-                            <p class="text-sm font-medium opacity-90 max-w-xs mx-auto leading-relaxed whitespace-pre-line">${data.profile.bio}</p>
-                        </div>
-                        <div class="flex gap-4 mb-10 flex-wrap justify-center animate-enter" style="animation-delay: 100ms">${socialsHtml}</div>
-                        <div id="main-tab" class="w-full space-y-4 animate-enter" style="animation-delay: 200ms">${linksHtml}</div>
-                        
-                        <div id="shop-tab" class="w-full hidden animate-enter pb-20" style="animation-delay: 0ms">
-                            <div class="sticky top-0 z-20 pb-4 pt-2 flex items-center gap-3">
-                                <button onclick="${isPreview?'closeShop()':'window.closeShop()'}" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full text-white hover:bg-white/40 backdrop-blur-md"><i class="fas fa-arrow-left"></i></button>
-                                <h2 class="font-bold text-lg text-white drop-shadow-sm" id="shop-title">Shop</h2>
-                            </div>
-                            <div class="flex overflow-x-auto gap-2 hide-scrollbar pb-2 mb-2" id="sub-tabs"></div>
-                            <div id="product-grid" class="grid grid-cols-2 gap-3"></div>
-                        </div>
-
-                        ${!isPreview ? `<footer class="mt-auto pt-16 pb-4 text-center animate-enter" style="animation-delay: 500ms"><a href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors text-xs font-bold opacity-80 hover:opacity-100"><i class="fas fa-cat"></i> Created with Mewo</a></footer>` : ''}
-                    </div>
-                </div>
-                ${iframeScript}
-            `;
-
-            if (isPreview) {
-                return `<!DOCTYPE html><html><head><script src="https://cdn.tailwindcss.com"><\/script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{font-family:sans-serif;margin:0}${stylesCss}</style></head><body>${bodyContent}</body></html>`;
-            } else {
-                return `<style>${stylesCss}</style>${bodyContent}`;
-            }
+            const iframeScript = isPreview ? `<script>const products = JSON.parse("${safeProducts}"); function openCollection(f) { document.getElementById('main-tab').classList.add('hidden'); document.getElementById('shop-tab').classList.remove('hidden'); const g = document.getElementById('product-grid'); const fl = products.filter(p => p.collection === f); document.getElementById('shop-title').innerText = f; if(fl.length === 0) { g.innerHTML = '<div class="col-span-2 text-center opacity-60">Trống</div>'; return; } g.innerHTML = fl.map(p => \`<div class="bg-white rounded-xl overflow-hidden shadow-sm"><div class="aspect-square bg-slate-100 relative"><img src="\${p.image||'https://placehold.co/200'}" class="w-full h-full object-cover"></div><div class="p-3"><h3 class="font-bold text-xs line-clamp-2">\${p.name}</h3><div class="flex justify-between items-center mt-2"><span class="text-red-500 font-bold text-xs">\${p.price}</span><a href="\${p.link}" target="_blank" class="bg-black text-white text-[10px] px-2 py-1 rounded">Mua</a></div></div></div>\`).join(''); const cats = [...new Set(products.map(p=>p.collection))].filter(c=>c); document.getElementById('sub-tabs').innerHTML = cats.map(c => \`<button onclick="openCollection('\${c}')" class="px-3 py-1 rounded-full text-[10px] font-bold transition whitespace-nowrap \${c===f ? 'bg-white text-slate-900' : 'bg-white/20 text-white'}">\${c}</button>\`).join(''); } function closeShop() { document.getElementById('shop-tab').classList.add('hidden'); document.getElementById('main-tab').classList.remove('hidden'); }<\/script>` : '';
+            const stylesCss = `::-webkit-scrollbar{width:0} .animate-enter{animation:fadeIn 0.6s forwards;opacity:0} @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}} .theme-bg-default{background:linear-gradient(-45deg,#ee7752,#e73c7e,#23a6d5,#23d5ab);background-size:400% 400%;animation:g 15s infinite} .theme-bg-ocean{background:linear-gradient(to bottom,#0f2027,#203a43,#2c5364)} .theme-bg-midnight{background:#000;color:#fff} .theme-bg-forest{background:linear-gradient(135deg,#43cea2,#185a9d)} .theme-bg-minimal{background:#f3f4f6;color:#333} .theme-bg-sunset{background:linear-gradient(to top,#fbc2eb,#a6c1ee)} @keyframes g{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}} .bio-wrapper{min-height:100vh;width:100%;display:flex;flex-direction:column;align-items:center}`;
+            const bodyContent = `<div class="bio-wrapper theme-bg-${theme.id}"><div class="w-full max-w-lg px-6 py-12 flex flex-col items-center min-h-screen relative"><div class="text-center mb-8 animate-enter" style="animation-delay:0ms"><div class="relative w-28 h-28 mx-auto mb-4 group"><img src="${data.profile.avatar}" class="relative w-full h-full rounded-full object-cover border-4 border-white/50 shadow-2xl" onerror="this.src='https://ui-avatars.com/api/?name=Mewo&background=random'"></div><h1 class="text-2xl font-extrabold mb-2 drop-shadow-md tracking-tight">${data.profile.name}</h1><p class="text-sm font-medium opacity-90 max-w-xs mx-auto leading-relaxed whitespace-pre-line">${data.profile.bio}</p></div><div class="flex gap-4 mb-10 flex-wrap justify-center animate-enter" style="animation-delay:100ms">${socialsHtml}</div><div id="main-tab" class="w-full space-y-4 animate-enter" style="animation-delay:200ms">${linksHtml}</div><div id="shop-tab" class="w-full hidden animate-enter pb-20" style="animation-delay:0ms"><div class="sticky top-0 z-20 pb-4 pt-2 flex items-center gap-3"><button onclick="${isPreview?'closeShop()':'window.closeShop()'}" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full text-white hover:bg-white/40 backdrop-blur-md"><i class="fas fa-arrow-left"></i></button><h2 class="font-bold text-lg text-white drop-shadow-sm" id="shop-title">Shop</h2></div><div class="flex overflow-x-auto gap-2 hide-scrollbar pb-2 mb-2" id="sub-tabs"></div><div id="product-grid" class="grid grid-cols-2 gap-3"></div></div>${!isPreview?'<footer class="mt-auto pt-16 pb-4 text-center animate-enter" style="animation-delay:500ms"><a href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors text-xs font-bold opacity-80 hover:opacity-100"><i class="fas fa-cat"></i> Created with Mewo</a></footer>':''}</div></div>${iframeScript}`;
+            return isPreview ? `<!DOCTYPE html><html><head><script src="https://cdn.tailwindcss.com"><\/script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{font-family:sans-serif;margin:0}${stylesCss}</style></head><body>${bodyContent}</body></html>` : `<style>${stylesCss}</style>${bodyContent}`;
         }
-
         function showToast(m,t='info'){ const d=document.createElement('div');d.className='toast';d.innerText=m;document.getElementById('toast-container').appendChild(d);setTimeout(()=>d.remove(),3000); }
         function copyToClipboard(t){ navigator.clipboard.writeText(t).then(()=>showToast("Copied","success")); }
         document.addEventListener('DOMContentLoaded', handleRoute);
