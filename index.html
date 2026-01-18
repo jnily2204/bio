@@ -35,40 +35,23 @@
 
     <style>
         body { background-color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
-        
-        /* Themes Definitions */
         .theme-default { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: meshMove 15s ease infinite; color: white; }
         .theme-ocean { background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); color: white; }
         .theme-midnight { background-color: #000000; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 30px 30px; color: white; }
         .theme-forest { background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); color: white; }
         .theme-minimal { background-color: #f3f4f6; color: #1f2937; }
         .theme-sunset { background: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%); color: #1e293b; }
-
         @keyframes meshMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        /* Button Styles */
-        .btn-style-rounded { border-radius: 9999px; }
-        .btn-style-rect { border-radius: 4px; }
-        .btn-style-soft { border-radius: 16px; }
-        
-        /* UI Utils */
+        .btn-style-rounded { border-radius: 9999px; } .btn-style-rect { border-radius: 4px; } .btn-style-soft { border-radius: 16px; }
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(0,0,0,0.05); }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .hidden { display: none !important; }
         .input-modern { width: 100%; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; transition: all 0.2s; outline: none; }
         .input-modern:focus { border-color: #e11d48; box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1); background: white; }
-        
-        /* Cat SVG */
         .cat-paws { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); transform-box: fill-box; transform-origin: center top; }
         .cat-heart { opacity: 0; transform: scale(0) translateY(10px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: center; transform-box: fill-box; }
-        .loving-it .cat-paws-left { transform: translate(10px, -25px) rotate(30deg); }
-        .loving-it .cat-paws-right { transform: translate(-10px, -25px) rotate(-30deg); }
-        .loving-it .cat-heart { opacity: 1; transform: scale(1.2) translateY(-5px); animation: heartBeat 1s infinite; }
-        .covering-eyes .cat-paws-left { transform: translate(12px, -45px) rotate(10deg); }
-        .covering-eyes .cat-paws-right { transform: translate(-12px, -45px) rotate(-10deg); }
-
-        /* Toast */
+        .loving-it .cat-paws-left { transform: translate(10px, -25px) rotate(30deg); } .loving-it .cat-paws-right { transform: translate(-10px, -25px) rotate(-30deg); } .loving-it .cat-heart { opacity: 1; transform: scale(1.2) translateY(-5px); animation: heartBeat 1s infinite; }
+        .covering-eyes .cat-paws-left { transform: translate(12px, -45px) rotate(10deg); } .covering-eyes .cat-paws-right { transform: translate(-12px, -45px) rotate(-10deg); }
         .toast { background: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); margin-bottom: 12px; border-left: 4px solid #e11d48; animation: slideInRight 0.4s; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 0.9rem; position: fixed; top: 24px; right: 24px; z-index: 9999; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
@@ -81,7 +64,6 @@
         
         <!-- AUTH VIEW -->
         <div id="view-auth" class="view-section hidden flex-grow min-h-screen flex flex-col lg:flex-row bg-white">
-            <!-- Left Side Branding -->
             <div class="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden flex-col justify-between p-12 text-white">
                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 24px 24px;"></div>
                 <div class="relative z-10 flex items-center gap-3"><i class="fas fa-cat text-brand-500 text-2xl"></i> <span class="font-bold text-2xl">Mewo</span></div>
@@ -89,7 +71,6 @@
                 <div class="relative z-10 text-sm text-slate-500">© 2024 Mewo Inc.</div>
             </div>
 
-            <!-- Right Side Auth Forms -->
             <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 bg-white relative">
                 <div class="w-full max-w-sm">
                     <!-- Cat SVG -->
@@ -115,7 +96,6 @@
                         </svg>
                     </div>
                     
-                    <!-- Main Auth Container -->
                     <div id="auth-main-container">
                         <div class="text-center mb-6"><h1 class="text-2xl font-bold text-slate-900">Xin chào 👋</h1><p class="text-slate-500 text-sm">Đăng nhập để quản lý Mewo của bạn.</p></div>
                         <div class="flex bg-slate-100 p-1 rounded-lg mb-6"><button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900">Đăng nhập</button><button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500">Đăng ký</button></div>
@@ -134,13 +114,11 @@
                             <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng ký</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="reg-loader"></div></button>
                         </form>
 
-                        <!-- Social Login Divider -->
                         <div class="relative my-6">
                             <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
                             <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-slate-500">Hoặc tiếp tục với</span></div>
                         </div>
 
-                        <!-- Social Buttons -->
                         <div class="w-full">
                             <button onclick="handleGoogleLogin()" class="w-full flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
                                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> <span class="text-sm font-medium">Google</span>
@@ -193,13 +171,13 @@
                         </div>
                     </div>
 
-                    <!-- TAB 1: LINKS (Collections & Links) -->
+                    <!-- TAB 1: LINKS -->
                     <div id="editor-tab-links" class="editor-tab-content space-y-4">
                         <div class="flex justify-between items-center"><h3 class="font-bold text-slate-800 text-sm">Danh sách liên kết</h3><button onclick="addLinkItem()" class="text-xs bg-slate-900 text-white px-3 py-1.5 rounded font-bold shadow-sm">+ Thêm</button></div>
                         <div id="ed-links-list" class="space-y-3 pb-10"></div>
                     </div>
 
-                    <!-- TAB 2: PRODUCTS (Affiliate) -->
+                    <!-- TAB 2: PRODUCTS -->
                     <div id="editor-tab-products" class="editor-tab-content hidden space-y-4">
                         <div class="flex justify-between items-center"><h3 class="font-bold text-slate-800 text-sm">Sản phẩm tiếp thị</h3><button onclick="addProductItem()" class="text-xs bg-slate-900 text-white px-3 py-1.5 rounded font-bold shadow-sm">+ Thêm SP</button></div>
                         <p class="text-xs text-slate-500 bg-slate-100 p-2 rounded">Chọn loại "Bộ sưu tập" ở tab Liên kết để nhóm các sản phẩm này.</p>
@@ -356,34 +334,59 @@
 
         // ROUTER
         function handleRoute() {
+            // Safety check for DOM readiness
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', handleRoute);
+                return;
+            }
+
             const hash = window.location.hash;
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            const sections = document.querySelectorAll('.view-section');
+            if(!sections.length) return; 
+
+            sections.forEach(el => el.classList.add('hidden'));
+            
+            const show = (id) => {
+                const el = document.getElementById(id);
+                if(el) el.classList.remove('hidden');
+                return el;
+            };
+
+            const authModal = document.getElementById('modal-auth'); // In case mixed versions
+            if (authModal && hash !== '' && hash !== '#') authModal.classList.add('hidden');
+
             if (hash.startsWith('#u/')) {
-                document.getElementById('view-public').classList.remove('hidden');
-                loadPublicBio(hash.split('/')[1]);
+                if(show('view-public')) loadPublicBio(hash.split('/')[1]);
             } else if (hash === '#dashboard') {
-                if (currentUser) { document.getElementById('view-dashboard').classList.remove('hidden'); loadDashboard(); } 
+                if (currentUser) { 
+                    if(show('view-dashboard')) loadDashboard(); 
+                } 
                 else window.location.hash = ''; 
             } else if (hash.startsWith('#edit/')) {
-                if (currentUser) { document.getElementById('view-editor').classList.remove('hidden'); loadEditor(hash.split('/')[1]); }
+                if (currentUser) { 
+                    if(show('view-editor')) loadEditor(hash.split('/')[1]); 
+                }
                 else window.location.hash = '';
             } else {
                 if (currentUser) window.location.hash = '#dashboard';
-                else document.getElementById('view-auth').classList.remove('hidden');
+                else {
+                    if(!show('view-auth')) show('view-landing'); // Check view-auth first as per current file structure
+                }
             }
         }
         window.addEventListener('hashchange', handleRoute);
         auth.onAuthStateChanged(async user => {
             currentUser = user;
             if (user) { 
-                document.getElementById('user-email-display').textContent = user.email || user.phoneNumber || 'User'; 
+                const emailDisplay = document.getElementById('user-email-display');
+                if(emailDisplay) emailDisplay.textContent = user.email || 'User'; 
                 await syncUserToDB(user);
                 
                 // Fix: Prevent double route triggering
                 if(!window.location.hash) {
-                    window.location.hash = '#dashboard'; // Triggers hashchange -> handleRoute
+                    window.location.hash = '#dashboard'; 
                 } else {
-                    handleRoute(); // Manual trigger for refresh
+                    handleRoute(); 
                 }
             } else {
                 handleRoute();
@@ -391,7 +394,7 @@
         });
 
         async function syncUserToDB(user) {
-            try { await db.collection('users').doc(user.uid).set({ email: user.email||user.phoneNumber||'Anon', lastLogin: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }); } catch(e){}
+            try { await db.collection('users').doc(user.uid).set({ email: user.email||'Anon', lastLogin: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }); } catch(e){}
         }
 
         // CAT & AUTH UI
