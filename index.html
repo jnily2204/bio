@@ -76,15 +76,12 @@
         
         <!-- AUTH VIEW -->
         <div id="view-auth" class="view-section hidden flex-grow min-h-screen flex flex-col lg:flex-row bg-white">
-            <!-- Left Side Branding -->
             <div class="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden flex-col justify-between p-12 text-white">
                 <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 24px 24px;"></div>
                 <div class="relative z-10 flex items-center gap-3"><i class="fas fa-cat text-brand-500 text-2xl"></i> <span class="font-bold text-2xl">Mewo</span></div>
                 <div class="relative z-10 max-w-md"><h2 class="text-5xl font-bold mb-6">Liên kết mọi thứ.<br>Một nơi duy nhất.</h2><p class="text-slate-400 text-lg">Nền tảng Bio Link miễn phí, mạnh mẽ và cute nhất vũ trụ.</p></div>
                 <div class="relative z-10 text-sm text-slate-500">© 2024 Mewo Inc.</div>
             </div>
-
-            <!-- Right Side Auth Forms -->
             <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 bg-white relative">
                 <div class="w-full max-w-sm">
                     <!-- Cat SVG -->
@@ -109,61 +106,42 @@
                             <g><ellipse class="cat-paws cat-paws-left" cx="25" cy="95" rx="10" ry="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/><ellipse class="cat-paws cat-paws-right" cx="95" cy="95" rx="10" ry="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/></g>
                         </svg>
                     </div>
+                    <div class="text-center mb-6"><h1 class="text-2xl font-bold text-slate-900">Xin chào 👋</h1><p class="text-slate-500 text-sm">Đăng nhập để quản lý Mewo của bạn.</p></div>
+                    <div class="flex bg-slate-100 p-1 rounded-lg mb-6"><button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900">Đăng nhập</button><button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500">Đăng ký</button></div>
                     
-                    <!-- Main Auth Container -->
-                    <div id="auth-main-container">
-                        <div class="text-center mb-6"><h1 class="text-2xl font-bold text-slate-900">Xin chào 👋</h1><p class="text-slate-500 text-sm">Đăng nhập để quản lý Mewo của bạn.</p></div>
-                        <div class="flex bg-slate-100 p-1 rounded-lg mb-6"><button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2 text-sm font-bold rounded shadow-sm bg-white text-slate-900">Đăng nhập</button><button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2 text-sm font-medium text-slate-500">Đăng ký</button></div>
-                        
-                        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-                            <input type="email" id="login-email" placeholder="Email" class="input-modern track-input" required>
-                            <input type="password" id="login-password" placeholder="Mật khẩu" class="input-modern pass-input" required>
-                            <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng nhập</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="login-loader"></div></button>
-                        </form>
-                        
-                        <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
-                            <input type="email" id="reg-email" placeholder="Email" class="input-modern track-input" required>
-                            <input type="password" id="reg-password" placeholder="Mật khẩu (min 6 ký tự)" class="input-modern pass-input" minlength="6" required>
-                            <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng ký</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="reg-loader"></div></button>
-                        </form>
-
-                        <div class="relative my-6">
-                            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
-                            <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-slate-500">Hoặc tiếp tục với</span></div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
-                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> <span class="text-sm font-medium">Google</span>
-                            </button>
-                            <button onclick="switchAuthView('phone')" class="flex items-center justify-center gap-2 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
-                                <i class="fas fa-phone text-slate-600"></i> <span class="text-sm font-medium">Số điện thoại</span>
-                            </button>
-                        </div>
+                    <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                        <input type="email" id="login-email" placeholder="Email" class="input-modern track-input" required>
+                        <input type="password" id="login-password" placeholder="Mật khẩu" class="input-modern pass-input" required>
+                        <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng nhập</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="login-loader"></div></button>
+                    </form>
+                    <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                        <input type="email" id="reg-email" placeholder="Email" class="input-modern track-input" required>
+                        <input type="password" id="reg-password" placeholder="Mật khẩu (min 6 ký tự)" class="input-modern pass-input" minlength="6" required>
+                        <button type="submit" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition flex justify-center gap-2"><span>Đăng ký</span><div class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" id="reg-loader"></div></button>
+                    </form>
+                    
+                    <!-- Social Login -->
+                    <div class="relative my-6"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-slate-500">Hoặc</span></div></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="handleGoogleLogin()" class="flex items-center justify-center gap-2 py-2.5 border rounded-lg hover:bg-slate-50"><img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"><span class="text-sm font-medium">Google</span></button>
+                        <button onclick="switchAuthView('phone')" class="flex items-center justify-center gap-2 py-2.5 border rounded-lg hover:bg-slate-50"><i class="fas fa-phone text-slate-600"></i><span class="text-sm font-medium">SĐT</span></button>
                     </div>
 
                     <!-- Phone Auth Container -->
-                    <div id="auth-phone-container" class="hidden w-full">
-                        <button onclick="switchAuthView('main')" class="text-sm text-slate-500 hover:text-slate-900 mb-4 flex items-center gap-1"><i class="fas fa-arrow-left"></i> Quay lại</button>
+                    <div id="auth-phone-container" class="hidden w-full absolute top-0 left-0 h-full bg-white p-6 z-20 flex flex-col">
+                        <button onclick="switchAuthView('main')" class="text-sm text-slate-500 hover:text-slate-900 mb-6 flex items-center gap-1"><i class="fas fa-arrow-left"></i> Quay lại</button>
                         <h2 class="text-xl font-bold mb-4">Đăng nhập bằng SĐT</h2>
-                        
                         <div id="phone-step-1">
-                            <div class="flex gap-2 mb-4">
-                                <div class="w-20 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-center text-sm font-bold flex items-center justify-center gap-1">🇻🇳 +84</div>
-                                <input type="tel" id="phone-input" placeholder="912345678" class="flex-1 input-modern" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                            </div>
+                            <div class="flex gap-2 mb-4"><div class="w-20 p-2.5 bg-slate-50 border rounded-lg text-center text-sm font-bold flex items-center justify-center">🇻🇳 +84</div><input type="tel" id="phone-input" placeholder="912345678" class="flex-1 input-modern" oninput="this.value = this.value.replace(/[^0-9]/g, '')"></div>
                             <div id="recaptcha-container" class="mb-4"></div>
-                            <button onclick="sendOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition mt-2" id="btn-send-otp">Gửi mã xác thực</button>
+                            <button onclick="sendOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold" id="btn-send-otp">Gửi mã xác thực</button>
                         </div>
-
                         <div id="phone-step-2" class="hidden">
-                            <p class="text-sm text-slate-500 mb-4">Nhập mã OTP đã gửi đến số điện thoại của bạn.</p>
+                            <p class="text-sm text-slate-500 mb-4">Nhập mã OTP:</p>
                             <input type="text" id="otp-input" placeholder="123456" class="input-modern text-center tracking-widest text-lg font-bold mb-4" maxlength="6">
-                            <button onclick="verifyOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold hover:bg-brand-700 transition">Xác nhận</button>
-                            <button onclick="switchAuthView('phone')" class="w-full text-slate-500 py-2 text-sm mt-2 hover:text-slate-700 text-center block">Gửi lại / Đổi số</button>
+                            <button onclick="verifyOTP()" class="w-full bg-brand-600 text-white py-3 rounded-lg font-bold">Xác nhận</button>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -539,13 +517,25 @@
         }
 
         function generatePublicHTML(data, isPreview) {
-            const theme = data.theme || {id:'default'};
+            const theme = data.theme || { id: 'default', buttonStyle: 'rounded' };
+            const btnStyleMap = {
+                'rounded': 'rounded-full',
+                'rect': 'rounded-md',
+                'soft': 'rounded-2xl'
+            };
+            const radiusClass = btnStyleMap[theme.buttonStyle] || 'rounded-full';
             
+            // Fix 1: Ensure click handler works for both Preview (local) and Public (global window)
+            const getClickAttr = (title) => {
+                const safeTitle = title.replace(/'/g, "\\'");
+                // For preview (iframe), function is local. For public (SPA), function is on window.
+                return isPreview ? `onclick="openCollection('${safeTitle}')"` : `onclick="window.openCollection('${safeTitle}')"`;
+            };
+
             const linksHtml = (data.links||[]).map(l => {
                 if(l.type === 'collection') {
                     // Collection Button
-                    const onclickAttr = isPreview ? '' : `onclick="window.openCollection('${l.title}')"`;
-                    return `<div ${onclickAttr} class="cursor-pointer block mb-4 group"><div class="relative w-full p-4 flex items-center justify-between bg-white/90 backdrop-blur-md shadow-sm border border-white/40 rounded-2xl hover:bg-white transition"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-brand-100 rounded-lg flex items-center justify-center text-brand-600"><i class="fas fa-layer-group"></i></div><span class="font-bold text-sm text-slate-800">${l.title}</span></div><i class="fas fa-chevron-right text-slate-400"></i></div></div>`;
+                    return `<div ${getClickAttr(l.title)} class="cursor-pointer block mb-4 group"><div class="relative w-full p-4 flex items-center justify-between bg-white/90 backdrop-blur-md shadow-sm border border-white/40 rounded-2xl hover:bg-white transition"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-brand-100 rounded-lg flex items-center justify-center text-brand-600"><i class="fas fa-layer-group"></i></div><span class="font-bold text-sm text-slate-800">${l.title}</span></div><i class="fas fa-chevron-right text-slate-400"></i></div></div>`;
                 } else {
                     return `<a href="${l.url}" target="_blank" class="block mb-4 group transition hover:-translate-y-1"><div class="relative w-full p-4 flex items-center justify-center bg-white/90 backdrop-blur-md shadow-sm border border-white/40 rounded-2xl hover:bg-white transition"><span class="font-bold text-sm text-slate-800">${l.title}</span></div></a>`;
                 }
@@ -556,10 +546,12 @@
                 socialsHtml = socialPlatforms.map(p => data.socials[p.id] ? `<a href="${data.socials[p.id]}" target="_blank" class="text-2xl text-white/90 hover:text-white transition"><i class="${p.icon}"></i></a>` : '').join('');
             }
 
-            // Script for Iframe Preview only
+            // Script for Iframe Preview only (Local functions)
+            // Fix 2: Escaping JSON properly to avoid script breaking
+            const safeProducts = JSON.stringify(data.products || []).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
             const iframeScript = isPreview ? `
                 <script>
-                    const products = ${JSON.stringify(data.products || [])};
+                    const products = JSON.parse("${safeProducts}");
                     function openCollection(filter) {
                         document.getElementById('main-tab').classList.add('hidden');
                         document.getElementById('shop-tab').classList.remove('hidden');
@@ -572,42 +564,115 @@
                                 <div class="aspect-square bg-slate-100 relative"><img src="\${p.image||'https://placehold.co/200'}" class="w-full h-full object-cover"></div>
                                 <div class="p-3"><h3 class="font-bold text-xs line-clamp-2">\${p.name}</h3><div class="flex justify-between items-center mt-2"><span class="text-red-500 font-bold text-xs">\${p.price}</span><a href="\${p.link}" target="_blank" class="bg-black text-white text-[10px] px-2 py-1 rounded">Mua</a></div></div>
                             </div>\`).join('');
+                        
+                        // Update Sub-tabs
+                        const cats = [...new Set(products.map(p=>p.collection))].filter(c=>c);
+                        document.getElementById('sub-tabs').innerHTML = cats.map(c => 
+                            \`<button onclick="openCollection('\${c}')" class="px-3 py-1 rounded-full text-[10px] font-bold transition whitespace-nowrap \${c===filter ? 'bg-white text-slate-900' : 'bg-white/20 text-white'}">\${c}</button>\`
+                        ).join('');
                     }
                     function closeShop() { document.getElementById('shop-tab').classList.add('hidden'); document.getElementById('main-tab').classList.remove('hidden'); }
                 <\/script>` : '';
 
-            const onclickAttrCollection = isPreview ? `onclick="openCollection('${data.links?.[0]?.title}')"` : ''; // Just for static analysis, real logic in script
+            // Common Styles (Shared)
+            const stylesCss = `
+                /* Scrollbar */
+                ::-webkit-scrollbar { width: 0px; background: transparent; }
+                
+                /* Animations */
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                .animate-enter { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+                
+                /* Theme Backgrounds */
+                .theme-bg-default { background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: white; }
+                .theme-bg-ocean { background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); color: white; }
+                .theme-bg-midnight { background-color: #000000; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 30px 30px; color: white; }
+                .theme-bg-forest { background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); color: white; }
+                .theme-bg-minimal { background-color: #f3f4f6; color: #1f2937; }
+                .theme-bg-sunset { background: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%); color: #1e293b; }
+                
+                @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+                
+                /* Wrapper ensuring full height */
+                .bio-wrapper { min-height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; }
+            `;
 
-            const content = `
-                <div class="bio-wrapper theme-bg-${theme.id} min-h-screen w-full flex flex-col items-center py-12 px-4 relative">
-                    <!-- Main Tab -->
-                    <div id="main-tab" class="w-full max-w-md text-center animate-fade-in">
-                        <img src="${data.profile.avatar}" class="w-24 h-24 rounded-full border-4 border-white/50 shadow-xl mx-auto mb-4 object-cover">
-                        <h1 class="text-xl font-bold mb-1 drop-shadow-sm text-white">${data.profile.name}</h1>
-                        <p class="text-sm opacity-90 mb-6 font-medium text-white/90 whitespace-pre-line">${data.profile.bio}</p>
-                        <div class="flex justify-center gap-4 mb-8">${socialsHtml}</div>
-                        <div class="w-full text-left space-y-4">${linksHtml}</div>
-                    </div>
-
-                    <!-- Shop Tab (Hidden) -->
-                    <div id="shop-tab" class="w-full max-w-md hidden animate-slide-up pb-20">
-                        <div class="sticky top-0 z-20 pb-4 pt-2 flex items-center gap-3">
-                            <button onclick="${isPreview?'closeShop()':'window.closeShop()'}" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full text-white hover:bg-white/40"><i class="fas fa-arrow-left"></i></button>
-                            <h2 class="font-bold text-lg text-white" id="shop-title">Shop</h2>
+            // Body Content (Shared)
+            const bodyContent = `
+                <div class="bio-wrapper theme-bg-${theme.id}">
+                    <div class="w-full max-w-lg px-6 py-12 flex flex-col items-center min-h-screen relative">
+                        
+                        <!-- Profile -->
+                        <div class="text-center mb-8 animate-enter" style="animation-delay: 0ms">
+                            <div class="relative w-28 h-28 mx-auto mb-4 group">
+                                <div class="absolute inset-0 bg-white/30 rounded-full blur-md group-hover:blur-lg transition-all duration-500"></div>
+                                <img src="${data.profile.avatar}" class="relative w-full h-full rounded-full object-cover border-4 border-white/50 shadow-2xl" 
+                                     onerror="this.src='https://ui-avatars.com/api/?name=Mewo&background=random'">
+                            </div>
+                            <h1 class="text-2xl font-extrabold mb-2 drop-shadow-md tracking-tight">${data.profile.name}</h1>
+                            <p class="text-sm font-medium opacity-90 max-w-xs mx-auto leading-relaxed whitespace-pre-line">${data.profile.bio}</p>
                         </div>
-                        <div class="flex overflow-x-auto gap-2 hide-scrollbar pb-2 mb-2" id="sub-tabs"></div>
-                        <div id="product-grid" class="grid grid-cols-2 gap-3"></div>
-                    </div>
 
-                    ${!isPreview ? '<footer class="mt-auto pt-10 text-xs opacity-60 text-white font-bold">Powered by Mewo</footer>' : ''}
+                        <!-- Socials -->
+                        <div class="flex gap-4 mb-10 flex-wrap justify-center animate-enter" style="animation-delay: 100ms">
+                            ${socialsHtml}
+                        </div>
+
+                        <!-- Main Tab: Links & Collections -->
+                        <div id="main-tab" class="w-full space-y-4 animate-enter" style="animation-delay: 200ms">
+                            ${linksHtml}
+                        </div>
+
+                        <!-- Shop Tab (Hidden) -->
+                        <div id="shop-tab" class="w-full hidden animate-enter pb-20" style="animation-delay: 0ms">
+                            <div class="sticky top-0 z-20 pb-4 pt-2 flex items-center gap-3">
+                                <button onclick="${isPreview?'closeShop()':'window.closeShop()'}" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full text-white hover:bg-white/40 backdrop-blur-md"><i class="fas fa-arrow-left"></i></button>
+                                <h2 class="font-bold text-lg text-white drop-shadow-sm" id="shop-title">Shop</h2>
+                            </div>
+                            <div class="flex overflow-x-auto gap-2 hide-scrollbar pb-2 mb-2" id="sub-tabs">
+                                <!-- Filter buttons injected by script -->
+                            </div>
+                            <div id="product-grid" class="grid grid-cols-2 gap-3">
+                                <!-- Products injected by script -->
+                            </div>
+                        </div>
+
+                        ${!isPreview ? `
+                        <footer class="mt-auto pt-16 pb-4 text-center animate-enter" style="animation-delay: 500ms">
+                            <a href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors text-xs font-bold opacity-80 hover:opacity-100">
+                                <i class="fas fa-cat"></i> Created with Mewo
+                            </a>
+                        </footer>` : ''}
+                    </div>
                 </div>
                 ${iframeScript}
             `;
 
-            if (isPreview) return `<!DOCTYPE html><html><head><script src="https://cdn.tailwindcss.com"><\/script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{font-family:sans-serif;margin:0}::-webkit-scrollbar{width:0} .theme-bg-default{background:linear-gradient(-45deg,#ee7752,#e73c7e,#23a6d5,#23d5ab);background-size:400% 400%;animation:g 15s infinite} @keyframes g{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}} .theme-bg-midnight{background:#000;color:#fff} .theme-bg-minimal{background:#f3f4f6;color:#333}</style></head><body>${content}</body></html>`;
-            
-            // SPA Return (No HTML/Body tags)
-            return `<style>.bio-wrapper{min-height:100vh} .theme-bg-default{background:linear-gradient(-45deg,#ee7752,#e73c7e,#23a6d5,#23d5ab);background-size:400% 400%;animation:g 15s infinite} @keyframes g{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}</style>${content}`;
+            if (isPreview) {
+                // Return FULL HTML Document for Iframe
+                return `
+                    <!DOCTYPE html>
+                    <html lang="vi">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <script src="https://cdn.tailwindcss.com"><\/script>
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+                        <style>
+                            body { font-family: 'Be Vietnam Pro', sans-serif; margin:0; min-height:100vh; overflow-x: hidden; }
+                            ${stylesCss}
+                        </style>
+                    </head>
+                    <body>
+                        ${bodyContent}
+                    </body>
+                    </html>
+                `;
+            } else {
+                // Return HTML Fragment + Style for SPA Div (No html/head/body tags)
+                return `<style>${stylesCss}</style>${bodyContent}`;
+            }
         }
 
         function showToast(m,t='info'){ const d=document.createElement('div');d.className='toast';d.innerText=m;document.getElementById('toast-container').appendChild(d);setTimeout(()=>d.remove(),3000); }
