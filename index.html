@@ -38,15 +38,15 @@
         body { background-color: #f8fafc; min-height: 100vh; overflow-x: hidden; }
         
         /* Modern Admin UI Styles */
-        .modern-input { width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid transparent; border-radius: 12px; font-size: 0.9rem; transition: all 0.2s; outline: none; font-weight: 500; color: #334155; }
+        .modern-input { width: 100%; padding: 12px 16px; background: #f1f5f9; border: 1px solid transparent; border-radius: 12px; font-size: 0.95rem; transition: all 0.2s; outline: none; font-weight: 500; color: #334155; }
         .modern-input:focus { background: #fff; border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .modern-input::placeholder { color: #94a3b8; font-weight: 400; }
         
-        .modern-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; transition: all 0.2s; position: relative; }
-        .modern-card:hover { box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08); transform: translateY(-2px); border-color: #e2e8f0; }
+        .modern-card { background: white; border-radius: 24px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; transition: all 0.2s; position: relative; }
+        .modern-card:hover { box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.08); transform: translateY(-2px); border-color: #e2e8f0; }
 
-        .modern-tab-container { background: #f1f5f9; padding: 4px; border-radius: 14px; display: flex; gap: 4px; }
-        .modern-tab { flex: 1; text-align: center; padding: 10px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; color: #64748b; transition: all 0.2s; cursor: pointer; }
+        .modern-tab-container { background: #e2e8f0; padding: 5px; border-radius: 16px; display: flex; gap: 5px; width: fit-content; }
+        .modern-tab { padding: 8px 24px; border-radius: 12px; font-size: 0.9rem; font-weight: 600; color: #64748b; transition: all 0.2s; cursor: pointer; white-space: nowrap; }
         .modern-tab:hover { color: #334155; }
         .modern-tab.active { background: white; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
@@ -59,8 +59,8 @@
         @keyframes meshMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         /* Utils */
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .hidden { display: none !important; }
         
         /* Cat SVG & Animations */
@@ -140,7 +140,7 @@
                             <g><ellipse class="cat-paws cat-paws-left" cx="25" cy="95" rx="10" ry="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/><ellipse class="cat-paws cat-paws-right" cx="95" cy="95" rx="10" ry="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/></g>
                         </svg>
                     </div>
-                    <div class="text-center mb-6"><h2 class="text-2xl font-bold text-slate-900" id="auth-title">Chào mừng trở lại!</h2><p class="text-slate-500 text-sm mt-1">Đăng nhập để quản lý bio.</p></div>
+                    <div class="text-center mb-6"><h2 class="text-2xl font-bold text-slate-900" id="auth-title">Chào mừng trở lại!</h2><p class="text-slate-500 text-sm mt-1">Đăng nhập để tiếp tục quản lý bio.</p></div>
                     <div class="flex bg-slate-100 p-1 rounded-xl mb-6"><button onclick="toggleAuthMode('login')" id="tab-login" class="flex-1 py-2.5 text-sm font-bold rounded-lg shadow-sm bg-white text-slate-900 transition-all">Đăng nhập</button><button onclick="toggleAuthMode('register')" id="tab-register" class="flex-1 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-700 transition-all">Đăng ký</button></div>
                     
                     <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
@@ -185,54 +185,136 @@
             </div>
         </div>
 
-        <!-- EDITOR VIEW -->
-        <div id="view-editor" class="view-section hidden flex-grow bg-slate-100 flex flex-col md:flex-row h-screen overflow-hidden">
-            <!-- Left Panel -->
-            <div class="w-full md:w-[450px] bg-[#f9fafb] border-r border-slate-200 flex flex-col h-full z-20 shadow-xl animate-slide-up md:animate-none">
-                <div class="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-white z-10 sticky top-0">
-                    <button onclick="goToDashboard()" class="text-slate-500 hover:text-slate-900 font-bold text-sm flex items-center gap-2 transition"><i class="fas fa-arrow-left"></i> Dashboard</button>
-                    <button onclick="saveCurrentBio()" class="bg-slate-900 text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-slate-800 shadow-md flex items-center gap-2 transition hover:scale-105 active:scale-95"><i class="fas fa-save"></i> Lưu</button>
+        <!-- EDITOR VIEW - MODERN & LINKTREE-STYLE -->
+        <div id="view-editor" class="view-section hidden flex-grow bg-[#f3f4f6] flex flex-col md:flex-row h-screen overflow-hidden">
+            
+            <!-- Left Panel (Editor) - Chiếm phần lớn -->
+            <div class="flex-1 flex flex-col h-full z-10 overflow-hidden relative border-r border-slate-200 bg-[#f9fafb]">
+                <!-- Header -->
+                <div class="px-8 py-5 border-b border-slate-200 flex justify-between items-center bg-white sticky top-0 z-30">
+                    <div class="flex items-center gap-4">
+                         <button onclick="goToDashboard()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition text-slate-500"><i class="fas fa-arrow-left"></i></button>
+                         <div>
+                             <h2 class="font-bold text-slate-800 text-lg">Chỉnh sửa Bio</h2>
+                             <div class="flex items-center gap-2 text-xs text-slate-500">
+                                 <span class="w-2 h-2 rounded-full bg-green-500"></span> Online: <a id="editor-url-display" href="#" target="_blank" class="hover:underline hover:text-brand-600">...</a>
+                             </div>
+                         </div>
+                    </div>
+                    <button onclick="saveCurrentBio()" class="bg-slate-900 text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-slate-800 shadow-lg shadow-slate-200 flex items-center gap-2 transition hover:scale-105 active:scale-95"><i class="fas fa-save"></i> Lưu Thay Đổi</button>
                 </div>
-                <div class="p-4 bg-white border-b border-slate-200">
-                    <div class="modern-tab-container"><div onclick="switchEditorTab('links')" id="tab-editor-links" class="modern-tab active">Liên kết</div><div onclick="switchEditorTab('products')" id="tab-editor-products" class="modern-tab">Sản phẩm</div><div onclick="switchEditorTab('appearance')" id="tab-editor-appearance" class="modern-tab">Giao diện</div></div>
-                </div>
-                <div class="overflow-y-auto flex-1 p-5 space-y-6 custom-scrollbar">
-                    <div class="modern-card flex justify-between items-center !py-3">
-                        <div class="flex items-center gap-2 overflow-hidden"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span><a id="live-preview-link" href="#" target="_blank" class="text-xs font-bold text-slate-600 hover:text-brand-600 truncate transition font-mono" id="editor-url-display">...</a></div>
-                        <div class="flex gap-1"><button onclick="copyToClipboard(document.getElementById('editor-url-display').innerText)" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition"><i class="fas fa-copy"></i></button><button onclick="showQRCode()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition"><i class="fas fa-qrcode"></i></button></div>
-                    </div>
-                    <div id="editor-tab-links" class="editor-tab-content space-y-4">
-                        <button onclick="addLinkItem()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-lg shadow-brand-500/30 transition flex items-center justify-center gap-2 transform active:scale-95"><i class="fas fa-plus-circle"></i> Thêm liên kết mới</button>
-                        <div id="ed-links-list" class="space-y-3 pb-10"></div>
-                    </div>
-                    <div id="editor-tab-products" class="editor-tab-content hidden space-y-4">
-                        <button onclick="addProductItem()" class="w-full py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold shadow-lg transition flex items-center justify-center gap-2 transform active:scale-95"><i class="fas fa-shopping-bag"></i> Thêm sản phẩm</button>
-                        <div class="p-3 bg-blue-50 text-blue-700 text-xs rounded-xl font-medium border border-blue-100 flex items-start gap-2"><i class="fas fa-info-circle mt-0.5"></i><div>Tạo một liên kết loại <b>"Bộ sưu tập"</b> ở tab Liên kết để hiển thị nhóm sản phẩm này.</div></div>
-                        <div id="ed-products-list" class="space-y-3 pb-10"></div>
-                    </div>
-                    <div id="editor-tab-appearance" class="editor-tab-content hidden space-y-6">
-                        <div class="modern-card space-y-4">
-                            <h3 class="font-bold text-sm text-slate-900">Hồ sơ</h3>
-                            <div class="flex gap-4 items-center"><div class="w-16 h-16 rounded-full bg-slate-100 overflow-hidden border border-slate-200 shrink-0"><img id="editor-avatar-preview" class="w-full h-full object-cover"></div><input type="text" id="ed-avatar" oninput="updatePreview()" placeholder="Dán link ảnh avatar..." class="modern-input"></div>
-                            <div><label class="text-xs font-bold text-slate-500 uppercase ml-1">Tên hiển thị</label><input type="text" id="ed-name" oninput="updatePreview()" placeholder="Ví dụ: Mewo Official" class="modern-input mt-1"></div>
-                            <div><label class="text-xs font-bold text-slate-500 uppercase ml-1">Tiểu sử (Bio)</label><textarea id="ed-bio" oninput="updatePreview()" placeholder="Giới thiệu ngắn về bạn..." rows="3" class="modern-input mt-1 resize-none"></textarea></div>
+
+                <!-- Tabs & Content -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10">
+                    <div class="max-w-3xl mx-auto space-y-8">
+                        <!-- Navigation Tabs -->
+                        <div class="flex justify-center">
+                            <div class="modern-tab-container bg-white border border-slate-200 shadow-sm p-1.5 rounded-2xl">
+                                <div onclick="switchEditorTab('links')" id="tab-editor-links" class="modern-tab active">Liên kết</div>
+                                <div onclick="switchEditorTab('products')" id="tab-editor-products" class="modern-tab">Cửa hàng</div>
+                                <div onclick="switchEditorTab('appearance')" id="tab-editor-appearance" class="modern-tab">Giao diện</div>
+                                <div onclick="switchEditorTab('settings')" id="tab-editor-settings" class="modern-tab">Cài đặt</div>
+                            </div>
                         </div>
-                        <div class="space-y-2">
-                            <h3 class="font-bold text-sm text-slate-900 ml-1">Chủ đề</h3>
-                            <div class="grid grid-cols-3 gap-3"><button onclick="setTheme('default')" class="h-24 rounded-xl bg-gradient-to-br from-pink-200 to-pink-400 shadow-sm hover:ring-4 ring-brand-200 transition transform hover:scale-105"></button><button onclick="setTheme('ocean')" class="h-24 rounded-xl bg-gradient-to-b from-blue-600 to-cyan-400 shadow-sm hover:ring-4 ring-blue-200 transition transform hover:scale-105"></button><button onclick="setTheme('midnight')" class="h-24 rounded-xl bg-slate-800 shadow-sm hover:ring-4 ring-slate-400 transition transform hover:scale-105"></button><button onclick="setTheme('forest')" class="h-24 rounded-xl bg-gradient-to-br from-green-700 to-green-400 shadow-sm hover:ring-4 ring-green-200 transition transform hover:scale-105"></button><button onclick="setTheme('minimal')" class="h-24 rounded-xl bg-white border border-slate-200 shadow-sm hover:ring-4 ring-slate-200 transition transform hover:scale-105"></button><button onclick="setTheme('sunset')" class="h-24 rounded-xl bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-400 shadow-sm hover:ring-4 ring-purple-200 transition transform hover:scale-105"></button></div>
+
+                        <!-- TAB 1: LINKS -->
+                        <div id="editor-tab-links" class="editor-tab-content space-y-6">
+                            <button onclick="addLinkItem()" class="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold shadow-xl shadow-brand-500/20 transition flex items-center justify-center gap-2 transform active:scale-95 text-base border border-transparent">
+                                <i class="fas fa-plus"></i> Thêm liên kết mới
+                            </button>
+                            <div id="ed-links-list" class="space-y-4 pb-10"></div>
                         </div>
-                        <div class="space-y-2"><h3 class="font-bold text-sm text-slate-900 ml-1">Kiểu nút</h3><div class="grid grid-cols-3 gap-2 bg-slate-200 p-1 rounded-xl"><button onclick="setButtonStyle('rounded')" class="py-2 bg-white rounded-lg text-xs font-bold shadow-sm hover:text-brand-600 transition">Tròn</button><button onclick="setButtonStyle('soft')" class="py-2 bg-slate-200/50 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:shadow-sm transition">Bo góc</button><button onclick="setButtonStyle('rect')" class="py-2 bg-slate-200/50 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:shadow-sm transition">Vuông</button></div></div>
-                        <div class="modern-card space-y-3"><h3 class="font-bold text-sm text-slate-900">Mạng xã hội</h3><div class="space-y-2" id="socials-list"></div></div>
+
+                        <!-- TAB 2: PRODUCTS -->
+                        <div id="editor-tab-products" class="editor-tab-content hidden space-y-6">
+                            <button onclick="addProductItem()" class="w-full py-4 bg-slate-800 hover:bg-slate-900 text-white rounded-2xl font-bold shadow-xl transition flex items-center justify-center gap-2 transform active:scale-95 text-base">
+                                <i class="fas fa-shopping-bag"></i> Thêm sản phẩm
+                            </button>
+                            <div class="p-4 bg-blue-50 text-blue-800 text-sm rounded-2xl font-medium border border-blue-100 flex items-start gap-3">
+                                <i class="fas fa-info-circle mt-0.5 text-lg"></i>
+                                <div>Mẹo: Tạo một liên kết loại <b>"Bộ sưu tập"</b> ở tab Liên kết để hiển thị nhóm sản phẩm này ra ngoài.</div>
+                            </div>
+                            <div id="ed-products-list" class="space-y-4 pb-10"></div>
+                        </div>
+
+                        <!-- TAB 3: APPEARANCE -->
+                        <div id="editor-tab-appearance" class="editor-tab-content hidden space-y-8">
+                            <!-- Profile Card -->
+                            <div class="modern-card">
+                                <h3 class="font-bold text-base text-slate-900 mb-6">Hồ sơ cá nhân</h3>
+                                <div class="flex flex-col sm:flex-row gap-6 items-start">
+                                    <div class="w-24 h-24 rounded-full bg-slate-100 overflow-hidden border-2 border-slate-100 shrink-0 shadow-inner group relative cursor-pointer">
+                                        <img id="editor-avatar-preview" class="w-full h-full object-cover">
+                                        <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition font-xs font-bold">Đổi ảnh</div>
+                                    </div>
+                                    <div class="flex-1 w-full space-y-4">
+                                        <div>
+                                            <label class="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Tên hiển thị</label>
+                                            <input type="text" id="ed-name" oninput="updatePreview()" class="modern-input w-full !text-base !font-bold">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Tiểu sử (Bio)</label>
+                                            <textarea id="ed-bio" oninput="updatePreview()" rows="3" class="modern-input w-full resize-none"></textarea>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Link Avatar</label>
+                                            <input type="text" id="ed-avatar" oninput="updatePreview()" class="modern-input w-full text-xs">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Themes -->
+                            <div class="space-y-4">
+                                <h3 class="font-bold text-base text-slate-900 ml-1">Chủ đề</h3>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                    <button onclick="setTheme('default')" class="h-32 rounded-2xl bg-gradient-to-br from-pink-200 to-pink-400 shadow-sm hover:ring-4 ring-brand-200 transition transform hover:scale-105 relative overflow-hidden group"><span class="absolute bottom-3 left-3 text-xs font-bold text-white drop-shadow-md">Kẹo ngọt</span></button>
+                                    <button onclick="setTheme('ocean')" class="h-32 rounded-2xl bg-gradient-to-b from-blue-600 to-cyan-400 shadow-sm hover:ring-4 ring-blue-200 transition transform hover:scale-105 relative overflow-hidden group"><span class="absolute bottom-3 left-3 text-xs font-bold text-white drop-shadow-md">Đại dương</span></button>
+                                    <button onclick="setTheme('midnight')" class="h-32 rounded-2xl bg-slate-900 shadow-sm hover:ring-4 ring-slate-400 transition transform hover:scale-105 relative overflow-hidden group"><span class="absolute bottom-3 left-3 text-xs font-bold text-white drop-shadow-md">Đêm tối</span></button>
+                                    <button onclick="setTheme('forest')" class="h-32 rounded-2xl bg-gradient-to-br from-green-700 to-green-400 shadow-sm hover:ring-4 ring-green-200 transition transform hover:scale-105 relative overflow-hidden group"><span class="absolute bottom-3 left-3 text-xs font-bold text-white drop-shadow-md">Rừng xanh</span></button>
+                                    <button onclick="setTheme('minimal')" class="h-32 rounded-2xl bg-white border-2 border-slate-200 shadow-sm hover:ring-4 ring-slate-200 transition transform hover:scale-105 relative overflow-hidden group"><span class="absolute bottom-3 left-3 text-xs font-bold text-slate-800">Tối giản</span></button>
+                                    <button onclick="setTheme('sunset')" class="h-32 rounded-2xl bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-400 shadow-sm hover:ring-4 ring-purple-200 transition transform hover:scale-105 relative overflow-hidden group"><span class="absolute bottom-3 left-3 text-xs font-bold text-white drop-shadow-md">Hoàng hôn</span></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Button Styles -->
+                            <div class="space-y-4">
+                                <h3 class="font-bold text-base text-slate-900 ml-1">Kiểu nút</h3>
+                                <div class="grid grid-cols-3 gap-3 bg-white p-2 rounded-2xl border border-slate-200">
+                                    <button onclick="setButtonStyle('rounded')" class="py-3 bg-slate-100 rounded-xl text-sm font-bold hover:bg-brand-50 hover:text-brand-600 transition">Tròn</button>
+                                    <button onclick="setButtonStyle('soft')" class="py-3 bg-slate-100 rounded-xl text-sm font-bold hover:bg-brand-50 hover:text-brand-600 transition">Bo góc</button>
+                                    <button onclick="setButtonStyle('rect')" class="py-3 bg-slate-100 rounded-xl text-sm font-bold hover:bg-brand-50 hover:text-brand-600 transition">Vuông</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 4: SETTINGS (Socials) -->
+                        <div id="editor-tab-settings" class="editor-tab-content hidden space-y-6">
+                            <div class="modern-card space-y-4">
+                                <h3 class="font-bold text-sm text-slate-900">Mạng xã hội</h3>
+                                <div class="space-y-3" id="socials-list">
+                                    <!-- Injected JS -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Right Preview -->
-            <div class="flex-1 bg-slate-100 flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
-                <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
-                <div class="w-[350px] h-[700px] bg-white rounded-[50px] border-[12px] border-slate-900 shadow-2xl overflow-hidden relative z-10 ring-8 ring-slate-900/5">
-                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-slate-900 rounded-b-2xl z-20"></div>
+
+            <!-- Right Panel: Preview (Phone) - Cố định bên phải -->
+            <div class="hidden lg:flex w-[480px] bg-white border-l border-slate-200 flex-col items-center justify-center p-8 relative z-20 shadow-[-10px_0_40px_-20px_rgba(0,0,0,0.05)]">
+                <!-- Phone Mockup -->
+                <div class="w-[360px] h-[720px] bg-white rounded-[56px] border-[14px] border-[#1a1a1a] shadow-2xl overflow-hidden relative z-10 ring-4 ring-slate-900/5 select-none transform scale-[0.95] xl:scale-100 transition-transform">
+                    <!-- Dynamic Island -->
+                    <div class="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-[35px] bg-black rounded-full z-30 flex items-center justify-between px-3">
+                        <div class="w-2 h-2 rounded-full bg-[#111] border border-[#222]"></div>
+                        <div class="w-2 h-2 rounded-full bg-green-500/20"></div>
+                    </div>
+                    <!-- Screen -->
                     <iframe id="preview-frame" class="w-full h-full bg-white"></iframe>
                 </div>
+                
+                <div class="absolute bottom-6 text-xs font-bold text-slate-300 uppercase tracking-widest">Live Preview</div>
             </div>
         </div>
 
@@ -384,7 +466,10 @@
         function switchEditorTab(t) {
             document.querySelectorAll('.editor-tab-content').forEach(e=>e.classList.add('hidden'));
             document.getElementById(`editor-tab-${t}`).classList.remove('hidden');
-            ['links','products','appearance'].forEach(tab => { document.getElementById(`tab-editor-${tab}`).className = t===tab ? 'modern-tab active' : 'modern-tab'; });
+            ['links','products','appearance','settings'].forEach(tab => { 
+                const el = document.getElementById(`tab-editor-${tab}`);
+                if(el) el.className = t===tab ? 'modern-tab active' : 'modern-tab'; 
+            });
         }
         function renderEditorLinks() {
             const l = document.getElementById('ed-links-list'); l.innerHTML='';
@@ -403,7 +488,7 @@
         function renderSocialsInput() {
             const l = document.getElementById('socials-list'); l.innerHTML='';
             socialPlatforms.forEach(p => {
-                l.innerHTML += `<div class="flex items-center gap-3 p-2 border border-slate-100 rounded-xl bg-slate-50 focus-within:bg-white focus-within:border-brand-200 transition"><i class="${p.icon} ${p.color} text-lg w-6 text-center"></i><input value="${currentBioData.socials[p.id]||''}" oninput="updateSocial('${p.id}',this.value)" class="text-sm w-full bg-transparent outline-none text-slate-700 placeholder-slate-400" placeholder="${p.label}..."></div>`;
+                l.innerHTML += `<div class="flex items-center gap-3 p-2 border border-slate-100 rounded-xl bg-slate-50 focus-within:bg-white focus-within:border-brand-200 transition"><i class="${p.icon} ${p.color} text-lg w-6 text-center"></i><input value="${currentBioData.socials[p.id]||''}" oninput="updateSocial('${p.id}',this.value)" class="text-sm w-full bg-transparent outline-none text-slate-700 placeholder-slate-400" placeholder="Dán link ${p.label}..."></div>`;
             });
         }
         function addLinkItem(){ currentBioData.links.push({title:"Mới",url:"#",type:'link'}); renderEditorLinks(); updatePreview(); }
