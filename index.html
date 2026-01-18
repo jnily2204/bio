@@ -24,7 +24,6 @@ import {
 // --- FIREBASE IMPORTS ---
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
-// import { getAnalytics } from 'firebase/analytics'; // Tạm ẩn Analytics để tránh lỗi môi trường demo
 
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
@@ -38,11 +37,12 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+// Kiểm tra xem app đã được init chưa để tránh lỗi duplicate khi hot-reload
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// --- 1. CÁC COMPONENT PHỤ TRỢ (UI ELEMENTS) ---
+// --- 1. CÁC COMPONENT PHỤ TRỢ (ĐỊNH NGHĨA TRƯỚC KHI DÙNG) ---
 
 // Nút chuyển đổi (Toggle Switch)
 const Toggle = ({ checked, onChange }) => (
@@ -53,6 +53,62 @@ const Toggle = ({ checked, onChange }) => (
     <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${checked ? 'translate-x-5' : ''}`} />
   </button>
 );
+
+// Component Menu Item trong Sidebar
+const NavItem = ({ icon, label, active, onClick }) => {
+  return (
+    <button 
+      onClick={onClick}
+      className={`
+        flex flex-col md:flex-row items-center md:space-x-3 p-3 rounded-xl transition-all w-full
+        ${active ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'}
+      `}
+    >
+      <div className={`${active ? 'text-orange-500' : ''}`}>{icon}</div>
+      <span className={`text-xs md:text-sm font-medium ${active ? 'font-bold' : ''}`}>{label}</span>
+    </button>
+  );
+};
+
+// Component lựa chọn Theme
+const ThemeOption = ({ label, bg, btn, textColor, active, onClick }) => {
+    return (
+        <button onClick={onClick} className="text-left group">
+            <div className={`
+               h-32 rounded-xl border-2 transition-all overflow-hidden relative shadow-sm
+               ${active ? 'border-orange-500 ring-2 ring-orange-200' : 'border-gray-200 group-hover:border-gray-300'}
+            `}>
+                <div className={`w-full h-full ${bg} flex flex-col items-center justify-center p-3 space-y-2`}>
+                    <div className="w-8 h-8 rounded-full bg-current opacity-20" />
+                    <div className={`w-full h-3 ${btn} rounded-md opacity-80`} />
+                    <div className={`w-full h-3 ${btn} rounded-md opacity-60`} />
+                </div>
+                {active && (
+                   <div className="absolute top-2 right-2 bg-orange-500 text-white p-1 rounded-full shadow-sm">
+                      <Check size={12} />
+                   </div>
+                )}
+            </div>
+            <p className="mt-2 text-sm font-medium text-gray-700 text-center">{label}</p>
+        </button>
+    )
+};
+
+// Component lựa chọn kiểu nút
+const ButtonStyleOption = ({ label, shape, active, onClick }) => {
+    return (
+        <button 
+          onClick={onClick}
+          className={`
+            flex-1 py-3 border-2 text-sm font-medium transition-all
+            ${shape}
+            ${active ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-gray-200 bg-white hover:border-gray-300'}
+          `}
+        >
+            {label}
+        </button>
+    )
+};
 
 // --- 2. TRANG ĐĂNG NHẬP / ĐĂNG KÝ (AUTH PAGE) ---
 
@@ -66,7 +122,7 @@ const AuthPage = () => {
     setErrorMsg("");
     try {
       await signInWithPopup(auth, provider);
-      // Không cần gọi hành động chuyển trang ở đây, onAuthStateChanged ở App sẽ tự bắt sự kiện
+      // Auth state change sẽ được bắt ở App component
     } catch (error) {
       console.error("Login Failed:", error);
       setErrorMsg(error.message);
@@ -177,9 +233,9 @@ const AuthPage = () => {
   );
 };
 
-// --- 3. ỨNG DỤNG CHÍNH (MAIN APP) ---
+// --- 3. ỨNG DỤNG CHÍNH (MAIN APP) - ĐƯỢC ĐỊNH NGHĨA CUỐI CÙNG ---
 
-export default function App() {
+const App = () => {
   // --- STATE (DỮ LIỆU) ---
   const [currentUser, setCurrentUser] = useState(null); // Trạng thái đăng nhập
   const [authLoading, setAuthLoading] = useState(true); // Trạng thái tải auth ban đầu
@@ -626,59 +682,6 @@ export default function App() {
 
     </div>
   );
-}
+};
 
-// --- SUB-COMPONENTS ---
-
-function NavItem({ icon, label, active, onClick }) {
-  return (
-    <button 
-      onClick={onClick}
-      className={`
-        flex flex-col md:flex-row items-center md:space-x-3 p-3 rounded-xl transition-all w-full
-        ${active ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'}
-      `}
-    >
-      <div className={`${active ? 'text-orange-500' : ''}`}>{icon}</div>
-      <span className={`text-xs md:text-sm font-medium ${active ? 'font-bold' : ''}`}>{label}</span>
-    </button>
-  );
-}
-
-function ThemeOption({ label, bg, btn, textColor, active, onClick }) {
-    return (
-        <button onClick={onClick} className="text-left group">
-            <div className={`
-               h-32 rounded-xl border-2 transition-all overflow-hidden relative shadow-sm
-               ${active ? 'border-orange-500 ring-2 ring-orange-200' : 'border-gray-200 group-hover:border-gray-300'}
-            `}>
-                <div className={`w-full h-full ${bg} flex flex-col items-center justify-center p-3 space-y-2`}>
-                    <div className="w-8 h-8 rounded-full bg-current opacity-20" />
-                    <div className={`w-full h-3 ${btn} rounded-md opacity-80`} />
-                    <div className={`w-full h-3 ${btn} rounded-md opacity-60`} />
-                </div>
-                {active && (
-                   <div className="absolute top-2 right-2 bg-orange-500 text-white p-1 rounded-full shadow-sm">
-                      <Check size={12} />
-                   </div>
-                )}
-            </div>
-            <p className="mt-2 text-sm font-medium text-gray-700 text-center">{label}</p>
-        </button>
-    )
-}
-
-function ButtonStyleOption({ label, shape, active, onClick }) {
-    return (
-        <button 
-          onClick={onClick}
-          className={`
-            flex-1 py-3 border-2 text-sm font-medium transition-all
-            ${shape}
-            ${active ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-gray-200 bg-white hover:border-gray-300'}
-          `}
-        >
-            {label}
-        </button>
-    )
-}
+export default App;
